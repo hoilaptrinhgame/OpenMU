@@ -27,6 +27,7 @@
     </mah:MetroWindow.RightWindowCommands>
     <Grid>
         <TextBlock Text="{Binding TestModel.Message}"></TextBlock>
-        <Button Content="{Binding TestModel.Message}" Width="160" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"></Button>
+        <Button Content="{Binding TestModel.Message}" Width="160" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" Command="{Binding CheckForUpdatesCommand}"></Button>
+        <ProgressBar Width="400" Height="10" Value="{Binding Progress}"></ProgressBar>
     </Grid>
 </mah:MetroWindow>
