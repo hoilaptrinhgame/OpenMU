@@ -47,6 +47,10 @@
       <HintPath>..\packages\ControlzEx.3.0.2.4\lib\net462\ControlzEx.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DefensiveProgrammingFramework, Version=1.0.5.0, Culture=neutral, PublicKeyToken=ad755474965819fa">
+      <HintPath>..\packages\DefensiveProgrammingFramework.1.0.6\lib\netstandard2.0\DefensiveProgrammingFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.6.5.1, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\MahApps.Metro.1.6.5\lib\net47\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
@@ -82,6 +86,10 @@
     </Reference>
     <Reference Include="Prism.Wpf, Version=7.1.0.431, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59">
       <HintPath>..\packages\Prism.Wpf.7.1.0.431\lib\net45\Prism.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Renci.SshNet, Version=2016.1.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106">
+      <HintPath>..\packages\SSH.NET.2016.1.0\lib\net40\Renci.SshNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RestSharp, Version=106.6.9.0, Culture=neutral, PublicKeyToken=598062e77f915f75">
@@ -126,6 +134,90 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\Torrent\BEncoding\BEncodedDictionary.cs" />
+    <Compile Include="Helpers\Torrent\BEncoding\BEncodedList.cs" />
+    <Compile Include="Helpers\Torrent\BEncoding\BEncodedNumber.cs" />
+    <Compile Include="Helpers\Torrent\BEncoding\BEncodedString.cs" />
+    <Compile Include="Helpers\Torrent\BEncoding\BEncodedValue.cs" />
+    <Compile Include="Helpers\Torrent\BEncoding\RawReader.cs" />
+    <Compile Include="Helpers\Torrent\EventArgs\TorrentHashingEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\EventArgs\TorrentLeechingEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\EventArgs\TorrentSeedingEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\EventArgs\TorrentStartedEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\EventArgs\TorrentStoppedEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\Exceptions\BEncodingException.cs" />
+    <Compile Include="Helpers\Torrent\Exceptions\MessageException.cs" />
+    <Compile Include="Helpers\Torrent\Exceptions\PeerWireProtocolException.cs" />
+    <Compile Include="Helpers\Torrent\Exceptions\TorrentClientException.cs" />
+    <Compile Include="Helpers\Torrent\Exceptions\TorrentInfoException.cs" />
+    <Compile Include="Helpers\Torrent\Exceptions\TorrentPersistanceException.cs" />
+    <Compile Include="Helpers\Torrent\Exceptions\TrackerProtocolException.cs" />
+    <Compile Include="Helpers\Torrent\Extensions\CryptoExtensions.cs" />
+    <Compile Include="Helpers\Torrent\Extensions\ExceptionExtensions.cs" />
+    <Compile Include="Helpers\Torrent\Extensions\IoExtensions.cs" />
+    <Compile Include="Helpers\Torrent\Extensions\ObjectExtensions.cs" />
+    <Compile Include="Helpers\Torrent\Extensions\RandomHelper.cs" />
+    <Compile Include="Helpers\Torrent\Extensions\StringCasing.cs" />
+    <Compile Include="Helpers\Torrent\Extensions\StringExtensions.cs" />
+    <Compile Include="Helpers\Torrent\Extensions\WebExtensions.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\AsyncConnectData.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\AsyncReadData.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\EventArgs\CommunicationErrorEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\EventArgs\PeerCommunicationErrorEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\EventArgs\PeerMessgeReceivedEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\EventArgs\PieceCompletedEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\EventArgs\PieceCorruptedEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\EventArgs\PieceRequestedEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\HandshakeState.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\LeechingState.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\BitfieldMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\CancelMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\ChokeMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\HandshakeMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\HaveMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\InterestedMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\KeepAliveMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\Message.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\PeerMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\PieceMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\PortMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\RequestMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\UnchokeMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Messages\UninterestedMessage.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Peer.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\PeerCommunicator.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\Piece.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\PieceManager.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\PieceStatus.cs" />
+    <Compile Include="Helpers\Torrent\PeerWireProtocol\SeedingState.cs" />
+    <Compile Include="Helpers\Torrent\PersistenceManager.cs" />
+    <Compile Include="Helpers\Torrent\ThrottlingManager.cs" />
+    <Compile Include="Helpers\Torrent\TorrentClient.cs" />
+    <Compile Include="Helpers\Torrent\TorrentFileInfo.cs" />
+    <Compile Include="Helpers\Torrent\TorrentInfo.cs" />
+    <Compile Include="Helpers\Torrent\TorrentPeerInfo.cs" />
+    <Compile Include="Helpers\Torrent\TorrentProgressInfo.cs" />
+    <Compile Include="Helpers\Torrent\TorrentTrackerInfo.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\EventArgs\AnnouncedEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\EventArgs\TrackingFailedEventArgs.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Http\HttpTracker.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Http\Messages\AnnounceMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Http\Messages\AnnounceResponseMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Tracker.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\AnnounceMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\AnnounceResponseMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\ConnectMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\ConnectResponseMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\ErrorMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\MessageType.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\ScrapeDetails.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\ScrapeMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\ScrapeResponseMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\TrackerMessage.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\TrackingAction.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\Messages\TrackingEvent.cs" />
+    <Compile Include="Helpers\Torrent\TrackerProtocol\Udp\UdpTracker.cs" />
+    <Compile Include="Helpers\Torrent\TransferManager.cs" />
     <Compile Include="Interfaces\IUpdater.cs" />
     <Compile Include="Managers\ArgumentsManager.cs" />
     <Compile Include="Managers\LauncherSettingsManager.cs" />
@@ -136,6 +228,8 @@
     <Compile Include="Models\LauncherSettings.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\Updaters\HTTPSUpdater.cs" />
+    <Compile Include="Models\Updaters\SFTPUpdater.cs" />
+    <Compile Include="Models\Updaters\TorrentUpdater.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Views\MainView.xaml.cs">
@@ -175,7 +269,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Helpers" />
+    <Content Include="Helpers\Torrent\Credits.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
