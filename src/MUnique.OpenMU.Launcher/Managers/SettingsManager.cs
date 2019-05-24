@@ -32,8 +32,9 @@ namespace MUnique.OpenMU.Launcher.Managers
             }
             catch (Exception e)
             {
-                logger.Log(LogLevel.Error, e);
+                //Create/Reset the launcher setting if it got broken
                 Settings = new Settings();
+                SaveSettings();
             }
             
             //Save the settings after any changes made to the object's properties

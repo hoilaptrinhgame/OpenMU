@@ -30,10 +30,11 @@ namespace MUnique.OpenMU.Launcher.Managers
             {
                 Settings = JsonConvert.DeserializeObject<LauncherSettings>(File.ReadAllText("launcher.json"));
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                logger.Log(LogLevel.Error, e);
+                //Create/Reset the launcher setting if it got broken
                 Settings = new LauncherSettings();
+                SaveSettings();
             }
             
             //Save the settings after any changes made to the object's properties

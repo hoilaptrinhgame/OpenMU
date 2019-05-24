@@ -1,10 +1,11 @@
+using MUnique.OpenMU.Launcher.Enumerations;
 using Prism.Mvvm;
 
 namespace MUnique.OpenMU.Launcher.Models
 {
     public class LauncherSettings : BindableBase
     {
-        private string iconPath;
+        private string iconPath = "icon.ico";
 
         public string IconPath
         {
@@ -12,7 +13,7 @@ namespace MUnique.OpenMU.Launcher.Models
             set => SetProperty(ref iconPath, value);
         }
 
-        private string name;
+        private string name = "TestName";
 
         public string Name
         {
@@ -20,12 +21,20 @@ namespace MUnique.OpenMU.Launcher.Models
             set => SetProperty(ref name, value);
         }
 
-        private string defaultAccentColor;
+        private string defaultAccentColor = "blue";
 
         public string DefaultAccentColor
         {
             get => defaultAccentColor;
             set => SetProperty(ref defaultAccentColor, value);
+        }
+
+        private UpdaterTypes updaterType = UpdaterTypes.HTTP;
+
+        public UpdaterTypes UpdaterType
+        {
+            get => updaterType;
+            set => SetProperty(ref updaterType, value);
         }
         
     }

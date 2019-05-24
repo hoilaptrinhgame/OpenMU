@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using MUnique.OpenMU.Launcher.Enumerations;
 using MUnique.OpenMU.Launcher.Interfaces;
 using MUnique.OpenMU.Launcher.Models;
 using MUnique.OpenMU.Launcher.Models.Updaters;
@@ -9,9 +10,27 @@ namespace MUnique.OpenMU.Launcher.Managers
 {
     public static class UpdateManager
     {
+        static UpdateManager()
+        {
+            switch (LauncherSettingsManager.Settings.UpdaterType)
+            {
+                case UpdaterTypes.HTTP:
+                    updater = new HTTPSUpdater();
+                    break;
+                case UpdaterTypes.Torrent:
+                    updater = new HTTPSUpdater();
+                    break;
+                case UpdaterTypes.SFTP:
+                    updater = new SFTPUpdater();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         
-        private static IUpdater updater = new HTTPSUpdater();
+        private static IUpdater updater;
 
         public static int TotalProgress => updater.TotalProgress;
 

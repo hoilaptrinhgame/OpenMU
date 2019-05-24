@@ -2,11 +2,15 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using MUnique.OpenMU.Launcher.Enumerations;
+using NLog;
 
 namespace MUnique.OpenMU.Launcher.Models
 {
-public class DownloadTask : IDisposable
+    public class DownloadTask : IDisposable
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        
         #region Fields
 
         private readonly WebClient WClient = new WebClient
@@ -17,7 +21,7 @@ public class DownloadTask : IDisposable
 
         #endregion
 
-        public bool StartedDownload { get; private set; }
+        internal bool StartedDownload { get; private set; }
 
         public void Dispose()
         {
@@ -25,7 +29,7 @@ public class DownloadTask : IDisposable
             URI = null;
         }
 
-        public void StartDownload()
+        internal void StartDownload()
         {
             if (StartedDownload)
             {
@@ -45,20 +49,45 @@ public class DownloadTask : IDisposable
                 Finished = true;
                 return;
             }
-            else
-            {
-                File.Delete(SavePath);
-            }
+
+            File.Delete(SavePath);
 
             //Console.WriteLine(URI.ToString());
+            switch (UpdaterType)
+            {
+                case UpdaterTypes.HTTP:
+                    DownloadHTTP();
+                    break;
+                case UpdaterTypes.Torrent:
+                    
+                    break;
+                case UpdaterTypes.SFTP:
+                    DownloadFTP();
+                    break;
+                default:
+                    logger.Warn($"Updater of type ({UpdaterType}) is not supported.");
+                    break;
+            }
+        }
+
+        private void DownloadHTTP()
+        {
+            WClient.DownloadFileAsync(URI, SavePath);
+        }
+
+        private void DownloadFTP()
+        {
+            WClient.Credentials = new NetworkCredential("username", "password");
             WClient.DownloadFileAsync(URI, SavePath);
         }
 
         #region Constructors and Destructors
 
-        public bool OnlyIfDoesntExists { get; set; }
+        public bool OnlyIfDoesntExists { get; set; } = false;
 
-        public DownloadTask(Uri uri, string savePath)
+        public UpdaterTypes UpdaterType { get; set; }
+
+        public DownloadTask(Uri uri, string savePath, UpdaterTypes type)
         {
             URI      = uri;
             SavePath = savePath;
