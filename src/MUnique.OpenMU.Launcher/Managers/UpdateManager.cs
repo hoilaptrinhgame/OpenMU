@@ -1,43 +1,40 @@
 using System.Threading.Tasks;
+using MUnique.OpenMU.Launcher.Interfaces;
 using MUnique.OpenMU.Launcher.Models;
+using MUnique.OpenMU.Launcher.Models.Updaters;
 
 namespace MUnique.OpenMU.Launcher.Managers
 {
     public static class UpdateManager
     {
-        public static int TotalProgress { get; private set; }
-        
+        private static IUpdater updater = new HTTPSUpdater();
+
+        public static int TotalProgress => updater.TotalProgress;
+
+        public static void CheckForUpdates()
+        {
+            updater.CheckForUpdates();
+        }
+
+        public static async void CheckForUpdatesAsync()
+        {
+            await updater.CheckForUpdatesAsync();
+        }
+
         public delegate void OnDownloadCompleteDelegate(DownloadTask task);
         public delegate void OnProgressChangedDelegate(int progress);
 
         public static event OnDownloadCompleteDelegate OnDownloadComplete;
         public static event OnProgressChangedDelegate OnProgressChanged;
-        
-        public static void CheckForUpdates()
+
+        public static void NotifyDownloadComplete(DownloadTask task)
         {
-            Task.Run(CheckForUpdatesAsync);
+            OnDownloadComplete?.Invoke(task);
         }
 
-        private static bool checkingForUpdates;
-        
-        public static async void CheckForUpdatesAsync()
+        public static void NotifyProgressChanged(int progress)
         {
-            if (checkingForUpdates)
-            {
-                return;
-            }
-
-            checkingForUpdates = true;
-            TotalProgress = 0;
-            //Simulating the update process
-            for (var i = 0; i < 100; i++)
-            {
-                await Task.Delay(50);
-                TotalProgress++;
-                OnProgressChanged?.Invoke(TotalProgress);
-            }
-            
-            checkingForUpdates = false;
+            OnProgressChanged?.Invoke(progress);
         }
     }
 }
