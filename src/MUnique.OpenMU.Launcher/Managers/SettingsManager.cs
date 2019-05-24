@@ -1,20 +1,20 @@
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using MUnique.OpenMU.Launcher.Models;
 using Newtonsoft.Json;
 
 namespace MUnique.OpenMU.Launcher.Managers
 {
-    public static class LauncherSettingsManager
+    public class SettingsManager
     {
-        static LauncherSettingsManager()
+        static SettingsManager()
         {
             LoadSettings();
         }
-        public static LauncherSettings Settings;
+        
+        public static Settings Settings;
         
         private static void LoadSettings()
         {
@@ -25,18 +25,18 @@ namespace MUnique.OpenMU.Launcher.Managers
 
             try
             {
-                Settings = JsonConvert.DeserializeObject<LauncherSettings>(File.ReadAllText("launcher.json"));
+                Settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("config.json"));
             }
             catch (Exception e)
             {
                 //TODO proper logging
-                Settings = new LauncherSettings();
+                Settings = new Settings();
             }
             
             //Save the settings after any changes made to the object's properties
             Settings.PropertyChanged += SettingsOnPropertyChanged;
         }
-        
+
         private static void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             SaveSettings();

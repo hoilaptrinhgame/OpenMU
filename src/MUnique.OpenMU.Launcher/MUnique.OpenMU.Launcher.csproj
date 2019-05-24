@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=2.5.0.0, Culture=neutral, PublicKeyToken=5a870481e358d379">
+      <HintPath>..\packages\CommandLineParser.2.5.0\lib\net461\CommandLine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="CommonServiceLocator, Version=2.0.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0">
       <HintPath>..\packages\CommonServiceLocator.2.0.4\lib\net47\CommonServiceLocator.dll</HintPath>
       <Private>True</Private>
@@ -109,10 +113,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Interfaces\IUpdater.cs" />
+    <Compile Include="Managers\ArgumentsManager.cs" />
     <Compile Include="Managers\LauncherSettingsManager.cs" />
+    <Compile Include="Managers\SettingsManager.cs" />
     <Compile Include="Managers\UpdateManager.cs" />
+    <Compile Include="Models\ArgumentOptions.cs" />
     <Compile Include="Models\DownloadTask.cs" />
     <Compile Include="Models\LauncherSettings.cs" />
+    <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\Updaters\HTTPSUpdater.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
