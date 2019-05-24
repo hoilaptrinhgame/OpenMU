@@ -3,13 +3,19 @@ using System.Threading.Tasks;
 using System.Windows;
 using MUnique.OpenMU.Launcher.Managers;
 using MUnique.OpenMU.Launcher.ViewModels;
+using NLog;
 
 namespace MUnique.OpenMU.Launcher.Views
 {
     public partial class MainView
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        
         public MainView()
         {
+            //TODO Remove
+            logger.Log(LogLevel.Info, "Test");
+            
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             InitializeComponent();
             
@@ -21,6 +27,7 @@ namespace MUnique.OpenMU.Launcher.Views
         {
             var exp = (Exception) e.ExceptionObject;
 
+            logger.Log(LogLevel.Error, exp, "Unhandled error.");
             MessageBox.Show(exp.ToString(), "Unexpected error.", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
     }

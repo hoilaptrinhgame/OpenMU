@@ -4,11 +4,14 @@ using System.IO;
 using System.Threading.Tasks;
 using MUnique.OpenMU.Launcher.Models;
 using Newtonsoft.Json;
+using NLog;
 
 namespace MUnique.OpenMU.Launcher.Managers
 {
-    public class SettingsManager
+    public static class SettingsManager
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        
         static SettingsManager()
         {
             LoadSettings();
@@ -29,7 +32,7 @@ namespace MUnique.OpenMU.Launcher.Managers
             }
             catch (Exception e)
             {
-                //TODO proper logging
+                logger.Log(LogLevel.Error, e);
                 Settings = new Settings();
             }
             
@@ -50,10 +53,11 @@ namespace MUnique.OpenMU.Launcher.Managers
             }
             catch (Exception e)
             {
+                logger.Log(LogLevel.Warn, "Failed to save Settings, retrying to save it again in 5 seconds ...");
                 //If the settings failed to save try again until it succeeds
                 Task.Run(() =>
                 {
-                    Task.Delay(1000);
+                    Task.Delay(5000);
                     SaveSettings();
                 });
             }
