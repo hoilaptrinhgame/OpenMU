@@ -6,14 +6,14 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 {
     /// <summary>
-    /// The torrent progress info.
+    ///     The torrent progress info.
     /// </summary>
     public class TorrentProgressInfo
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TorrentProgressInfo" /> class.
+        ///     Initializes a new instance of the <see cref="TorrentProgressInfo" /> class.
         /// </summary>
         /// <param name="torrentInfoHash">The torrent information hash.</param>
         /// <param name="duration">The duration.</param>
@@ -24,7 +24,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         /// <param name="uploadSpeed">The upload speed.</param>
         /// <param name="leecherCount">The leecher count.</param>
         /// <param name="seederCount">The seeder count.</param>
-        public TorrentProgressInfo(string torrentInfoHash, TimeSpan duration, decimal completedPercentage, long downloaded, decimal downloadSpeed, long uploaded, decimal uploadSpeed, int leecherCount, int seederCount)
+        public TorrentProgressInfo(string torrentInfoHash, TimeSpan duration, decimal completedPercentage, long downloaded, decimal downloadSpeed, long uploaded,
+            decimal uploadSpeed, int leecherCount, int seederCount)
         {
             torrentInfoHash.CannotBeNullOrEmpty();
             duration.MustBeGreaterThanOrEqualTo(TimeSpan.Zero);
@@ -36,20 +37,20 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             leecherCount.MustBeGreaterThanOrEqualTo(0);
             seederCount.MustBeGreaterThanOrEqualTo(0);
 
-            this.TorrentInfoHash = torrentInfoHash;
-            this.Duration = duration;
-            this.CompletedPercentage = completedPercentage;
-            this.Downloaded = downloaded;
-            this.DownloadSpeed = downloadSpeed;
-            this.Uploaded = uploaded;
-            this.UploadSpeed = uploadSpeed;
-            this.LeecherCount = leecherCount;
-            this.SeederCount = seederCount;
+            TorrentInfoHash = torrentInfoHash;
+            Duration = duration;
+            CompletedPercentage = completedPercentage;
+            Downloaded = downloaded;
+            DownloadSpeed = downloadSpeed;
+            Uploaded = uploaded;
+            UploadSpeed = uploadSpeed;
+            LeecherCount = leecherCount;
+            SeederCount = seederCount;
 
-            this.Trackers = new List<TorrentTrackerInfo>();
-            this.Peers = new List<TorrentPeerInfo>();
-            this.Pieces = new List<PieceStatus>();
-            this.Files = new List<TorrentFileInfo>();
+            Trackers = new List<TorrentTrackerInfo>();
+            Peers = new List<TorrentPeerInfo>();
+            Pieces = new List<PieceStatus>();
+            Files = new List<TorrentFileInfo>();
         }
 
         #endregion Public Constructors
@@ -57,7 +58,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="TorrentProgressInfo"/> class from being created.
+        ///     Prevents a default instance of the <see cref="TorrentProgressInfo" /> class from being created.
         /// </summary>
         private TorrentProgressInfo()
         {
@@ -68,160 +69,108 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Public Properties
 
         /// <summary>
-        /// Gets the completed percentage.
+        ///     Gets the completed percentage.
         /// </summary>
         /// <value>
-        /// The completed percentage.
+        ///     The completed percentage.
         /// </value>
-        public decimal CompletedPercentage
-        {
-            get;
-            private set;
-        }
+        public decimal CompletedPercentage { get; }
 
         /// <summary>
-        /// Gets the downloaded byte count.
+        ///     Gets the downloaded byte count.
         /// </summary>
         /// <value>
-        /// The downloaded byte count.
+        ///     The downloaded byte count.
         /// </value>
-        public long Downloaded
-        {
-            get;
-            private set;
-        }
+        public long Downloaded { get; }
 
         /// <summary>
-        /// Gets the download speed in bytes per second.
+        ///     Gets the download speed in bytes per second.
         /// </summary>
         /// <value>
-        /// The download speed in bytes per second.
+        ///     The download speed in bytes per second.
         /// </value>
-        public decimal DownloadSpeed
-        {
-            get;
-            private set;
-        }
+        public decimal DownloadSpeed { get; }
 
         /// <summary>
-        /// Gets the duration.
+        ///     Gets the duration.
         /// </summary>
         /// <value>
-        /// The duration.
+        ///     The duration.
         /// </value>
-        public TimeSpan Duration
-        {
-            get;
-            private set;
-        }
+        public TimeSpan Duration { get; }
 
         /// <summary>
-        /// Gets the files.
+        ///     Gets the files.
         /// </summary>
         /// <value>
-        /// The files.
+        ///     The files.
         /// </value>
-        public IEnumerable<TorrentFileInfo> Files
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<TorrentFileInfo> Files { get; }
 
         /// <summary>
-        /// Gets the leecher count.
+        ///     Gets the leecher count.
         /// </summary>
         /// <value>
-        /// The leecher count.
+        ///     The leecher count.
         /// </value>
-        public int LeecherCount
-        {
-            get;
-            private set;
-        }
+        public int LeecherCount { get; }
 
         /// <summary>
-        /// Gets the peers.
+        ///     Gets the peers.
         /// </summary>
         /// <value>
-        /// The peers.
+        ///     The peers.
         /// </value>
-        public IEnumerable<TorrentPeerInfo> Peers
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<TorrentPeerInfo> Peers { get; }
 
         /// <summary>
-        /// Gets the pieces.
+        ///     Gets the pieces.
         /// </summary>
         /// <value>
-        /// The pieces.
+        ///     The pieces.
         /// </value>
-        public List<PieceStatus> Pieces
-        {
-            get;
-            private set;
-        }
+        public List<PieceStatus> Pieces { get; }
 
         /// <summary>
-        /// Gets the seeder count.
+        ///     Gets the seeder count.
         /// </summary>
         /// <value>
-        /// The seeder count.
+        ///     The seeder count.
         /// </value>
-        public int SeederCount
-        {
-            get;
-            private set;
-        }
+        public int SeederCount { get; }
 
         /// <summary>
-        /// Gets the torrent information hash.
+        ///     Gets the torrent information hash.
         /// </summary>
         /// <value>
-        /// The torrent information hash.
+        ///     The torrent information hash.
         /// </value>
-        public string TorrentInfoHash
-        {
-            get;
-            private set;
-        }
+        public string TorrentInfoHash { get; }
 
         /// <summary>
-        /// Gets the trackers.
+        ///     Gets the trackers.
         /// </summary>
         /// <value>
-        /// The trackers.
+        ///     The trackers.
         /// </value>
-        public IEnumerable<TorrentTrackerInfo> Trackers
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<TorrentTrackerInfo> Trackers { get; }
 
         /// <summary>
-        /// Gets the uploaded byte count.
+        ///     Gets the uploaded byte count.
         /// </summary>
         /// <value>
-        /// The uploaded byte count.
+        ///     The uploaded byte count.
         /// </value>
-        public long Uploaded
-        {
-            get;
-            private set;
-        }
+        public long Uploaded { get; }
 
         /// <summary>
-        /// Gets the upload speed in bytes per second.
+        ///     Gets the upload speed in bytes per second.
         /// </summary>
         /// <value>
-        /// The upload speed in bytes per second.
+        ///     The upload speed in bytes per second.
         /// </value>
-        public decimal UploadSpeed
-        {
-            get;
-            private set;
-        }
+        public decimal UploadSpeed { get; }
 
         #endregion Public Properties
     }

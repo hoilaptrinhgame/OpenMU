@@ -2,43 +2,18 @@
 using System.Linq;
 using DefensiveProgrammingFramework;
 using MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions;
-using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
     /// <summary>
-    /// The scrape message.
+    ///     The scrape message.
     /// </summary>
     public class ScrapeMessage : TrackerMessage
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The action length in bytes.
-        /// </summary>
-        private const int ActionLength = 4;
-
-        /// <summary>
-        /// The connection identifier length in bytes.
-        /// </summary>
-        private const int ConnectionIdLength = 8;
-
-        /// <summary>
-        /// The information hash length in bytes.
-        /// </summary>
-        private const int InfoHashLength = 20;
-
-        /// <summary>
-        /// The transaction identifier length in bytes.
-        /// </summary>
-        private const int TransactionIdLength = 4;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScrapeMessage" /> class.
+        ///     Initializes a new instance of the <see cref="ScrapeMessage" /> class.
         /// </summary>
         /// <param name="connectionId">The connection identifier.</param>
         /// <param name="transactionId">The transaction unique identifier.</param>
@@ -49,71 +24,81 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             connectionId.MustBeGreaterThanOrEqualTo(0);
             infoHashes.CannotBeNull();
 
-            this.ConnectionId = connectionId;
-            this.InfoHashes = infoHashes;
+            ConnectionId = connectionId;
+            InfoHashes = infoHashes;
         }
 
         #endregion Public Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The action length in bytes.
+        /// </summary>
+        private const int ActionLength = 4;
+
+        /// <summary>
+        ///     The connection identifier length in bytes.
+        /// </summary>
+        private const int ConnectionIdLength = 8;
+
+        /// <summary>
+        ///     The information hash length in bytes.
+        /// </summary>
+        private const int InfoHashLength = 20;
+
+        /// <summary>
+        ///     The transaction identifier length in bytes.
+        /// </summary>
+        private const int TransactionIdLength = 4;
+
+        #endregion Private Fields
+
         #region Public Properties
 
         /// <summary>
-        /// Gets the connection identifier.
+        ///     Gets the connection identifier.
         /// </summary>
         /// <value>
-        /// The connection identifier.
+        ///     The connection identifier.
         /// </value>
-        public long ConnectionId
-        {
-            get;
-            private set;
-        }
+        public long ConnectionId { get; }
 
         /// <summary>
-        /// Gets the information hashes.
+        ///     Gets the information hashes.
         /// </summary>
         /// <value>
-        /// The information hashes.
+        ///     The information hashes.
         /// </value>
-        public IEnumerable<string> InfoHashes
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<string> InfoHashes { get; }
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return ConnectionIdLength + ActionLength + TransactionIdLength + (this.InfoHashes.Count() * 20);
-            }
-        }
+        public override int Length => ConnectionIdLength + ActionLength + TransactionIdLength + InfoHashes.Count() * 20;
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="message">The message.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, int offset, out ScrapeMessage message)
         {
             long connectionId;
             int action;
             int transactionId;
-            List<string> infoHashes = new List<string>();
+            var infoHashes = new List<string>();
 
             message = null;
 
@@ -121,18 +106,15 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                 buffer.Length >= offset + ConnectionIdLength + ActionLength + TransactionIdLength &&
                 offset >= 0)
             {
-                connectionId = Message.ReadLong(buffer, ref offset);
-                action = Message.ReadInt(buffer, ref offset);
-                transactionId = Message.ReadInt(buffer, ref offset);
+                connectionId = ReadLong(buffer, ref offset);
+                action = ReadInt(buffer, ref offset);
+                transactionId = ReadInt(buffer, ref offset);
 
                 if (connectionId >= 0 &&
-                    action == (int)TrackingAction.Scrape &&
+                    action == (int) TrackingAction.Scrape &&
                     transactionId >= 0)
                 {
-                    while (offset <= buffer.Length - InfoHashLength)
-                    {
-                        infoHashes.Add(Message.ReadBytes(buffer, ref offset, InfoHashLength).ToHexaDecimalString());
-                    }
+                    while (offset <= buffer.Length - InfoHashLength) infoHashes.Add(ReadBytes(buffer, ref offset, InfoHashLength).ToHexaDecimalString());
 
                     message = new ScrapeMessage(connectionId, transactionId, infoHashes);
                 }
@@ -142,7 +124,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -153,16 +135,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, this.ConnectionId);
-            Message.Write(buffer, ref written, (int)this.Action);
-            Message.Write(buffer, ref written, this.TransactionId);
+            Write(buffer, ref written, ConnectionId);
+            Write(buffer, ref written, (int) Action);
+            Write(buffer, ref written, TransactionId);
 
-            foreach (string infoHash in this.InfoHashes)
-            {
-                Message.Write(buffer, ref written, infoHash.ToByteArray());
-            }
+            foreach (var infoHash in InfoHashes) Write(buffer, ref written, infoHash.ToByteArray());
 
             return written - offset;
         }

@@ -13,38 +13,14 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 {
     /// <summary>
-    /// The peer communicator.
+    ///     The peer communicator.
     /// </summary>
     public sealed class PeerCommunicator : IDisposable
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The locker.
-        /// </summary>
-        private readonly object locker = new object();
-
-        /// <summary>
-        /// The network stream.
-        /// </summary>
-        private NetworkStream stream;
-
-        /// <summary>
-        /// The TCP client.
-        /// </summary>
-        private TcpClient tcp;
-
-        /// <summary>
-        /// The throttling manager.
-        /// </summary>
-        private ThrottlingManager tm;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PeerCommunicator" /> class.
+        ///     Initializes a new instance of the <see cref="PeerCommunicator" /> class.
         /// </summary>
         /// <param name="throttlingManager">The throttling manager.</param>
         /// <param name="tcp">The TCP.</param>
@@ -53,17 +29,17 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             throttlingManager.CannotBeNull();
             tcp.CannotBeNull();
 
-            this.PieceData = null;
+            PieceData = null;
 
-            this.tm = throttlingManager;
+            tm = throttlingManager;
             this.tcp = tcp;
 
             var data = new AsyncReadData(this.tcp.ReceiveBufferSize);
 
-            this.stream = this.tcp.GetStream();
-            this.stream.BeginRead(data.Buffer, data.OffsetStart, data.Buffer.Length, this.Receive, data);
+            stream = this.tcp.GetStream();
+            stream.BeginRead(data.Buffer, data.OffsetStart, data.Buffer.Length, Receive, data);
 
-            this.Endpoint = this.tcp.Client.RemoteEndPoint as IPEndPoint;
+            Endpoint = this.tcp.Client.RemoteEndPoint as IPEndPoint;
         }
 
         #endregion Public Constructors
@@ -71,7 +47,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="PeerCommunicator"/> class from being created.
+        ///     Prevents a default instance of the <see cref="PeerCommunicator" /> class from being created.
         /// </summary>
         private PeerCommunicator()
         {
@@ -79,15 +55,39 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 
         #endregion Private Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The locker.
+        /// </summary>
+        private readonly object locker = new object();
+
+        /// <summary>
+        ///     The network stream.
+        /// </summary>
+        private NetworkStream stream;
+
+        /// <summary>
+        ///     The TCP client.
+        /// </summary>
+        private TcpClient tcp;
+
+        /// <summary>
+        ///     The throttling manager.
+        /// </summary>
+        private readonly ThrottlingManager tm;
+
+        #endregion Private Fields
+
         #region Public Events
 
         /// <summary>
-        /// Occurs when communication error occurred.
+        ///     Occurs when communication error occurred.
         /// </summary>
         public event EventHandler<CommunicationErrorEventArgs> CommunicationError;
 
         /// <summary>
-        /// Occurs when a peer message has been received.
+        ///     Occurs when a peer message has been received.
         /// </summary>
         public event EventHandler<PeerMessgeReceivedEventArgs> MessageReceived;
 
@@ -96,78 +96,66 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Public Properties
 
         /// <summary>
-        /// Gets the endpoint.
+        ///     Gets the endpoint.
         /// </summary>
         /// <value>
-        /// The endpoint.
+        ///     The endpoint.
         /// </value>
-        public IPEndPoint Endpoint
-        {
-            get;
-            private set;
-        }
+        public IPEndPoint Endpoint { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the object is disposed.
+        ///     Gets a value indicating whether the object is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if object is disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if object is disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool IsDisposed
-        {
-            get;
-            private set;
-        }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets or sets the piece data.
+        ///     Gets or sets the piece data.
         /// </summary>
         /// <value>
-        /// The piece data.
+        ///     The piece data.
         /// </value>
-        public byte[] PieceData
-        {
-            get;
-            set;
-        }
+        public byte[] PieceData { get; set; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            lock (this.locker)
+            lock (locker)
             {
-                if (!this.IsDisposed)
+                if (!IsDisposed)
                 {
-                    Debug.WriteLine($"disposing peer communicator for {this.tcp.Client.RemoteEndPoint}");
+                    Debug.WriteLine($"disposing peer communicator for {tcp.Client.RemoteEndPoint}");
 
-                    this.IsDisposed = true;
+                    IsDisposed = true;
 
-                    if (this.stream != null)
+                    if (stream != null)
                     {
-                        this.stream.Flush();
-                        this.stream.Close();
-                        this.stream.Dispose();
-                        this.stream = null;
+                        stream.Flush();
+                        stream.Close();
+                        stream.Dispose();
+                        stream = null;
                     }
 
-                    if (this.tcp != null)
+                    if (tcp != null)
                     {
-                        this.tcp.Close();
-                        this.tcp.Dispose();
-                        this.tcp = null;
+                        tcp.Close();
+                        tcp.Dispose();
+                        tcp = null;
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Sends the specified message.
+        ///     Sends the specified message.
         /// </summary>
         /// <param name="messages">The messages.</param>
         public void Send(IEnumerable<PeerMessage> messages)
@@ -175,13 +163,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             messages.CannotBeNullOrEmpty();
 
             byte[] data = null;
-            int offset = 0;
+            var offset = 0;
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            lock (this.locker)
+            lock (locker)
             {
-                if (!this.IsDisposed)
+                if (!IsDisposed)
                 {
                     if (messages.Count() == 1)
                     {
@@ -201,13 +189,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 
                     try
                     {
-                        this.stream.BeginWrite(data, 0, data.Length, this.Send, null);
+                        stream.BeginWrite(data, 0, data.Length, Send, null);
 
-                        this.tm.Write(data.Length);
+                        tm.Write(data.Length);
                     }
                     catch (IOException ex)
                     {
-                        this.OnCommunicationError(this, new CommunicationErrorEventArgs(ex.Message));
+                        OnCommunicationError(this, new CommunicationErrorEventArgs(ex.Message));
                     }
                 }
             }
@@ -218,18 +206,18 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Private Methods
 
         /// <summary>
-        /// Checks if object is disposed.
+        ///     Checks if object is disposed.
         /// </summary>
         private void CheckIfObjectIsDisposed()
         {
-            if (this.IsDisposed)
+            if (IsDisposed)
             {
-                throw new ObjectDisposedException(this.GetType().Name);
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 
         /// <summary>
-        /// Called when a communication error occurs.
+        ///     Called when a communication error occurs.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -238,14 +226,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.CommunicationError != null)
+            if (CommunicationError != null)
             {
-                this.CommunicationError(sender, e);
+                CommunicationError(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when a peer message has been received.
+        ///     Called when a peer message has been received.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -254,33 +242,33 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.MessageReceived != null)
+            if (MessageReceived != null)
             {
-                this.MessageReceived(sender, e);
+                MessageReceived(sender, e);
             }
         }
 
         /// <summary>
-        /// Asynchronous write callback.
+        ///     Asynchronous write callback.
         /// </summary>
         /// <param name="ar">The async result.</param>
         private void Receive(IAsyncResult ar)
         {
-            AsyncReadData data = ar.AsyncState as AsyncReadData;
-            int bytesRead = 0;
-            int offset = data.OffsetStart;
+            var data = ar.AsyncState as AsyncReadData;
+            var bytesRead = 0;
+            var offset = data.OffsetStart;
             PeerMessage message;
             PieceMessage pieceMessage;
             bool isIncomplete;
 
-            lock (this.locker)
+            lock (locker)
             {
-                if (!this.IsDisposed)
+                if (!IsDisposed)
                 {
                     try
                     {
                         // read data
-                        bytesRead = this.stream.EndRead(ar);
+                        bytesRead = stream.EndRead(ar);
 
                         if (bytesRead > 0)
                         {
@@ -288,11 +276,10 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 
                             // walk through the array and try to decode messages
                             while (offset <= data.OffsetEnd)
-                            {
-                                if (PieceMessage.TryDecode(data.Buffer, ref offset, data.OffsetEnd, out pieceMessage, out isIncomplete, this.PieceData))
+                                if (PieceMessage.TryDecode(data.Buffer, ref offset, data.OffsetEnd, out pieceMessage, out isIncomplete, PieceData))
                                 {
                                     // successfully decoded message
-                                    this.OnMessageReceived(this, new PeerMessgeReceivedEventArgs((PeerMessage)pieceMessage));
+                                    OnMessageReceived(this, new PeerMessgeReceivedEventArgs(pieceMessage));
 
                                     // remember where we left off
                                     data.OffsetStart = offset;
@@ -300,7 +287,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                                 else if (PeerMessage.TryDecode(data.Buffer, ref offset, data.OffsetEnd, out message, out isIncomplete))
                                 {
                                     // successfully decoded message
-                                    this.OnMessageReceived(this, new PeerMessgeReceivedEventArgs(message));
+                                    OnMessageReceived(this, new PeerMessgeReceivedEventArgs(message));
 
                                     // remember where we left off
                                     data.OffsetStart = offset;
@@ -315,7 +302,6 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                                     // move to next byte
                                     offset++;
                                 }
-                            }
 
                             if (data.OffsetStart == data.OffsetEnd)
                             {
@@ -327,10 +313,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                                      data.OffsetStart < data.OffsetEnd)
                             {
                                 // move data to beginning of the buffere
-                                for (int i = data.OffsetStart; i < data.OffsetEnd; i++)
-                                {
-                                    data.Buffer[i - data.OffsetStart] = data.Buffer[i];
-                                }
+                                for (var i = data.OffsetStart; i < data.OffsetEnd; i++) data.Buffer[i - data.OffsetStart] = data.Buffer[i];
 
                                 // reset offset
                                 data.OffsetEnd = data.OffsetEnd - data.OffsetStart;
@@ -341,39 +324,39 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                                 throw new PeerWireProtocolException("Invalid data.");
                             }
 
-                            this.tm.Read(bytesRead);
+                            tm.Read(bytesRead);
 
                             // resume reading
-                            if (!this.IsDisposed)
+                            if (!IsDisposed)
                             {
-                                this.stream.BeginRead(data.Buffer, data.OffsetEnd, data.Buffer.Length - data.OffsetEnd, this.Receive, data);
+                                stream.BeginRead(data.Buffer, data.OffsetEnd, data.Buffer.Length - data.OffsetEnd, Receive, data);
                             }
                         }
                         else
                         {
                             // we received no data
-                            Debug.WriteLine($"received no data from {this.Endpoint}");
+                            Debug.WriteLine($"received no data from {Endpoint}");
                         }
                     }
                     catch (IOException ex)
                     {
-                        Debug.WriteLine($"could not read data from {this.Endpoint}: {ex.Message}");
+                        Debug.WriteLine($"could not read data from {Endpoint}: {ex.Message}");
 
-                        this.OnCommunicationError(this, new CommunicationErrorEventArgs(ex.Message));
+                        OnCommunicationError(this, new CommunicationErrorEventArgs(ex.Message));
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Asynchronous send callback.
+        ///     Asynchronous send callback.
         /// </summary>
         /// <param name="ar">The async result.</param>
         private void Send(IAsyncResult ar)
         {
-            if (!this.IsDisposed)
+            if (!IsDisposed)
             {
-                this.stream.EndWrite(ar);
+                stream.EndWrite(ar);
             }
         }
 

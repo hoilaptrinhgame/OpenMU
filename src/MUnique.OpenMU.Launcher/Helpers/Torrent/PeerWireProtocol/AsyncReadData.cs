@@ -3,23 +3,23 @@
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 {
     /// <summary>
-    /// The asynchronous read data.
+    ///     The asynchronous read data.
     /// </summary>
     public sealed class AsyncReadData
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AsyncReadData"/> class.
+        ///     Initializes a new instance of the <see cref="AsyncReadData" /> class.
         /// </summary>
         /// <param name="bufferLength">Length of the buffer.</param>
         public AsyncReadData(int bufferLength)
         {
             bufferLength.MustBeGreaterThan(0);
 
-            this.Buffer = new byte[bufferLength];
-            this.OffsetStart = 0;
-            this.OffsetEnd = 0;
+            Buffer = new byte[bufferLength];
+            OffsetStart = 0;
+            OffsetEnd = 0;
         }
 
         #endregion Public Constructors
@@ -27,7 +27,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="AsyncReadData"/> class from being created.
+        ///     Prevents a default instance of the <see cref="AsyncReadData" /> class from being created.
         /// </summary>
         private AsyncReadData()
         {
@@ -38,40 +38,28 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Public Properties
 
         /// <summary>
-        /// Gets the data buffer.
+        ///     Gets the data buffer.
         /// </summary>
         /// <value>
-        /// The data buffer.
+        ///     The data buffer.
         /// </value>
-        public byte[] Buffer
-        {
-            get;
-            private set;
-        }
+        public byte[] Buffer { get; }
 
         /// <summary>
-        /// Gets or sets the buffer offset end.
+        ///     Gets or sets the buffer offset end.
         /// </summary>
         /// <value>
-        /// The buffer offset end.
+        ///     The buffer offset end.
         /// </value>
-        public int OffsetEnd
-        {
-            get;
-            set;
-        }
+        public int OffsetEnd { get; set; }
 
         /// <summary>
-        /// Gets or sets the buffer offset start.
+        ///     Gets or sets the buffer offset start.
         /// </summary>
         /// <value>
-        /// The buffer offset start.
+        ///     The buffer offset start.
         /// </value>
-        public int OffsetStart
-        {
-            get;
-            set;
-        }
+        public int OffsetStart { get; set; }
 
         #endregion Public Properties
     }

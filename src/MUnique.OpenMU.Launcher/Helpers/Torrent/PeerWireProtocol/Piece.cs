@@ -7,23 +7,23 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 {
     /// <summary>
-    /// The piece.
+    ///     The piece.
     /// </summary>
     public sealed class Piece
     {
         #region Private Fields
 
         /// <summary>
-        /// The completed block count.
+        ///     The completed block count.
         /// </summary>
-        private int completedBlockCount = 0;
+        private int completedBlockCount;
 
         #endregion Private Fields
 
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Piece" /> class.
+        ///     Initializes a new instance of the <see cref="Piece" /> class.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <param name="pieceHash">The piece hash.</param>
@@ -41,18 +41,18 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             pieceData.IsNotNull().Then(() => pieceData.LongLength.MustBeEqualTo(pieceLength));
             bitField.IsNotNull().Then(() => bitField.LongLength.MustBeEqualTo(blockCount));
 
-            this.PieceIndex = pieceIndex;
-            this.PieceHash = pieceHash;
-            this.PieceLength = pieceLength;
-            this.PieceData = pieceData ?? new byte[this.PieceLength];
+            PieceIndex = pieceIndex;
+            PieceHash = pieceHash;
+            PieceLength = pieceLength;
+            PieceData = pieceData ?? new byte[PieceLength];
 
-            this.BlockLength = blockLength;
-            this.BlockCount = blockCount;
+            BlockLength = blockLength;
+            BlockCount = blockCount;
 
-            this.IsCompleted = false;
-            this.IsCorrupted = false;
+            IsCompleted = false;
+            IsCorrupted = false;
 
-            this.BitField = bitField ?? new bool[blockCount];
+            BitField = bitField ?? new bool[blockCount];
         }
 
         #endregion Public Constructors
@@ -60,7 +60,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="Piece"/> class from being created.
+        ///     Prevents a default instance of the <see cref="Piece" /> class from being created.
         /// </summary>
         private Piece()
         {
@@ -71,12 +71,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Public Events
 
         /// <summary>
-        /// Occurs when piece has completed.
+        ///     Occurs when piece has completed.
         /// </summary>
         public event EventHandler<PieceCompletedEventArgs> Completed;
 
         /// <summary>
-        /// Occurs when piece has become corrupted.
+        ///     Occurs when piece has become corrupted.
         /// </summary>
         public event EventHandler<System.EventArgs> Corrupted;
 
@@ -85,212 +85,176 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Public Properties
 
         /// <summary>
-        /// Gets the bit field.
+        ///     Gets the bit field.
         /// </summary>
         /// <value>
-        /// The bit field.
+        ///     The bit field.
         /// </value>
-        public bool[] BitField
-        {
-            get;
-            private set;
-        }
+        public bool[] BitField { get; }
 
         /// <summary>
-        /// Gets the block count.
+        ///     Gets the block count.
         /// </summary>
         /// <value>
-        /// The block count.
+        ///     The block count.
         /// </value>
-        public int BlockCount
-        {
-            get;
-            private set;
-        }
+        public int BlockCount { get; }
 
         /// <summary>
-        /// Gets the length of the block in bytes.
+        ///     Gets the length of the block in bytes.
         /// </summary>
         /// <value>
-        /// The length of the block in bytes.
+        ///     The length of the block in bytes.
         /// </value>
-        public int BlockLength
-        {
-            get;
-            private set;
-        }
+        public int BlockLength { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the piece is completed.
+        ///     Gets a value indicating whether the piece is completed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the piece is completed; otherwise, <c>false</c>.
+        ///     <c>true</c> if the piece is completed; otherwise, <c>false</c>.
         /// </value>
-        public bool IsCompleted
-        {
-            get;
-            private set;
-        }
+        public bool IsCompleted { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether the piece is corrupted.
+        ///     Gets a value indicating whether the piece is corrupted.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the piece is corrupted; otherwise, <c>false</c>.
+        ///     <c>true</c> if the piece is corrupted; otherwise, <c>false</c>.
         /// </value>
-        public bool IsCorrupted
-        {
-            get;
-            private set;
-        }
+        public bool IsCorrupted { get; private set; }
 
         /// <summary>
-        /// Gets the piece data.
+        ///     Gets the piece data.
         /// </summary>
         /// <value>
-        /// The piece data.
+        ///     The piece data.
         /// </value>
-        public byte[] PieceData
-        {
-            get;
-            private set;
-        }
+        public byte[] PieceData { get; }
 
         /// <summary>
-        /// Gets the piece hash.
+        ///     Gets the piece hash.
         /// </summary>
         /// <value>
-        /// The piece hash.
+        ///     The piece hash.
         /// </value>
-        public string PieceHash
-        {
-            get;
-            private set;
-        }
+        public string PieceHash { get; }
 
         /// <summary>
-        /// Gets the index of the piece.
+        ///     Gets the index of the piece.
         /// </summary>
         /// <value>
-        /// The index of the piece.
+        ///     The index of the piece.
         /// </value>
-        public int PieceIndex
-        {
-            get;
-            private set;
-        }
+        public int PieceIndex { get; }
 
         /// <summary>
-        /// Gets the length of the piece.
+        ///     Gets the length of the piece.
         /// </summary>
         /// <value>
-        /// The length of the piece.
+        ///     The length of the piece.
         /// </value>
-        public long PieceLength
-        {
-            get;
-            private set;
-        }
+        public long PieceLength { get; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Gets the block.
+        ///     Gets the block.
         /// </summary>
         /// <param name="blockOffset">The block offset.</param>
         /// <returns>The block data.</returns>
         public byte[] GetBlock(long blockOffset)
         {
             blockOffset.MustBeGreaterThanOrEqualTo(0);
-            blockOffset.MustBeLessThan(this.PieceLength);
+            blockOffset.MustBeLessThan(PieceLength);
 
             byte[] data;
 
-            data = new byte[this.GetBlockLength(blockOffset)];
+            data = new byte[GetBlockLength(blockOffset)];
 
-            Buffer.BlockCopy(this.PieceData, (int)blockOffset, data, 0, data.Length);
+            Buffer.BlockCopy(PieceData, (int) blockOffset, data, 0, data.Length);
 
             return data;
         }
 
         /// <summary>
-        /// Gets the index of the block.
+        ///     Gets the index of the block.
         /// </summary>
         /// <param name="blockOffset">The block offset.</param>
         /// <returns>The block index.</returns>
         public int GetBlockIndex(long blockOffset)
         {
             blockOffset.MustBeGreaterThanOrEqualTo(0);
-            blockOffset.MustBeLessThanOrEqualTo(this.PieceLength);
-            (blockOffset % this.BlockLength).MustBeEqualTo(0);
+            blockOffset.MustBeLessThanOrEqualTo(PieceLength);
+            (blockOffset % BlockLength).MustBeEqualTo(0);
 
-            return (int)(blockOffset / this.BlockLength);
+            return (int) (blockOffset / BlockLength);
         }
 
         /// <summary>
-        /// Gets the length of the block.
+        ///     Gets the length of the block.
         /// </summary>
         /// <param name="blockOffset">The block offset.</param>
         /// <returns>The block length.</returns>
         public long GetBlockLength(long blockOffset)
         {
-            return Math.Min(this.BlockLength, this.PieceLength - blockOffset);
+            return Math.Min(BlockLength, PieceLength - blockOffset);
         }
 
         /// <summary>
-        /// Gets the block offset.
+        ///     Gets the block offset.
         /// </summary>
         /// <param name="blockIndex">Index of the block.</param>
         /// <returns>The block offset.</returns>
         public long GetBlockOffset(int blockIndex)
         {
             blockIndex.MustBeGreaterThanOrEqualTo(0);
-            blockIndex.MustBeLessThanOrEqualTo((int)(this.PieceLength / this.BlockLength));
+            blockIndex.MustBeLessThanOrEqualTo((int) (PieceLength / BlockLength));
 
-            return this.BlockLength * blockIndex;
+            return BlockLength * blockIndex;
         }
 
         /// <summary>
-        /// Puts the block.
+        ///     Puts the block.
         /// </summary>
         /// <param name="blockOffset">Index of the block.</param>
         /// <param name="blockData">The block data.</param>
         public void PutBlock(int blockOffset, byte[] blockData = null)
         {
             blockOffset.MustBeGreaterThanOrEqualTo(0);
-            ((long)blockOffset).MustBeLessThan(this.PieceLength);
-            (blockOffset % this.BlockLength).MustBeEqualTo(0);
+            ((long) blockOffset).MustBeLessThan(PieceLength);
+            (blockOffset % BlockLength).MustBeEqualTo(0);
             blockData.IsNotNull().Then(() => blockData.CannotBeNullOrEmpty());
-            blockData.IsNotNull().Then(() => blockData.Length.MustBeEqualTo((int)this.GetBlockLength(blockOffset)));
+            blockData.IsNotNull().Then(() => blockData.Length.MustBeEqualTo((int) GetBlockLength(blockOffset)));
 
-            int blockIndex = this.GetBlockIndex(blockOffset);
+            var blockIndex = GetBlockIndex(blockOffset);
 
-            if (!this.BitField[blockIndex])
+            if (!BitField[blockIndex])
             {
-                this.BitField[blockIndex] = true;
+                BitField[blockIndex] = true;
 
                 if (blockData != null)
                 {
-                    Buffer.BlockCopy(blockData, 0, this.PieceData, blockOffset, blockData.Length);
+                    Buffer.BlockCopy(blockData, 0, PieceData, blockOffset, blockData.Length);
                 }
 
-                this.completedBlockCount++;
+                completedBlockCount++;
 
-                if (this.completedBlockCount == this.BlockCount)
+                if (completedBlockCount == BlockCount)
                 {
-                    if (string.Compare(this.PieceData.CalculateSha1Hash(0, (int)this.PieceLength).ToHexaDecimalString(), this.PieceHash, true, CultureInfo.InvariantCulture) == 0)
+                    if (string.Compare(PieceData.CalculateSha1Hash(0, (int) PieceLength).ToHexaDecimalString(), PieceHash, true, CultureInfo.InvariantCulture) == 0)
                     {
-                        this.IsCompleted = true;
+                        IsCompleted = true;
 
-                        this.OnCompleted(this, new PieceCompletedEventArgs(this.PieceIndex, this.PieceData));
+                        OnCompleted(this, new PieceCompletedEventArgs(PieceIndex, PieceData));
                     }
                     else
                     {
-                        this.IsCorrupted = true;
+                        IsCorrupted = true;
 
-                        this.OnCorrupted(this, new PieceCorruptedEventArgs(this.PieceIndex));
+                        OnCorrupted(this, new PieceCorruptedEventArgs(PieceIndex));
                     }
                 }
             }
@@ -301,7 +265,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Private Methods
 
         /// <summary>
-        /// Called when piece has completed.
+        ///     Called when piece has completed.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -310,14 +274,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.Completed != null)
+            if (Completed != null)
             {
-                this.Completed(sender, e);
+                Completed(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when piece has become corrupted.
+        ///     Called when piece has become corrupted.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -326,9 +290,9 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.Corrupted != null)
+            if (Corrupted != null)
             {
-                this.Corrupted(sender, e);
+                Corrupted(sender, e);
             }
         }
 

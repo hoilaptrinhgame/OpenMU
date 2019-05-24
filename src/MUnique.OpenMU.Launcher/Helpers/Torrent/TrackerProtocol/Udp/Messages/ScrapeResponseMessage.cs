@@ -1,39 +1,38 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DefensiveProgrammingFramework;
-using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
     /// <summary>
-    /// The scrape response message.
+    ///     The scrape response message.
     /// </summary>
     public sealed class ScrapeResponseMessage : TrackerMessage
     {
         #region Private Fields
 
         /// <summary>
-        /// The action length in bytes.
+        ///     The action length in bytes.
         /// </summary>
         private const int ActionLength = 4;
 
         /// <summary>
-        /// The completed length in bytes.
+        ///     The completed length in bytes.
         /// </summary>
         private const int CompletedLength = 4;
 
         /// <summary>
-        /// The leechers length in bytes.
+        ///     The leechers length in bytes.
         /// </summary>
         private const int LeechersLength = 4;
 
         /// <summary>
-        /// The seeders length in bytes.
+        ///     The seeders length in bytes.
         /// </summary>
         private const int SeedersLength = 4;
 
         /// <summary>
-        /// The transaction identifier length in bytes.
+        ///     The transaction identifier length in bytes.
         /// </summary>
         private const int TransactionIdLength = 4;
 
@@ -42,7 +41,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScrapeResponseMessage"/> class.
+        ///     Initializes a new instance of the <see cref="ScrapeResponseMessage" /> class.
         /// </summary>
         public ScrapeResponseMessage()
             : this(0, new List<ScrapeDetails>())
@@ -50,7 +49,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScrapeResponseMessage"/> class.
+        ///     Initializes a new instance of the <see cref="ScrapeResponseMessage" /> class.
         /// </summary>
         /// <param name="transactionId">The transaction unique identifier.</param>
         /// <param name="scrapes">The scrapes.</param>
@@ -59,7 +58,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         {
             scrapes.CannotBeNull();
 
-            this.Scrapes = scrapes;
+            Scrapes = scrapes;
         }
 
         #endregion Public Constructors
@@ -67,43 +66,33 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         #region Public Properties
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return ActionLength + TransactionIdLength + (this.Scrapes.Count() * (SeedersLength + CompletedLength + LeechersLength));
-            }
-        }
+        public override int Length => ActionLength + TransactionIdLength + Scrapes.Count() * (SeedersLength + CompletedLength + LeechersLength);
 
         /// <summary>
-        /// Gets the scrapes.
+        ///     Gets the scrapes.
         /// </summary>
         /// <value>
-        /// The scrapes.
+        ///     The scrapes.
         /// </value>
-        public IEnumerable<ScrapeDetails> Scrapes
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<ScrapeDetails> Scrapes { get; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="message">The message.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, int offset, out ScrapeResponseMessage message)
         {
@@ -112,7 +101,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             int seeds;
             int completed;
             int leechers;
-            List<ScrapeDetails> scrapeInfo = new List<ScrapeDetails>();
+            var scrapeInfo = new List<ScrapeDetails>();
 
             message = null;
 
@@ -120,17 +109,17 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                 buffer.Length >= offset + ActionLength + TransactionIdLength &&
                 offset >= 0)
             {
-                action = Message.ReadInt(buffer, ref offset);
-                transactionId = Message.ReadInt(buffer, ref offset);
+                action = ReadInt(buffer, ref offset);
+                transactionId = ReadInt(buffer, ref offset);
 
-                if (action == (int)TrackingAction.Scrape &&
+                if (action == (int) TrackingAction.Scrape &&
                     transactionId >= 0)
                 {
                     while (offset <= buffer.Length - SeedersLength - CompletedLength - LeechersLength)
                     {
-                        seeds = Message.ReadInt(buffer, ref offset);
-                        completed = Message.ReadInt(buffer, ref offset);
-                        leechers = Message.ReadInt(buffer, ref offset);
+                        seeds = ReadInt(buffer, ref offset);
+                        completed = ReadInt(buffer, ref offset);
+                        leechers = ReadInt(buffer, ref offset);
 
                         scrapeInfo.Add(new ScrapeDetails(seeds, leechers, completed));
                     }
@@ -143,7 +132,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -154,16 +143,16 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, (int)this.Action);
-            Message.Write(buffer, ref written, this.TransactionId);
+            Write(buffer, ref written, (int) Action);
+            Write(buffer, ref written, TransactionId);
 
-            foreach (var scrape in this.Scrapes)
+            foreach (var scrape in Scrapes)
             {
-                Message.Write(buffer, ref written, scrape.SeedersCount);
-                Message.Write(buffer, ref written, scrape.CompleteCount);
-                Message.Write(buffer, ref written, scrape.LeechesCount);
+                Write(buffer, ref written, scrape.SeedersCount);
+                Write(buffer, ref written, scrape.CompleteCount);
+                Write(buffer, ref written, scrape.LeechesCount);
             }
 
             return written - offset;

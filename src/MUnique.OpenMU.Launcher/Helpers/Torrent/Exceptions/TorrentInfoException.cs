@@ -6,6 +6,15 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Exceptions
     [Serializable]
     public class TorrentInfoException : Exception
     {
+        #region Protected Constructors
+
+        protected TorrentInfoException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        #endregion Protected Constructors
+
         #region Public Constructors
 
         public TorrentInfoException()
@@ -23,14 +32,5 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Exceptions
         }
 
         #endregion Public Constructors
-
-        #region Protected Constructors
-
-        protected TorrentInfoException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-
-        #endregion Protected Constructors
     }
 }

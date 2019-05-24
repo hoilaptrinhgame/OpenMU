@@ -3,14 +3,14 @@
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
     /// <summary>
-    /// The scrape details.
+    ///     The scrape details.
     /// </summary>
     public class ScrapeDetails
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScrapeDetails" /> class.
+        ///     Initializes a new instance of the <see cref="ScrapeDetails" /> class.
         /// </summary>
         /// <param name="seedersCount">The seeders count.</param>
         /// <param name="leechesCount">The leeches count.</param>
@@ -21,9 +21,9 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             leechesCount.MustBeGreaterThanOrEqualTo(0);
             completeCount.MustBeGreaterThanOrEqualTo(0);
 
-            this.CompleteCount = completeCount;
-            this.LeechesCount = leechesCount;
-            this.SeedersCount = seedersCount;
+            CompleteCount = completeCount;
+            LeechesCount = leechesCount;
+            SeedersCount = seedersCount;
         }
 
         #endregion Public Constructors
@@ -31,7 +31,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="ScrapeDetails"/> class from being created.
+        ///     Prevents a default instance of the <see cref="ScrapeDetails" /> class from being created.
         /// </summary>
         private ScrapeDetails()
         {
@@ -42,40 +42,28 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         #region Public Properties
 
         /// <summary>
-        /// Gets the complete count.
+        ///     Gets the complete count.
         /// </summary>
         /// <value>
-        /// The complete count.
+        ///     The complete count.
         /// </value>
-        public int CompleteCount
-        {
-            get;
-            private set;
-        }
+        public int CompleteCount { get; }
 
         /// <summary>
-        /// Gets the leeches count.
+        ///     Gets the leeches count.
         /// </summary>
         /// <value>
-        /// The leeches count.
+        ///     The leeches count.
         /// </value>
-        public int LeechesCount
-        {
-            get;
-            private set;
-        }
+        public int LeechesCount { get; }
 
         /// <summary>
-        /// Gets the seeders count.
+        ///     Gets the seeders count.
         /// </summary>
         /// <value>
-        /// The seeders count.
+        ///     The seeders count.
         /// </value>
-        public int SeedersCount
-        {
-            get;
-            private set;
-        }
+        public int SeedersCount { get; }
 
         #endregion Public Properties
     }

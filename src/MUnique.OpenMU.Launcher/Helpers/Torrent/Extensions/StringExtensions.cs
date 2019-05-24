@@ -7,14 +7,14 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
 {
     /// <summary>
-    /// The string extensions.
+    ///     The string extensions.
     /// </summary>
     public static class StringExtensions
     {
         #region Public Methods
 
         /// <summary>
-        /// Formats the specified text.
+        ///     Formats the specified text.
         /// </summary>
         /// <param name="text">The text.</param>
         /// <param name="arguments">The arguments.</param>
@@ -25,7 +25,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
         }
 
         /// <summary>
-        /// Generates a random string from the characters of the string.
+        ///     Generates a random string from the characters of the string.
         /// </summary>
         /// <param name="str">The string.</param>
         /// <param name="size">The string size.</param>
@@ -36,7 +36,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
         }
 
         /// <summary>
-        /// Converts the hexadecimal string to byte array.
+        ///     Converts the hexadecimal string to byte array.
         /// </summary>
         /// <param name="value">The hexadecimal string.</param>
         /// <returns>The byte array.</returns>
@@ -48,111 +48,114 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
         }
 
         /// <summary>
-        /// Converts byte count to respective measurement.
+        ///     Converts byte count to respective measurement.
         /// </summary>
         /// <param name="byteCount">The length.</param>
         /// <param name="accuracy">The accuracy.</param>
         /// <returns>
-        /// The string representation of byte count.
+        ///     The string representation of byte count.
         /// </returns>
         public static string ToBytes(this long byteCount, decimal accuracy = 1)
         {
             long kb = 1024;
-            long mb = kb * 1024;
-            long gb = mb * 1024;
-            long tb = gb * 1024;
-            long pb = tb * 1024;
+            var mb = kb * 1024;
+            var gb = mb * 1024;
+            var tb = gb * 1024;
+            var pb = tb * 1024;
 
             if (byteCount < kb)
             {
                 return "{0:##0}B".Format2(byteCount);
             }
-            else if (byteCount < mb)
+
+            if (byteCount < mb)
             {
                 return "{0:0}kB".Format2(Math.Round(byteCount / kb / accuracy) * accuracy);
             }
-            else if (byteCount < gb)
+
+            if (byteCount < gb)
             {
                 return "{0:0}MB".Format2(Math.Round(byteCount / mb / accuracy) * accuracy);
             }
-            else if (byteCount < tb)
+
+            if (byteCount < tb)
             {
                 return "{0:0}GB".Format2(Math.Round(byteCount / gb / accuracy) * accuracy);
             }
-            else if (byteCount < pb)
+
+            if (byteCount < pb)
             {
                 return "{0:0}TB".Format2(Math.Round(byteCount / tb / accuracy) * accuracy);
             }
-            else
-            {
-                return "{0:0}PB".Format2(Math.Round(byteCount / pb / accuracy) * accuracy);
-            }
+
+            return "{0:0}PB".Format2(Math.Round(byteCount / pb / accuracy) * accuracy);
         }
 
         /// <summary>
-        /// Converts byte count to respective measurement.
+        ///     Converts byte count to respective measurement.
         /// </summary>
         /// <param name="byteCount">The length.</param>
         /// <param name="accuracy">The accuracy.</param>
         /// <returns>
-        /// The string representation of byte count.
+        ///     The string representation of byte count.
         /// </returns>
         public static string ToBytes(this decimal byteCount, decimal accuracy = 1)
         {
             long kb = 1024;
-            long mb = kb * 1024;
-            long gb = mb * 1024;
-            long tb = gb * 1024;
-            long pb = tb * 1024;
+            var mb = kb * 1024;
+            var gb = mb * 1024;
+            var tb = gb * 1024;
+            var pb = tb * 1024;
 
             if (byteCount < kb)
             {
                 return "{0:##0}B".Format2(byteCount);
             }
-            else if (byteCount < mb)
+
+            if (byteCount < mb)
             {
                 return "{0:0}kB".Format2(Math.Round(byteCount / kb / accuracy) * accuracy);
             }
-            else if (byteCount < gb)
+
+            if (byteCount < gb)
             {
                 return "{0:0}MB".Format2(Math.Round(byteCount / mb / accuracy) * accuracy);
             }
-            else if (byteCount < tb)
+
+            if (byteCount < tb)
             {
                 return "{0:0}GB".Format2(Math.Round(byteCount / gb / accuracy) * accuracy);
             }
-            else if (byteCount < pb)
+
+            if (byteCount < pb)
             {
                 return "{0:0}TB".Format2(Math.Round(byteCount / tb / accuracy) * accuracy);
             }
-            else
-            {
-                return "{0:0}PB".Format2(Math.Round(byteCount / pb / accuracy) * accuracy);
-            }
+
+            return "{0:0}PB".Format2(Math.Round(byteCount / pb / accuracy) * accuracy);
         }
 
         /// <summary>
-        /// To the capital word case.
+        ///     To the capital word case.
         /// </summary>
         /// <param name="str">The string.</param>
         /// <param name="separators">The separators.</param>
         /// <returns>
-        /// String in capital word case.
+        ///     String in capital word case.
         /// </returns>
         public static string ToCapitalWordCase(this string str, params char[] separators)
         {
             str.CannotBeNull();
             separators.CannotBeNull();
 
-            List<string> words = new List<string>();
+            var words = new List<string>();
 
             if (separators.Length == 0)
             {
-                separators = new char[] { ' ' };
+                separators = new[] {' '};
             }
 
             foreach (var word in str.Split(separators))
-            {
                 if (word.Length == 0)
                 {
                     words.Add(string.Empty);
@@ -165,17 +168,16 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
                 {
                     words.Add(char.ToUpper(word[0], CultureInfo.InvariantCulture) + word.Substring(1));
                 }
-            }
 
             return string.Join(" ", words);
         }
 
         /// <summary>
-        /// Converts the byte array the hexadecimal string.
+        ///     Converts the byte array the hexadecimal string.
         /// </summary>
         /// <param name="value">The byte array.</param>
         /// <returns>
-        /// The hexadecimal string.
+        ///     The hexadecimal string.
         /// </returns>
         public static string ToHexaDecimalString(this byte[] value)
         {
@@ -185,7 +187,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
         }
 
         /// <summary>
-        /// Converts string to sentence case.
+        ///     Converts string to sentence case.
         /// </summary>
         /// <param name="str">The string to transform.</param>
         /// <returns>String in sentence case.</returns>
@@ -195,12 +197,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
         }
 
         /// <summary>
-        /// To the snake case.
+        ///     To the snake case.
         /// </summary>
         /// <param name="str">The string.</param>
         /// <param name="separators">The separators.</param>
         /// <returns>
-        /// String in snake case.
+        ///     String in snake case.
         /// </returns>
         public static string ToSnakeCase(this string str, params char[] separators)
         {
@@ -209,19 +211,19 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
 
             if (separators.Length == 0)
             {
-                separators = new char[] { ' ' };
+                separators = new[] {' '};
             }
 
             return string.Join("_", str.ToUpper(CultureInfo.InvariantCulture).Split(separators, StringSplitOptions.RemoveEmptyEntries));
         }
 
         /// <summary>
-        /// Returns a <see cref="string"/> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <param name="str">The string to transform.</param>
         /// <param name="stringCasing">The string casing.</param>
         /// <returns>
-        /// A <see cref="string"/> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public static string ToString(this string str, StringCasing stringCasing)
         {
@@ -229,42 +231,40 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
             {
                 return str;
             }
-            else
+
+            switch (stringCasing)
             {
-                switch (stringCasing)
-                {
-                    case StringCasing.Upper:
-                        return str.ToUpper(CultureInfo.CurrentCulture);
+                case StringCasing.Upper:
+                    return str.ToUpper(CultureInfo.CurrentCulture);
 
-                    case StringCasing.Lower:
-                        return str.ToLower(CultureInfo.CurrentCulture);
+                case StringCasing.Lower:
+                    return str.ToLower(CultureInfo.CurrentCulture);
 
-                    case StringCasing.Sentence:
-                        return ToSentenceCase(str);
+                case StringCasing.Sentence:
+                    return ToSentenceCase(str);
 
-                    case StringCasing.Title:
-                        return ToTitleCase(str, CultureInfo.CurrentCulture);
+                case StringCasing.Title:
+                    return ToTitleCase(str, CultureInfo.CurrentCulture);
 
-                    case StringCasing.CapitalWord:
-                        return ToCapitalWordCase(str);
+                case StringCasing.CapitalWord:
+                    return ToCapitalWordCase(str);
 
-                    case StringCasing.SnakeCase:
-                        return ToSnakeCase(str);
+                case StringCasing.SnakeCase:
+                    return ToSnakeCase(str);
 
-                    case StringCasing.CamelCase:
-                        return ToSnakeCase(str);
+                case StringCasing.CamelCase:
+                    return ToSnakeCase(str);
 
-                    case StringCasing.None:
-                        return str;
+                case StringCasing.None:
+                    return str;
 
-                    default:
-                        throw new FormatException("Invalid string casing format.");
-                }
+                default:
+                    throw new FormatException("Invalid string casing format.");
             }
         }
 
         /// <summary>
-        /// Converts string to title case.
+        ///     Converts string to title case.
         /// </summary>
         /// <param name="str">The string to transform.</param>
         /// <param name="culture">The culture.</param>
@@ -277,10 +277,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
             {
                 return culture.TextInfo.ToTitleCase(str.ToLower(CultureInfo.CurrentCulture));
             }
-            else
-            {
-                throw new ArgumentNullException(nameof(culture), "Culture info cannot be null.");
-            }
+
+            throw new ArgumentNullException(nameof(culture), "Culture info cannot be null.");
         }
 
         #endregion Public Methods

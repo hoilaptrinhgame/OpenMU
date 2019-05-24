@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using MUnique.OpenMU.Launcher.Enumerations;
 using MUnique.OpenMU.Launcher.Interfaces;
 using MUnique.OpenMU.Launcher.Models;
@@ -10,6 +9,14 @@ namespace MUnique.OpenMU.Launcher.Managers
 {
     public static class UpdateManager
     {
+        public delegate void OnDownloadCompleteDelegate(DownloadTask task);
+
+        public delegate void OnProgressChangedDelegate(int progress);
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        private static readonly IUpdater updater;
+
         static UpdateManager()
         {
             switch (LauncherSettingsManager.Settings.UpdaterType)
@@ -27,10 +34,6 @@ namespace MUnique.OpenMU.Launcher.Managers
                     throw new ArgumentOutOfRangeException();
             }
         }
-        
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        
-        private static IUpdater updater;
 
         public static int TotalProgress => updater.TotalProgress;
 
@@ -42,7 +45,7 @@ namespace MUnique.OpenMU.Launcher.Managers
             }
             catch (Exception e)
             {
-                logger.Log(LogLevel.Error,e);
+                logger.Log(LogLevel.Error, e);
             }
         }
 
@@ -54,12 +57,9 @@ namespace MUnique.OpenMU.Launcher.Managers
             }
             catch (Exception e)
             {
-                logger.Log(LogLevel.Error,e);
+                logger.Log(LogLevel.Error, e);
             }
         }
-
-        public delegate void OnDownloadCompleteDelegate(DownloadTask task);
-        public delegate void OnProgressChangedDelegate(int progress);
 
         public static event OnDownloadCompleteDelegate OnDownloadComplete;
         public static event OnProgressChangedDelegate OnProgressChanged;
@@ -72,7 +72,7 @@ namespace MUnique.OpenMU.Launcher.Managers
             }
             catch (Exception e)
             {
-                logger.Log(LogLevel.Error,e, "Failed to notify download complete.");
+                logger.Log(LogLevel.Error, e, "Failed to notify download complete.");
             }
         }
 
@@ -84,7 +84,7 @@ namespace MUnique.OpenMU.Launcher.Managers
             }
             catch (Exception e)
             {
-                logger.Log(LogLevel.Error,e);
+                logger.Log(LogLevel.Error, e);
             }
         }
     }

@@ -9,11 +9,7 @@ namespace MUnique.OpenMU.Launcher.Managers
     public static class ArgumentsManager
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        
-        public static bool HasArgs { get; private set; }
 
-        public static ArgumentOptions ArgumentOptions { get; private set; }
-        
         static ArgumentsManager()
         {
             try
@@ -26,14 +22,18 @@ namespace MUnique.OpenMU.Launcher.Managers
                 }
 
                 HasArgs = true;
-                
+
                 Parser.Default.ParseArguments<ArgumentOptions>(args)
-                    .WithParsed<ArgumentOptions>(o => { ArgumentOptions = o; });
+                    .WithParsed(o => { ArgumentOptions = o; });
             }
             catch (Exception e)
             {
                 logger.Log(LogLevel.Error, e);
             }
         }
+
+        public static bool HasArgs { get; }
+
+        public static ArgumentOptions ArgumentOptions { get; private set; }
     }
 }

@@ -1,32 +1,17 @@
 ﻿using System.Text;
 using DefensiveProgrammingFramework;
-using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
     /// <summary>
-    /// The UDP error message.
+    ///     The UDP error message.
     /// </summary>
     public class ErrorMessage : TrackerMessage
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The action length in bytes.
-        /// </summary>
-        private const int ActionLength = 4;
-
-        /// <summary>
-        /// The transaction identifier length in bytes.
-        /// </summary>
-        private const int TransactionIdLength = 4;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorMessage" /> class.
+        ///     Initializes a new instance of the <see cref="ErrorMessage" /> class.
         /// </summary>
         /// <param name="transactionId">The transaction unique identifier.</param>
         /// <param name="errorMessage">The error.</param>
@@ -35,51 +20,55 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         {
             errorMessage.CannotBeNullOrEmpty();
 
-            this.ErrorText = errorMessage;
+            ErrorText = errorMessage;
         }
 
         #endregion Public Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The action length in bytes.
+        /// </summary>
+        private const int ActionLength = 4;
+
+        /// <summary>
+        ///     The transaction identifier length in bytes.
+        /// </summary>
+        private const int TransactionIdLength = 4;
+
+        #endregion Private Fields
+
         #region Public Properties
 
         /// <summary>
-        /// Gets the error text.
+        ///     Gets the error text.
         /// </summary>
         /// <value>
-        /// The error text.
+        ///     The error text.
         /// </value>
-        public string ErrorText
-        {
-            get;
-            private set;
-        }
+        public string ErrorText { get; }
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return ActionLength + TransactionIdLength + Encoding.ASCII.GetByteCount(this.ErrorText);
-            }
-        }
+        public override int Length => ActionLength + TransactionIdLength + Encoding.ASCII.GetByteCount(ErrorText);
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="message">The message.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, int offset, out ErrorMessage message)
         {
@@ -93,13 +82,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                 buffer.Length >= offset + ActionLength + TransactionIdLength &&
                 offset >= 0)
             {
-                action = Message.ReadInt(buffer, ref offset);
-                transactionId = Message.ReadInt(buffer, ref offset);
+                action = ReadInt(buffer, ref offset);
+                transactionId = ReadInt(buffer, ref offset);
 
-                if (action == (int)TrackingAction.Error &&
+                if (action == (int) TrackingAction.Error &&
                     transactionId >= 0)
                 {
-                    errorMessage = Message.ReadString(buffer, ref offset, buffer.Length - offset);
+                    errorMessage = ReadString(buffer, ref offset, buffer.Length - offset);
 
                     if (errorMessage.IsNotNullOrEmpty())
                     {
@@ -112,7 +101,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -123,11 +112,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, (int)this.Action);
-            Message.Write(buffer, ref written, this.TransactionId);
-            Message.Write(buffer, ref written, this.ErrorText);
+            Write(buffer, ref written, (int) Action);
+            Write(buffer, ref written, TransactionId);
+            Write(buffer, ref written, ErrorText);
 
             return written - offset;
         }

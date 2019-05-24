@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Timers;
 using DefensiveProgrammingFramework;
 using MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs;
 using MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages;
@@ -8,23 +9,23 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
 {
     /// <summary>
-    /// The tracker base.
+    ///     The tracker base.
     /// </summary>
     public abstract class Tracker : IDisposable
     {
         #region Private Fields
 
         /// <summary>
-        /// The tracking timer.
+        ///     The tracking timer.
         /// </summary>
-        private System.Timers.Timer timer;
+        private Timer timer;
 
         #endregion Private Fields
 
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Tracker" /> class.
+        ///     Initializes a new instance of the <see cref="Tracker" /> class.
         /// </summary>
         /// <param name="trackerUri">The tracker URI.</param>
         /// <param name="peerId">The peer identifier.</param>
@@ -40,11 +41,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
             listeningPort.MustBeGreaterThanOrEqualTo(IPEndPoint.MinPort);
             listeningPort.MustBeGreaterThanOrEqualTo(IPEndPoint.MinPort);
 
-            this.UpdateInterval = TimeSpan.FromMinutes(10);
-            this.TrackerUri = trackerUri;
-            this.TorrentInfoHash = torrentInfoHash;
-            this.ListeningPort = listeningPort;
-            this.PeerId = peerId;
+            UpdateInterval = TimeSpan.FromMinutes(10);
+            TrackerUri = trackerUri;
+            TorrentInfoHash = torrentInfoHash;
+            ListeningPort = listeningPort;
+            PeerId = peerId;
         }
 
         #endregion Public Constructors
@@ -52,17 +53,17 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
         #region Public Events
 
         /// <summary>
-        /// Occurs when announce has completed.
+        ///     Occurs when announce has completed.
         /// </summary>
         public event EventHandler<AnnouncedEventArgs> Announced;
 
         /// <summary>
-        /// Occurs before announce has started.
+        ///     Occurs before announce has started.
         /// </summary>
         public event EventHandler<System.EventArgs> Announcing;
 
         /// <summary>
-        /// Occurs when tracking has failed.
+        ///     Occurs when tracking has failed.
         /// </summary>
         public event EventHandler<TrackingFailedEventArgs> TrackingFailed;
 
@@ -71,192 +72,148 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
         #region Public Properties
 
         /// <summary>
-        /// Gets or sets the bytes downloaded.
+        ///     Gets or sets the bytes downloaded.
         /// </summary>
         /// <value>
-        /// The bytes downloaded.
+        ///     The bytes downloaded.
         /// </value>
-        public long BytesDownloaded
-        {
-            get;
-            set;
-        }
+        public long BytesDownloaded { get; set; }
 
         /// <summary>
-        /// Gets or sets the bytes left to download.
+        ///     Gets or sets the bytes left to download.
         /// </summary>
         /// <value>
-        /// The bytes left to download.
+        ///     The bytes left to download.
         /// </value>
-        public long BytesLeftToDownload
-        {
-            get;
-            set;
-        }
+        public long BytesLeftToDownload { get; set; }
 
         /// <summary>
-        /// Gets or sets the bytes uploaded.
+        ///     Gets or sets the bytes uploaded.
         /// </summary>
         /// <value>
-        /// The bytes uploaded.
+        ///     The bytes uploaded.
         /// </value>
-        public long BytesUploaded
-        {
-            get;
-            set;
-        }
+        public long BytesUploaded { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the object is disposed.
+        ///     Gets a value indicating whether the object is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the object is disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if the object is disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool IsDisposed
-        {
-            get;
-            private set;
-        }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets the listening port.
+        ///     Gets the listening port.
         /// </summary>
         /// <value>
-        /// The listening port.
+        ///     The listening port.
         /// </value>
-        public int ListeningPort
-        {
-            get;
-            private set;
-        }
+        public int ListeningPort { get; }
 
         /// <summary>
-        /// Gets the peer identifier.
+        ///     Gets the peer identifier.
         /// </summary>
         /// <value>
-        /// The peer identifier.
+        ///     The peer identifier.
         /// </value>
-        public string PeerId
-        {
-            get;
-            private set;
-        }
+        public string PeerId { get; }
 
         /// <summary>
-        /// Gets the torrent information hash.
+        ///     Gets the torrent information hash.
         /// </summary>
         /// <value>
-        /// The torrent information hash.
+        ///     The torrent information hash.
         /// </value>
-        public string TorrentInfoHash
-        {
-            get;
-            private set;
-        }
+        public string TorrentInfoHash { get; }
 
         /// <summary>
-        /// Gets the tracker URI.
+        ///     Gets the tracker URI.
         /// </summary>
         /// <value>
-        /// The tracker URI.
+        ///     The tracker URI.
         /// </value>
-        public Uri TrackerUri
-        {
-            get;
-            private set;
-        }
+        public Uri TrackerUri { get; }
 
         /// <summary>
-        /// Gets or sets the tracking event.
+        ///     Gets or sets the tracking event.
         /// </summary>
         /// <value>
-        /// The tracking event.
+        ///     The tracking event.
         /// </value>
-        public TrackingEvent TrackingEvent
-        {
-            get;
-            set;
-        }
+        public TrackingEvent TrackingEvent { get; set; }
 
         /// <summary>
-        /// Gets or sets the update interval.
+        ///     Gets or sets the update interval.
         /// </summary>
         /// <value>
-        /// The update interval.
+        ///     The update interval.
         /// </value>
-        public TimeSpan UpdateInterval
-        {
-            get;
-            protected set;
-        }
+        public TimeSpan UpdateInterval { get; protected set; }
 
         /// <summary>
-        /// Gets or sets the wanted peer count.
+        ///     Gets or sets the wanted peer count.
         /// </summary>
         /// <value>
-        /// The wanted peer count.
+        ///     The wanted peer count.
         /// </value>
-        public int WantedPeerCount
-        {
-            get;
-            set;
-        }
+        public int WantedPeerCount { get; set; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public virtual void Dispose()
         {
-            if (!this.IsDisposed)
+            if (!IsDisposed)
             {
-                this.IsDisposed = true;
+                IsDisposed = true;
 
                 Debug.WriteLine("disposing tracker");
 
-                this.StopTracking();
+                StopTracking();
             }
         }
 
         /// <summary>
-        /// Starts the tracking.
+        ///     Starts the tracking.
         /// </summary>
         public void StartTracking()
         {
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            Debug.WriteLine($"starting tracking {this.TrackerUri} for torrent { this.TorrentInfoHash}");
+            Debug.WriteLine($"starting tracking {TrackerUri} for torrent {TorrentInfoHash}");
 
-            this.OnStart();
+            OnStart();
 
-            this.timer = new System.Timers.Timer();
-            this.timer.Interval = TimeSpan.FromSeconds(1).TotalMilliseconds;
-            this.timer.Elapsed += this.Timer_Elapsed;
-            this.timer.Enabled = true;
-            this.timer.Start();
+            timer = new Timer();
+            timer.Interval = TimeSpan.FromSeconds(1).TotalMilliseconds;
+            timer.Elapsed += Timer_Elapsed;
+            timer.Enabled = true;
+            timer.Start();
         }
 
         /// <summary>
-        /// Stops the tracking.
+        ///     Stops the tracking.
         /// </summary>
         public void StopTracking()
         {
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            Debug.WriteLine($"stopping tracking {this.TrackerUri} for torrent {this.TorrentInfoHash}");
+            Debug.WriteLine($"stopping tracking {TrackerUri} for torrent {TorrentInfoHash}");
 
-            if (this.timer != null)
+            if (timer != null)
             {
-                this.timer.Stop();
-                this.timer.Enabled = false;
-                this.timer.Dispose();
-                this.timer = null;
+                timer.Stop();
+                timer.Enabled = false;
+                timer.Dispose();
+                timer = null;
             }
 
-            this.OnStop();
+            OnStop();
         }
 
         #endregion Public Methods
@@ -264,12 +221,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
         #region Protected Methods
 
         /// <summary>
-        /// Called when announcing.
+        ///     Called when announcing.
         /// </summary>
         protected abstract void OnAnnounce();
 
         /// <summary>
-        /// Called when announce has completed.
+        ///     Called when announce has completed.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -278,14 +235,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.Announced != null)
+            if (Announced != null)
             {
-                this.Announced(sender, e);
+                Announced(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when announce.
+        ///     Called when announce.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -294,19 +251,19 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.Announcing != null)
+            if (Announcing != null)
             {
-                this.Announcing(sender, e);
+                Announcing(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when starting tracking.
+        ///     Called when starting tracking.
         /// </summary>
         protected abstract void OnStart();
 
         /// <summary>
-        /// Called when stopping tracking.
+        ///     Called when stopping tracking.
         /// </summary>
         protected abstract void OnStop();
 
@@ -315,18 +272,18 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
         #region Private Methods
 
         /// <summary>
-        /// Checks if object is disposed.
+        ///     Checks if object is disposed.
         /// </summary>
         private void CheckIfObjectIsDisposed()
         {
-            if (this.IsDisposed)
+            if (IsDisposed)
             {
-                throw new ObjectDisposedException(this.GetType().Name);
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 
         /// <summary>
-        /// Called when tracking has failed.
+        ///     Called when tracking has failed.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -335,24 +292,24 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TrackingFailed != null)
+            if (TrackingFailed != null)
             {
-                this.TrackingFailed(sender, e);
+                TrackingFailed(sender, e);
             }
         }
 
         /// <summary>
-        /// Handles the Elapsed event of the Timer control.
+        ///     Handles the Elapsed event of the Timer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Timers.ElapsedEventArgs"/> instance containing the event data.</param>
-        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        /// <param name="e">The <see cref="System.Timers.ElapsedEventArgs" /> instance containing the event data.</param>
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            this.timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
+            timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
 
-            this.OnAnnounce();
+            OnAnnounce();
 
-            this.timer.Interval = this.UpdateInterval.TotalMilliseconds;
+            timer.Interval = UpdateInterval.TotalMilliseconds;
         }
 
         #endregion Private Methods

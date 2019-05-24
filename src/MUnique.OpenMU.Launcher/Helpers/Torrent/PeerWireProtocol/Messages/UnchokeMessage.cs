@@ -3,76 +3,63 @@
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 {
     /// <summary>
-    /// The un-choke message.
+    ///     The un-choke message.
     /// </summary>
     public class UnchokeMessage : PeerMessage
     {
         #region Public Fields
 
         /// <summary>
-        /// The message unique identifier.
+        ///     The message unique identifier.
         /// </summary>
         public const byte MessageId = 1;
 
         #endregion Public Fields
 
-        #region Private Fields
-
-        /// <summary>
-        /// The message unique identifier length in bytes.
-        /// </summary>
-        private const int MessageIdLength = 1;
-
-        /// <summary>
-        /// The message length in bytes.
-        /// </summary>
-        private const int MessageLength = 1;
-
-        /// <summary>
-        /// The message length in bytes.
-        /// </summary>
-        private const int MessageLengthLength = 4;
-
-        /// <summary>
-        /// The message length in bytes.
-        /// </summary>
-        private const int PayloadLength = 0;
-
-        #endregion Private Fields
-
         #region Public Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UnchokeMessage"/> class.
-        /// </summary>
-        public UnchokeMessage()
-        {
-        }
 
         #endregion Public Constructors
 
         #region Public Properties
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return MessageLengthLength + MessageIdLength + PayloadLength;
-            }
-        }
+        public override int Length => MessageLengthLength + MessageIdLength + PayloadLength;
 
         #endregion Public Properties
+
+        #region Private Fields
+
+        /// <summary>
+        ///     The message unique identifier length in bytes.
+        /// </summary>
+        private const int MessageIdLength = 1;
+
+        /// <summary>
+        ///     The message length in bytes.
+        /// </summary>
+        private const int MessageLength = 1;
+
+        /// <summary>
+        ///     The message length in bytes.
+        /// </summary>
+        private const int MessageLengthLength = 4;
+
+        /// <summary>
+        ///     The message length in bytes.
+        /// </summary>
+        private const int PayloadLength = 0;
+
+        #endregion Private Fields
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offsetFrom">The offset.</param>
@@ -80,7 +67,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         /// <param name="message">The message.</param>
         /// <param name="isIncomplete">if set to <c>true</c> the message is incomplete.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, ref int offsetFrom, int offsetTo, out UnchokeMessage message, out bool isIncomplete)
         {
@@ -94,8 +81,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
                 buffer.Length >= offsetFrom + MessageLengthLength + MessageIdLength + PayloadLength &&
                 offsetFrom >= 0)
             {
-                messageLength = Message.ReadInt(buffer, ref offsetFrom);
-                messageId = Message.ReadByte(buffer, ref offsetFrom);
+                messageLength = ReadInt(buffer, ref offsetFrom);
+                messageId = ReadByte(buffer, ref offsetFrom);
 
                 if (messageLength == MessageLength &&
                     messageId == MessageId)
@@ -115,12 +102,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <returns>
-        /// The encoded peer message.
+        ///     The encoded peer message.
         /// </returns>
         public override int Encode(byte[] buffer, int offset)
         {
@@ -128,20 +115,20 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, MessageLength);
-            Message.Write(buffer, ref written, MessageId);
+            Write(buffer, ref written, MessageLength);
+            Write(buffer, ref written, MessageId);
 
-            return this.CheckWritten(written - offset);
+            return CheckWritten(written - offset);
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="object" />, is equal to this instance.
+        ///     Determines whether the specified <see cref="object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
@@ -149,21 +136,21 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        ///     Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
-            return this.ToString().GetHashCode();
+            return ToString().GetHashCode();
         }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {

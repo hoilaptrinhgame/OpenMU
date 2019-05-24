@@ -1,42 +1,17 @@
 ﻿using System;
 using DefensiveProgrammingFramework;
-using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
     /// <summary>
-    /// The connect message.
+    ///     The connect message.
     /// </summary>
     public class ConnectMessage : TrackerMessage
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The action length in bytes.
-        /// </summary>
-        private const int ActionLength = 4;
-
-        /// <summary>
-        /// The default connection identifier
-        /// </summary>
-        private const long ConnectionId = 0x41727101980;
-
-        /// <summary>
-        /// The connection identifier length in bytes.
-        /// </summary>
-        private const int ConnectionIdLength = 8;
-
-        /// <summary>
-        /// The transaction identifier length in bytes.
-        /// </summary>
-        private const int TransactionIdLength = 4;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConnectMessage" /> class.
+        ///     Initializes a new instance of the <see cref="ConnectMessage" /> class.
         /// </summary>
         /// <param name="transactionId">The transaction identifier.</param>
         public ConnectMessage(int transactionId)
@@ -49,7 +24,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="ConnectMessage"/> class from being created.
+        ///     Prevents a default instance of the <see cref="ConnectMessage" /> class from being created.
         /// </summary>
         private ConnectMessage()
             : this(DateTime.UtcNow.GetHashCode())
@@ -61,31 +36,49 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         #region Public Properties
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return ConnectionIdLength + ActionLength + TransactionIdLength;
-            }
-        }
+        public override int Length => ConnectionIdLength + ActionLength + TransactionIdLength;
 
         #endregion Public Properties
+
+        #region Private Fields
+
+        /// <summary>
+        ///     The action length in bytes.
+        /// </summary>
+        private const int ActionLength = 4;
+
+        /// <summary>
+        ///     The default connection identifier
+        /// </summary>
+        private const long ConnectionId = 0x41727101980;
+
+        /// <summary>
+        ///     The connection identifier length in bytes.
+        /// </summary>
+        private const int ConnectionIdLength = 8;
+
+        /// <summary>
+        ///     The transaction identifier length in bytes.
+        /// </summary>
+        private const int TransactionIdLength = 4;
+
+        #endregion Private Fields
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="message">The message.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, int offset, out ConnectMessage message)
         {
@@ -99,12 +92,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                 buffer.Length >= offset + ConnectionIdLength + ActionLength + TransactionIdLength &&
                 offset >= 0)
             {
-                connectionId = Message.ReadLong(buffer, ref offset);
-                action = Message.ReadInt(buffer, ref offset);
-                transactionId = Message.ReadInt(buffer, ref offset);
+                connectionId = ReadLong(buffer, ref offset);
+                action = ReadInt(buffer, ref offset);
+                transactionId = ReadInt(buffer, ref offset);
 
-                if (connectionId == ConnectMessage.ConnectionId &&
-                    action == (int)TrackingAction.Connect &&
+                if (connectionId == ConnectionId &&
+                    action == (int) TrackingAction.Connect &&
                     transactionId >= 0)
                 {
                     message = new ConnectMessage(transactionId);
@@ -115,12 +108,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <returns>
-        /// The encoded peer message.
+        ///     The encoded peer message.
         /// </returns>
         public override int Encode(byte[] buffer, int offset)
         {
@@ -128,20 +121,20 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, ConnectMessage.ConnectionId);
-            Message.Write(buffer, ref written, (int)this.Action);
-            Message.Write(buffer, ref written, this.TransactionId);
+            Write(buffer, ref written, ConnectionId);
+            Write(buffer, ref written, (int) Action);
+            Write(buffer, ref written, TransactionId);
 
-            return this.CheckWritten(written - offset);
+            return CheckWritten(written - offset);
         }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {

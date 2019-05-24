@@ -5,41 +5,35 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
 {
     /// <summary>
-    /// Random helper.
+    ///     Random helper.
     /// </summary>
     public static class RandomHelper
     {
         #region Private Fields
 
         /// <summary>
-        /// The random generator.
+        ///     The random generator.
         /// </summary>
-        private static Random random = new Random(DateTime.UtcNow.Millisecond);
+        private static readonly Random random = new Random(DateTime.UtcNow.Millisecond);
 
         #endregion Private Fields
 
         #region Public Properties
 
         /// <summary>
-        /// Gets the random.
+        ///     Gets the random.
         /// </summary>
         /// <value>
-        /// The random.
+        ///     The random.
         /// </value>
-        public static Random Random
-        {
-            get
-            {
-                return RandomHelper.random;
-            }
-        }
+        public static Random Random => random;
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Generates a random string with the given length.
+        ///     Generates a random string with the given length.
         /// </summary>
         /// <param name="size">Size of the string</param>
         /// <param name="stringCasing">The string casing.</param>
@@ -52,24 +46,19 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
             {
                 return string.Empty;
             }
-            else
-            {
-                size.MustBeGreaterThan(0);
-                characters.CannotBeNullOrEmpty();
 
-                StringBuilder builder = new StringBuilder();
+            size.MustBeGreaterThan(0);
+            characters.CannotBeNullOrEmpty();
 
-                for (int i = 0; i < size; i++)
-                {
-                    builder.Append(characters[random.Next(0, characters.Length - 1)]);
-                }
+            var builder = new StringBuilder();
 
-                return builder.ToString().ToString(stringCasing);
-            }
+            for (var i = 0; i < size; i++) builder.Append(characters[random.Next(0, characters.Length - 1)]);
+
+            return builder.ToString().ToString(stringCasing);
         }
 
         /// <summary>
-        /// Generates a random string with the given length.
+        ///     Generates a random string with the given length.
         /// </summary>
         /// <param name="size">Size of the string</param>
         /// <param name="characters">The characters.</param>
@@ -80,10 +69,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
             {
                 return string.Empty;
             }
-            else
-            {
-                return RandomString(size, StringCasing.None, characters.ToCharArray());
-            }
+
+            return RandomString(size, StringCasing.None, characters.ToCharArray());
         }
 
         #endregion Public Methods

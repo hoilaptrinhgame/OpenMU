@@ -4,14 +4,14 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
     /// <summary>
-    /// The tracker message base.
+    ///     The tracker message base.
     /// </summary>
     public abstract class TrackerMessage : Message
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrackerMessage"/> class.
+        ///     Initializes a new instance of the <see cref="TrackerMessage" /> class.
         /// </summary>
         /// <param name="action">The action.</param>
         /// <param name="transactionId">The transaction unique identifier.</param>
@@ -19,51 +19,23 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         {
             transactionId.MustBeGreaterThanOrEqualTo(0);
 
-            this.Action = action;
-            this.TransactionId = transactionId;
+            Action = action;
+            TransactionId = transactionId;
         }
 
         #endregion Public Constructors
 
-        #region Public Properties
-
-        /// <summary>
-        /// Gets or sets the action.
-        /// </summary>
-        /// <value>
-        /// The action.
-        /// </value>
-        public TrackingAction Action
-        {
-            get;
-            protected set;
-        }
-
-        /// <summary>
-        /// Gets or sets the transaction unique identifier.
-        /// </summary>
-        /// <value>
-        /// The transaction unique identifier.
-        /// </value>
-        public int TransactionId
-        {
-            get;
-            protected set;
-        }
-
-        #endregion Public Properties
-
         #region Public Methods
 
         /// <summary>
-        /// Tries to decode the message.
+        ///     Tries to decode the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="messageType">Type of the message.</param>
         /// <param name="message">The decoded message.</param>
         /// <returns>
-        /// True if message was successfully decoded; false otherwise.
+        ///     True if message was successfully decoded; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, int offset, MessageType messageType, out TrackerMessage message)
         {
@@ -73,10 +45,10 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 
             if (buffer.IsNotNullOrEmpty())
             {
-                action = messageType == MessageType.Request ? Message.ReadInt(buffer, ref offset) : Message.ReadInt(buffer, ref offset);
+                action = messageType == MessageType.Request ? ReadInt(buffer, ref offset) : ReadInt(buffer, ref offset);
                 offset = 0;
 
-                if (action == (int)TrackingAction.Connect)
+                if (action == (int) TrackingAction.Connect)
                 {
                     if (messageType == MessageType.Request)
                     {
@@ -93,7 +65,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                         message = message2;
                     }
                 }
-                else if (action == (int)TrackingAction.Announce)
+                else if (action == (int) TrackingAction.Announce)
                 {
                     if (messageType == MessageType.Request)
                     {
@@ -110,7 +82,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                         message = message2;
                     }
                 }
-                else if (action == (int)TrackingAction.Scrape)
+                else if (action == (int) TrackingAction.Scrape)
                 {
                     if (messageType == MessageType.Request)
                     {
@@ -127,16 +99,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                         message = message2;
                     }
                 }
-                else if (action == (int)TrackingAction.Error)
+                else if (action == (int) TrackingAction.Error)
                 {
                     ErrorMessage message2;
                     ErrorMessage.TryDecode(buffer, offset, out message2);
 
                     message = message2;
-                }
-                else
-                {
-                    // could not decode UDP message
                 }
             }
 
@@ -144,5 +112,25 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         }
 
         #endregion Public Methods
+
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets or sets the action.
+        /// </summary>
+        /// <value>
+        ///     The action.
+        /// </value>
+        public TrackingAction Action { get; protected set; }
+
+        /// <summary>
+        ///     Gets or sets the transaction unique identifier.
+        /// </summary>
+        /// <value>
+        ///     The transaction unique identifier.
+        /// </value>
+        public int TransactionId { get; protected set; }
+
+        #endregion Public Properties
     }
 }

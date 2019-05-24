@@ -19,53 +19,14 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 {
     /// <summary>
-    /// The torrent transfer manager.
+    ///     The torrent transfer manager.
     /// </summary>
     public sealed class TransferManager : IDisposable
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The downloaded bytes count.
-        /// </summary>
-        private long downloaded = 0;
-
-        /// <summary>
-        /// The peers.
-        /// </summary>
-        private Dictionary<IPEndPoint, Peer> peers = new Dictionary<IPEndPoint, Peer>();
-
-        /// <summary>
-        /// The persistence manager.
-        /// </summary>
-        private PersistenceManager persistenceManager;
-
-        /// <summary>
-        /// The piece manager.
-        /// </summary>
-        private PieceManager pieceManager;
-
-        /// <summary>
-        /// The throttling manager.
-        /// </summary>
-        private ThrottlingManager throttlingManager;
-
-        /// <summary>
-        /// The trackers.
-        /// </summary>
-        private IDictionary<Uri, Tracker> trackers = new Dictionary<Uri, Tracker>();
-
-        /// <summary>
-        /// The uploaded bytes count.
-        /// </summary>
-        private long uploaded = 0;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransferManager" /> class.
+        ///     Initializes a new instance of the <see cref="TransferManager" /> class.
         /// </summary>
         /// <param name="listeningPort">The port.</param>
         /// <param name="torrentInfo">The torrent information.</param>
@@ -81,12 +42,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
             Tracker tracker = null;
 
-            this.PeerId = "-AB1100-" + "0123456789ABCDEF".Random(24);
+            PeerId = "-AB1100-" + "0123456789ABCDEF".Random(24);
 
             Debug.WriteLine($"creating torrent manager for torrent {torrentInfo.InfoHash}");
-            Debug.WriteLine($"local peer id {this.PeerId}");
+            Debug.WriteLine($"local peer id {PeerId}");
 
-            this.TorrentInfo = torrentInfo;
+            TorrentInfo = torrentInfo;
 
             this.throttlingManager = throttlingManager;
 
@@ -98,23 +59,23 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                 if (trackerUri.Scheme == "http" ||
                     trackerUri.Scheme == "https")
                 {
-                    tracker = new HttpTracker(trackerUri, this.PeerId, torrentInfo.InfoHash, listeningPort);
+                    tracker = new HttpTracker(trackerUri, PeerId, torrentInfo.InfoHash, listeningPort);
                 }
                 else if (trackerUri.Scheme == "udp")
                 {
-                    tracker = new UdpTracker(trackerUri, this.PeerId, torrentInfo.InfoHash, listeningPort);
+                    tracker = new UdpTracker(trackerUri, PeerId, torrentInfo.InfoHash, listeningPort);
                 }
 
                 if (tracker != null)
                 {
                     tracker.TrackingEvent = TrackingEvent.Started;
-                    tracker.Announcing += this.Tracker_Announcing;
-                    tracker.Announced += this.Tracker_Announced;
-                    tracker.TrackingFailed += this.Tracker_TrackingFailed;
-                    tracker.BytesLeftToDownload = this.TorrentInfo.Length - this.Downloaded;
+                    tracker.Announcing += Tracker_Announcing;
+                    tracker.Announced += Tracker_Announced;
+                    tracker.TrackingFailed += Tracker_TrackingFailed;
+                    tracker.BytesLeftToDownload = TorrentInfo.Length - Downloaded;
                     tracker.WantedPeerCount = 30; // we can handle 30 peers at a time
 
-                    this.trackers.Add(trackerUri, tracker);
+                    trackers.Add(trackerUri, tracker);
                 }
                 else
                 {
@@ -129,7 +90,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="TransferManager"/> class from being created.
+        ///     Prevents a default instance of the <see cref="TransferManager" /> class from being created.
         /// </summary>
         private TransferManager()
         {
@@ -137,30 +98,69 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
         #endregion Private Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The downloaded bytes count.
+        /// </summary>
+        private long downloaded;
+
+        /// <summary>
+        ///     The peers.
+        /// </summary>
+        private Dictionary<IPEndPoint, Peer> peers = new Dictionary<IPEndPoint, Peer>();
+
+        /// <summary>
+        ///     The persistence manager.
+        /// </summary>
+        private readonly PersistenceManager persistenceManager;
+
+        /// <summary>
+        ///     The piece manager.
+        /// </summary>
+        private PieceManager pieceManager;
+
+        /// <summary>
+        ///     The throttling manager.
+        /// </summary>
+        private readonly ThrottlingManager throttlingManager;
+
+        /// <summary>
+        ///     The trackers.
+        /// </summary>
+        private IDictionary<Uri, Tracker> trackers = new Dictionary<Uri, Tracker>();
+
+        /// <summary>
+        ///     The uploaded bytes count.
+        /// </summary>
+        private long uploaded;
+
+        #endregion Private Fields
+
         #region Public Events
 
         /// <summary>
-        /// Occurs when torrent transfer has begun hashing.
+        ///     Occurs when torrent transfer has begun hashing.
         /// </summary>
         public event EventHandler<System.EventArgs> TorrentHashing;
 
         /// <summary>
-        /// Occurs when torrent is leeching.
+        ///     Occurs when torrent is leeching.
         /// </summary>
         public event EventHandler<System.EventArgs> TorrentLeeching;
 
         /// <summary>
-        /// Occurs when torrent transfer has begun seeding.
+        ///     Occurs when torrent transfer has begun seeding.
         /// </summary>
         public event EventHandler<System.EventArgs> TorrentSeeding;
 
         /// <summary>
-        /// Occurs when torrent has started.
+        ///     Occurs when torrent has started.
         /// </summary>
         public event EventHandler<System.EventArgs> TorrentStarted;
 
         /// <summary>
-        /// Occurs when torrent has stopped.
+        ///     Occurs when torrent has stopped.
         /// </summary>
         public event EventHandler<System.EventArgs> TorrentStopped;
 
@@ -169,188 +169,166 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Public Properties
 
         /// <summary>
-        /// Gets the completed percentage.
+        ///     Gets the completed percentage.
         /// </summary>
         /// <value>
-        /// The completed percentage.
+        ///     The completed percentage.
         /// </value>
-        public decimal CompletedPercentage
-        {
-            get
-            {
-                return this.pieceManager.CompletedPercentage;
-            }
-        }
+        public decimal CompletedPercentage => pieceManager.CompletedPercentage;
 
         /// <summary>
-        /// Gets the downloaded bytes count.
+        ///     Gets the downloaded bytes count.
         /// </summary>
         /// <value>
-        /// The downloaded bytes count.
+        ///     The downloaded bytes count.
         /// </value>
         public long Downloaded
         {
             get
             {
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    return this.downloaded + this.peers.Values.Sum(x => x.Downloaded);
+                    return downloaded + peers.Values.Sum(x => x.Downloaded);
                 }
             }
         }
 
         /// <summary>
-        /// Gets the download speed in bytes per second.
+        ///     Gets the download speed in bytes per second.
         /// </summary>
         /// <value>
-        /// The download speed in bytes per second.
+        ///     The download speed in bytes per second.
         /// </value>
         public decimal DownloadSpeed
         {
             get
             {
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    return this.peers.Values.Sum(x => x.DownloadSpeed);
+                    return peers.Values.Sum(x => x.DownloadSpeed);
                 }
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the object is disposed.
+        ///     Gets a value indicating whether the object is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the object is disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if the object is disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool IsDisposed
-        {
-            get;
-            private set;
-        }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets the leeching peer count.
+        ///     Gets the leeching peer count.
         /// </summary>
         /// <value>
-        /// The leeching peer count.
+        ///     The leeching peer count.
         /// </value>
         public int LeechingPeerCount
         {
             get
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    return this.peers.Values.Count(x => x.LeechingState == LeechingState.Interested);
+                    return peers.Values.Count(x => x.LeechingState == LeechingState.Interested);
                 }
             }
         }
 
         /// <summary>
-        /// Gets the peer count.
+        ///     Gets the peer count.
         /// </summary>
         /// <value>
-        /// The peer count.
+        ///     The peer count.
         /// </value>
         public int PeerCount
         {
             get
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    return this.peers.Count;
+                    return peers.Count;
                 }
             }
         }
 
         /// <summary>
-        /// Gets the peer identifier.
+        ///     Gets the peer identifier.
         /// </summary>
         /// <value>
-        /// The peer identifier.
+        ///     The peer identifier.
         /// </value>
-        public string PeerId
-        {
-            get;
-            private set;
-        }
+        public string PeerId { get; }
 
         /// <summary>
-        /// Gets the seeding peer count.
+        ///     Gets the seeding peer count.
         /// </summary>
         /// <value>
-        /// The seeding peer count.
+        ///     The seeding peer count.
         /// </value>
         public int SeedingPeerCount
         {
             get
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    return this.peers.Values.Count(x => x.SeedingState == SeedingState.Unchoked);
+                    return peers.Values.Count(x => x.SeedingState == SeedingState.Unchoked);
                 }
             }
         }
 
         /// <summary>
-        /// Gets the start time.
+        ///     Gets the start time.
         /// </summary>
         /// <value>
-        /// The start time.
+        ///     The start time.
         /// </value>
-        public DateTime StartTime
-        {
-            get;
-            private set;
-        }
+        public DateTime StartTime { get; private set; }
 
         /// <summary>
-        /// Gets the torrent information.
+        ///     Gets the torrent information.
         /// </summary>
         /// <value>
-        /// The torrent information.
+        ///     The torrent information.
         /// </value>
-        public TorrentInfo TorrentInfo
-        {
-            get;
-            private set;
-        }
+        public TorrentInfo TorrentInfo { get; }
 
         /// <summary>
-        /// Gets the uploaded bytes count.
+        ///     Gets the uploaded bytes count.
         /// </summary>
         /// <value>
-        /// The uploaded bytes count.
+        ///     The uploaded bytes count.
         /// </value>
         public long Uploaded
         {
             get
             {
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    return this.uploaded + this.peers.Values.Sum(x => x.Uploaded);
+                    return uploaded + peers.Values.Sum(x => x.Uploaded);
                 }
             }
         }
 
         /// <summary>
-        /// Gets the upload speed in bytes per second.
+        ///     Gets the upload speed in bytes per second.
         /// </summary>
         /// <value>
-        /// The upload speed in bytes per second.
+        ///     The upload speed in bytes per second.
         /// </value>
         public decimal UploadSpeed
         {
             get
             {
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    return this.peers.Values.Sum(x => x.UploadSpeed);
+                    return peers.Values.Sum(x => x.UploadSpeed);
                 }
             }
         }
@@ -360,7 +338,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Public Methods
 
         /// <summary>
-        /// Adds the leecher.
+        ///     Adds the leecher.
         /// </summary>
         /// <param name="tcp">The TCP.</param>
         /// <param name="peerId">The peer identifier.</param>
@@ -370,27 +348,27 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             peerId.CannotBeNull();
 
             Peer peer;
-            int maxLeechers = 10;
+            var maxLeechers = 10;
 
-            lock (((IDictionary)this.peers).SyncRoot)
+            lock (((IDictionary) peers).SyncRoot)
             {
-                if (!this.peers.ContainsKey(tcp.Client.RemoteEndPoint as IPEndPoint))
+                if (!peers.ContainsKey(tcp.Client.RemoteEndPoint as IPEndPoint))
                 {
-                    if (this.LeechingPeerCount < maxLeechers)
+                    if (LeechingPeerCount < maxLeechers)
                     {
-                        Debug.WriteLine($"adding leeching peer {tcp.Client.RemoteEndPoint} to torrent {this.TorrentInfo.InfoHash}");
+                        Debug.WriteLine($"adding leeching peer {tcp.Client.RemoteEndPoint} to torrent {TorrentInfo.InfoHash}");
 
                         // setup tcp client
-                        tcp.ReceiveBufferSize = (int)Math.Max(this.TorrentInfo.BlockLength, this.TorrentInfo.PieceHashes.Count()) + 100;
+                        tcp.ReceiveBufferSize = Math.Max(TorrentInfo.BlockLength, TorrentInfo.PieceHashes.Count()) + 100;
                         tcp.SendBufferSize = tcp.ReceiveBufferSize;
-                        tcp.Client.ReceiveTimeout = (int)TimeSpan.FromSeconds(60).TotalMilliseconds;
+                        tcp.Client.ReceiveTimeout = (int) TimeSpan.FromSeconds(60).TotalMilliseconds;
                         tcp.Client.SendTimeout = tcp.Client.ReceiveTimeout;
 
                         // add new peer
-                        peer = new Peer(new PeerCommunicator(this.throttlingManager, tcp), this.pieceManager, this.PeerId, peerId);
-                        peer.CommunicationErrorOccurred += this.Peer_CommunicationErrorOccurred;
+                        peer = new Peer(new PeerCommunicator(throttlingManager, tcp), pieceManager, PeerId, peerId);
+                        peer.CommunicationErrorOccurred += Peer_CommunicationErrorOccurred;
 
-                        this.peers.Add(tcp.Client.RemoteEndPoint as IPEndPoint, peer);
+                        peers.Add(tcp.Client.RemoteEndPoint as IPEndPoint, peer);
                     }
                     else
                     {
@@ -405,115 +383,110 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            if (!this.IsDisposed)
+            if (!IsDisposed)
             {
-                this.IsDisposed = true;
+                IsDisposed = true;
 
-                Debug.WriteLine($"disposing torrent manager for torrent {this.TorrentInfo.InfoHash}");
+                Debug.WriteLine($"disposing torrent manager for torrent {TorrentInfo.InfoHash}");
 
-                this.Stop();
+                Stop();
 
-                lock (((IDictionary)this.trackers).SyncRoot)
+                lock (((IDictionary) trackers).SyncRoot)
                 {
-                    if (this.trackers != null)
+                    if (trackers != null)
                     {
-                        this.trackers.Clear();
-                        this.trackers = null;
+                        trackers.Clear();
+                        trackers = null;
                     }
                 }
 
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    if (this.peers != null)
+                    if (peers != null)
                     {
-                        this.peers.Clear();
-                        this.peers = null;
+                        peers.Clear();
+                        peers = null;
                     }
                 }
 
-                if (this.pieceManager != null)
+                if (pieceManager != null)
                 {
-                    this.pieceManager.Dispose();
-                    this.pieceManager = null;
+                    pieceManager.Dispose();
+                    pieceManager = null;
                 }
             }
         }
 
         /// <summary>
-        /// Starts this instance.
+        ///     Starts this instance.
         /// </summary>
         public void Start()
         {
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            this.StartTime = DateTime.UtcNow;
+            StartTime = DateTime.UtcNow;
 
-            Debug.WriteLine($"starting torrent manager for torrent {this.TorrentInfo.InfoHash}");
+            Debug.WriteLine($"starting torrent manager for torrent {TorrentInfo.InfoHash}");
 
-            this.OnTorrentHashing(this, System.EventArgs.Empty);
+            OnTorrentHashing(this, System.EventArgs.Empty);
 
             // initialize piece manager
-            this.pieceManager = new PieceManager(this.TorrentInfo.InfoHash, this.TorrentInfo.Length, this.TorrentInfo.PieceHashes, this.TorrentInfo.PieceLength, this.TorrentInfo.BlockLength, this.persistenceManager.Verify());
-            this.pieceManager.PieceCompleted += this.PieceManager_PieceCompleted;
-            this.pieceManager.PieceRequested += this.PieceManager_PieceRequested;
+            pieceManager = new PieceManager(TorrentInfo.InfoHash, TorrentInfo.Length, TorrentInfo.PieceHashes, TorrentInfo.PieceLength, TorrentInfo.BlockLength,
+                persistenceManager.Verify());
+            pieceManager.PieceCompleted += PieceManager_PieceCompleted;
+            pieceManager.PieceRequested += PieceManager_PieceRequested;
 
             // start tracking
-            lock (((IDictionary)this.trackers).SyncRoot)
+            lock (((IDictionary) trackers).SyncRoot)
             {
-                foreach (var tracker in this.trackers.Values)
-                {
-                    tracker.StartTracking();
-                }
+                foreach (var tracker in trackers.Values) tracker.StartTracking();
             }
 
-            this.OnTorrentStarted(this, System.EventArgs.Empty);
+            OnTorrentStarted(this, System.EventArgs.Empty);
 
-            if (this.pieceManager.IsComplete)
+            if (pieceManager.IsComplete)
             {
-                this.OnTorrentSeeding(this, System.EventArgs.Empty);
+                OnTorrentSeeding(this, System.EventArgs.Empty);
             }
         }
 
         /// <summary>
-        /// Stops this instance.
+        ///     Stops this instance.
         /// </summary>
         public void Stop()
         {
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            Debug.WriteLine($"stopping torrent manager for torrent {this.TorrentInfo.InfoHash}");
+            Debug.WriteLine($"stopping torrent manager for torrent {TorrentInfo.InfoHash}");
 
             // stop peers
-            lock (((IDictionary)this.peers).SyncRoot)
+            lock (((IDictionary) peers).SyncRoot)
             {
-                foreach (var peer in this.peers.Values)
+                foreach (var peer in peers.Values)
                 {
                     peer.Dispose();
 
-                    this.downloaded += peer.Downloaded;
-                    this.uploaded += peer.Uploaded;
+                    downloaded += peer.Downloaded;
+                    uploaded += peer.Uploaded;
                 }
 
-                this.peers.Clear();
+                peers.Clear();
             }
 
             // stop tracking
-            lock (((IDictionary)this.trackers).SyncRoot)
+            lock (((IDictionary) trackers).SyncRoot)
             {
-                foreach (var tracker in this.trackers.Values)
-                {
-                    tracker.StopTracking();
-                }
+                foreach (var tracker in trackers.Values) tracker.StopTracking();
             }
 
-            this.OnTorrentStopped(this, System.EventArgs.Empty);
+            OnTorrentStopped(this, System.EventArgs.Empty);
 
-            this.pieceManager.Dispose();
-            this.pieceManager = null;
+            pieceManager.Dispose();
+            pieceManager = null;
         }
 
         #endregion Public Methods
@@ -521,7 +494,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Private Methods
 
         /// <summary>
-        /// Adds the peer.
+        ///     Adds the peer.
         /// </summary>
         /// <param name="endpoint">The endpoint.</param>
         private void AddSeeder(IPEndPoint endpoint)
@@ -530,34 +503,34 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
             TcpClient tcp;
 
-            lock (((IDictionary)this.peers).SyncRoot)
+            lock (((IDictionary) peers).SyncRoot)
             {
-                if (!this.peers.ContainsKey(endpoint))
+                if (!peers.ContainsKey(endpoint))
                 {
                     // set up tcp client
                     tcp = new TcpClient();
-                    tcp.ReceiveBufferSize = (int)Math.Max(this.TorrentInfo.BlockLength, this.TorrentInfo.PieceHashes.Count()) + 100;
+                    tcp.ReceiveBufferSize = Math.Max(TorrentInfo.BlockLength, TorrentInfo.PieceHashes.Count()) + 100;
                     tcp.SendBufferSize = tcp.ReceiveBufferSize;
-                    tcp.Client.ReceiveTimeout = (int)TimeSpan.FromSeconds(60).TotalMilliseconds;
+                    tcp.Client.ReceiveTimeout = (int) TimeSpan.FromSeconds(60).TotalMilliseconds;
                     tcp.Client.SendTimeout = tcp.Client.ReceiveTimeout;
-                    tcp.BeginConnect(endpoint.Address, endpoint.Port, this.PeerConnected, new AsyncConnectData(endpoint, tcp));
+                    tcp.BeginConnect(endpoint.Address, endpoint.Port, PeerConnected, new AsyncConnectData(endpoint, tcp));
                 }
             }
         }
 
         /// <summary>
-        /// Checks if object is disposed.
+        ///     Checks if object is disposed.
         /// </summary>
         private void CheckIfObjectIsDisposed()
         {
-            if (this.IsDisposed)
+            if (IsDisposed)
             {
-                throw new ObjectDisposedException(this.GetType().Name);
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 
         /// <summary>
-        /// Called when torrent is hashing.
+        ///     Called when torrent is hashing.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -566,14 +539,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentHashing != null)
+            if (TorrentHashing != null)
             {
-                this.TorrentHashing(sender, e);
+                TorrentHashing(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when torrent is leeching.
+        ///     Called when torrent is leeching.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -582,14 +555,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentLeeching != null)
+            if (TorrentLeeching != null)
             {
-                this.TorrentLeeching(sender, e);
+                TorrentLeeching(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when torrent transfer has begun seeding.
+        ///     Called when torrent transfer has begun seeding.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -598,14 +571,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentSeeding != null)
+            if (TorrentSeeding != null)
             {
-                this.TorrentSeeding(sender, e);
+                TorrentSeeding(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when torrent has started.
+        ///     Called when torrent has started.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -614,14 +587,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentStarted != null)
+            if (TorrentStarted != null)
             {
-                this.TorrentStarted(sender, e);
+                TorrentStarted(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when torrent has stopped.
+        ///     Called when torrent has stopped.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -630,14 +603,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentStopped != null)
+            if (TorrentStopped != null)
             {
-                this.TorrentStopped(sender, e);
+                TorrentStopped(sender, e);
             }
         }
 
         /// <summary>
-        /// Handles the CommunicationErrorOccurred event of the Peer control.
+        ///     Handles the CommunicationErrorOccurred event of the Peer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
@@ -649,18 +622,18 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
             if (e.IsFatal)
             {
-                Debug.WriteLine($"fatal communication error occurred for peer {peer.Endpoint} on torrent {this.TorrentInfo.InfoHash}: {e.ErrorMessage}");
+                Debug.WriteLine($"fatal communication error occurred for peer {peer.Endpoint} on torrent {TorrentInfo.InfoHash}: {e.ErrorMessage}");
 
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
                     // update transfer parameters
-                    this.downloaded += peer.Downloaded;
-                    this.uploaded += peer.Uploaded;
+                    downloaded += peer.Downloaded;
+                    uploaded += peer.Uploaded;
 
                     // something is wrong with the peer -> remove it from the list and close the connection
-                    if (this.peers.ContainsKey(peer.Endpoint))
+                    if (peers.ContainsKey(peer.Endpoint))
                     {
-                        this.peers.Remove(peer.Endpoint);
+                        peers.Remove(peer.Endpoint);
                     }
 
                     // dispose of the peer
@@ -669,12 +642,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             }
             else
             {
-                Debug.WriteLine($"communication error occurred for peer {peer.Endpoint} on torrent {this.TorrentInfo.InfoHash}: {e.ErrorMessage}");
+                Debug.WriteLine($"communication error occurred for peer {peer.Endpoint} on torrent {TorrentInfo.InfoHash}: {e.ErrorMessage}");
             }
         }
 
         /// <summary>
-        /// Peers the connected.
+        ///     Peers the connected.
         /// </summary>
         /// <param name="ar">The async result.</param>
         private void PeerConnected(IAsyncResult ar)
@@ -692,9 +665,9 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                 tcp = data.Tcp;
                 tcp.EndConnect(ar);
 
-                lock (((IDictionary)this.peers).SyncRoot)
+                lock (((IDictionary) peers).SyncRoot)
                 {
-                    if (this.peers.ContainsKey(endpoint))
+                    if (peers.ContainsKey(endpoint))
                     {
                         // peer is already present
                         tcp.Close();
@@ -702,13 +675,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                     }
                     else
                     {
-                        Debug.WriteLine($"adding seeding peer {endpoint} to torrent {this.TorrentInfo.InfoHash}");
+                        Debug.WriteLine($"adding seeding peer {endpoint} to torrent {TorrentInfo.InfoHash}");
 
                         // add new peer
-                        peer = new Peer(new PeerCommunicator(this.throttlingManager, tcp), this.pieceManager, this.PeerId);
-                        peer.CommunicationErrorOccurred += this.Peer_CommunicationErrorOccurred;
+                        peer = new Peer(new PeerCommunicator(throttlingManager, tcp), pieceManager, PeerId);
+                        peer.CommunicationErrorOccurred += Peer_CommunicationErrorOccurred;
 
-                        this.peers.Add(endpoint, peer);
+                        peers.Add(endpoint, peer);
                     }
                 }
             }
@@ -723,87 +696,85 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         }
 
         /// <summary>
-        /// Handles the PieceCompleted event of the PieceManager control.
+        ///     Handles the PieceCompleted event of the PieceManager control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="PieceCompletedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="PieceCompletedEventArgs" /> instance containing the event data.</param>
         private void PieceManager_PieceCompleted(object sender, PieceCompletedEventArgs e)
         {
-            Debug.WriteLine($"piece {e.PieceIndex} completed for torrent {this.TorrentInfo.InfoHash}");
+            Debug.WriteLine($"piece {e.PieceIndex} completed for torrent {TorrentInfo.InfoHash}");
 
             // persist piece
-            this.persistenceManager.Put(this.TorrentInfo.Files, this.TorrentInfo.PieceLength, e.PieceIndex, e.PieceData);
+            persistenceManager.Put(TorrentInfo.Files, TorrentInfo.PieceLength, e.PieceIndex, e.PieceData);
 
-            if (this.pieceManager.CompletedPercentage == 1)
+            if (pieceManager.CompletedPercentage == 1)
             {
-                this.OnTorrentSeeding(this, System.EventArgs.Empty);
+                OnTorrentSeeding(this, System.EventArgs.Empty);
             }
             else
             {
-                this.OnTorrentLeeching(this, System.EventArgs.Empty);
+                OnTorrentLeeching(this, System.EventArgs.Empty);
             }
         }
 
         /// <summary>
-        /// Handles the PieceRequested event of the PieceManager control.
+        ///     Handles the PieceRequested event of the PieceManager control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="PieceRequestedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="PieceRequestedEventArgs" /> instance containing the event data.</param>
         private void PieceManager_PieceRequested(object sender, PieceRequestedEventArgs e)
         {
-            Debug.WriteLine($"piece {e.PieceIndex} requested for torrent {this.TorrentInfo.InfoHash}");
+            Debug.WriteLine($"piece {e.PieceIndex} requested for torrent {TorrentInfo.InfoHash}");
 
             // get piece data
-            e.PieceData = this.persistenceManager.Get(e.PieceIndex);
+            e.PieceData = persistenceManager.Get(e.PieceIndex);
         }
 
         /// <summary>
-        /// Handles the Announced event of the Tracker control.
+        ///     Handles the Announced event of the Tracker control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="AnnouncedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="AnnouncedEventArgs" /> instance containing the event data.</param>
         private void Tracker_Announced(object sender, AnnouncedEventArgs e)
         {
-            lock (((IDictionary)this.peers).SyncRoot)
+            lock (((IDictionary) peers).SyncRoot)
             {
                 foreach (var endpoint in e.Peers)
-                {
                     try
                     {
-                        this.AddSeeder(endpoint);
+                        AddSeeder(endpoint);
                     }
                     catch (SocketException ex)
                     {
                         Debug.WriteLine($"could not connect to peer {endpoint}: {ex.Message}");
                     }
-                }
             }
         }
 
         /// <summary>
-        /// Handles the Announcing event of the Tracker control.
+        ///     Handles the Announcing event of the Tracker control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void Tracker_Announcing(object sender, System.EventArgs e)
         {
             Tracker tracker;
 
             tracker = sender as Tracker;
-            tracker.BytesDownloaded = this.Downloaded;
-            tracker.BytesLeftToDownload = this.TorrentInfo.Length - this.Downloaded;
-            tracker.BytesUploaded = this.Uploaded;
-            tracker.TrackingEvent = this.CompletedPercentage == 1 ? TrackingEvent.Completed : TrackingEvent.Started;
+            tracker.BytesDownloaded = Downloaded;
+            tracker.BytesLeftToDownload = TorrentInfo.Length - Downloaded;
+            tracker.BytesUploaded = Uploaded;
+            tracker.TrackingEvent = CompletedPercentage == 1 ? TrackingEvent.Completed : TrackingEvent.Started;
         }
 
         /// <summary>
-        /// Handles the TrackingFailed event of the Tracker control.
+        ///     Handles the TrackingFailed event of the Tracker control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="TrackingFailedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="TrackingFailedEventArgs" /> instance containing the event data.</param>
         private void Tracker_TrackingFailed(object sender, TrackingFailedEventArgs e)
         {
-            Debug.WriteLine($"tracking failed for tracker {e.TrackerUri} for torrent {this.TorrentInfo.InfoHash}: \"{e.FailureReason}\"");
+            Debug.WriteLine($"tracking failed for tracker {e.TrackerUri} for torrent {TorrentInfo.InfoHash}: \"{e.FailureReason}\"");
 
             sender.As<Tracker>().Dispose();
         }

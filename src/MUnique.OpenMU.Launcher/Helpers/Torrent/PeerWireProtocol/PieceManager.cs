@@ -2,64 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Timers;
 using DefensiveProgrammingFramework;
 using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs;
+using Timer = System.Timers.Timer;
 
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 {
     /// <summary>
-    /// The piece manager.
+    ///     The piece manager.
     /// </summary>
     public sealed class PieceManager : IDisposable
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The checkout timeout.
-        /// </summary>
-        private readonly TimeSpan checkoutTimeout = TimeSpan.FromSeconds(120);
-
-        /// <summary>
-        /// The timer timeout.
-        /// </summary>
-        private readonly TimeSpan timerTimeout = TimeSpan.FromSeconds(10);
-
-        /// <summary>
-        /// The check out piece index / check out time dictionary.
-        /// </summary>
-        private Dictionary<int, DateTime> checkouts;
-
-        /// <summary>
-        /// The thread locker.
-        /// </summary>
-        private object locker = new object();
-
-        /// <summary>
-        /// The piece hashes.
-        /// </summary>
-        private IEnumerable<string> pieceHashes;
-
-        /// <summary>
-        /// The pieces count.
-        /// </summary>
-        private int piecesCount = 0;
-
-        /// <summary>
-        /// The present pieces count.
-        /// </summary>
-        private int presentPiecesCount = 0;
-
-        /// <summary>
-        /// The checkout timer.
-        /// </summary>
-        private System.Timers.Timer timer;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PieceManager" /> class.
+        ///     Initializes a new instance of the <see cref="PieceManager" /> class.
         /// </summary>
         /// <param name="torrentInfoHash">The torrent information hash.</param>
         /// <param name="torrentLength">Length of the torrent.</param>
@@ -72,43 +30,43 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             torrentInfoHash.CannotBeNullOrEmpty();
             pieceHashes.CannotBeNullOrEmpty();
             pieceLength.MustBeGreaterThan(0);
-            ((long)blockLength).MustBeLessThanOrEqualTo(pieceLength);
+            ((long) blockLength).MustBeLessThanOrEqualTo(pieceLength);
             (pieceLength % blockLength).MustBeEqualTo(0);
             bitField.CannotBeNull();
             bitField.Length.MustBeEqualTo(pieceHashes.Count());
 
-            this.PieceLength = pieceLength;
-            this.BlockLength = blockLength;
-            this.BlockCount = (int)(pieceLength / blockLength);
+            PieceLength = pieceLength;
+            BlockLength = blockLength;
+            BlockCount = (int) (pieceLength / blockLength);
 
-            this.TorrentInfoHash = torrentInfoHash;
-            this.TorrentLength = torrentLength;
+            TorrentInfoHash = torrentInfoHash;
+            TorrentLength = torrentLength;
 
             this.pieceHashes = pieceHashes;
 
-            this.BitField = bitField;
+            BitField = bitField;
 
-            for (int i = 0; i < this.BitField.Length; i++)
+            for (var i = 0; i < BitField.Length; i++)
             {
-                if (this.BitField[i] != PieceStatus.Ignore)
+                if (BitField[i] != PieceStatus.Ignore)
                 {
-                    this.piecesCount++;
+                    piecesCount++;
                 }
 
                 if (bitField[i] == PieceStatus.Present)
                 {
-                    this.presentPiecesCount++;
+                    presentPiecesCount++;
                 }
             }
 
-            this.checkouts = new Dictionary<int, DateTime>();
+            checkouts = new Dictionary<int, DateTime>();
 
             // setup checkout timer
-            this.timer = new System.Timers.Timer();
-            this.timer.Interval = this.timerTimeout.TotalMilliseconds;
-            this.timer.Elapsed += this.Timer_Elapsed;
-            this.timer.Enabled = true;
-            this.timer.Start();
+            timer = new Timer();
+            timer.Interval = timerTimeout.TotalMilliseconds;
+            timer.Elapsed += Timer_Elapsed;
+            timer.Enabled = true;
+            timer.Start();
         }
 
         #endregion Public Constructors
@@ -116,7 +74,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="PieceManager"/> class from being created.
+        ///     Prevents a default instance of the <see cref="PieceManager" /> class from being created.
         /// </summary>
         private PieceManager()
         {
@@ -124,15 +82,59 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 
         #endregion Private Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The checkout timeout.
+        /// </summary>
+        private readonly TimeSpan checkoutTimeout = TimeSpan.FromSeconds(120);
+
+        /// <summary>
+        ///     The timer timeout.
+        /// </summary>
+        private readonly TimeSpan timerTimeout = TimeSpan.FromSeconds(10);
+
+        /// <summary>
+        ///     The check out piece index / check out time dictionary.
+        /// </summary>
+        private readonly Dictionary<int, DateTime> checkouts;
+
+        /// <summary>
+        ///     The thread locker.
+        /// </summary>
+        private readonly object locker = new object();
+
+        /// <summary>
+        ///     The piece hashes.
+        /// </summary>
+        private readonly IEnumerable<string> pieceHashes;
+
+        /// <summary>
+        ///     The pieces count.
+        /// </summary>
+        private readonly int piecesCount;
+
+        /// <summary>
+        ///     The present pieces count.
+        /// </summary>
+        private int presentPiecesCount;
+
+        /// <summary>
+        ///     The checkout timer.
+        /// </summary>
+        private Timer timer;
+
+        #endregion Private Fields
+
         #region Public Events
 
         /// <summary>
-        /// Occurs when piece has completed.
+        ///     Occurs when piece has completed.
         /// </summary>
         public event EventHandler<PieceCompletedEventArgs> PieceCompleted;
 
         /// <summary>
-        /// Occurs when block is requested.
+        ///     Occurs when block is requested.
         /// </summary>
         public event EventHandler<PieceRequestedEventArgs> PieceRequested;
 
@@ -141,175 +143,143 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Public Properties
 
         /// <summary>
-        /// Gets the bit field.
+        ///     Gets the bit field.
         /// </summary>
         /// <value>
-        /// The bit field.
+        ///     The bit field.
         /// </value>
-        public PieceStatus[] BitField
-        {
-            get;
-            private set;
-        }
+        public PieceStatus[] BitField { get; }
 
         /// <summary>
-        /// Gets the block count.
+        ///     Gets the block count.
         /// </summary>
         /// <value>
-        /// The block count.
+        ///     The block count.
         /// </value>
-        public int BlockCount
-        {
-            get;
-            private set;
-        }
+        public int BlockCount { get; }
 
         /// <summary>
-        /// Gets the length of the block.
+        ///     Gets the length of the block.
         /// </summary>
         /// <value>
-        /// The length of the block.
+        ///     The length of the block.
         /// </value>
-        public int BlockLength
-        {
-            get;
-            private set;
-        }
+        public int BlockLength { get; }
 
         /// <summary>
-        /// Gets the completed percentage.
+        ///     Gets the completed percentage.
         /// </summary>
         /// <value>
-        /// The completed percentage.
+        ///     The completed percentage.
         /// </value>
-        public decimal CompletedPercentage
-        {
-            get;
-            private set;
-        }
+        public decimal CompletedPercentage { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether all pieces are complete.
+        ///     Gets a value indicating whether all pieces are complete.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if all pieces are complete; otherwise, <c>false</c>.
+        ///     <c>true</c> if all pieces are complete; otherwise, <c>false</c>.
         /// </value>
         public bool IsComplete
         {
             get
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
-                return this.presentPiecesCount == this.piecesCount;
+                return presentPiecesCount == piecesCount;
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the object is disposed.
+        ///     Gets a value indicating whether the object is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if object is disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if object is disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool IsDisposed
-        {
-            get;
-            private set;
-        }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether it is end game (only 5% pieces is missing).
+        ///     Gets a value indicating whether it is end game (only 5% pieces is missing).
         /// </summary>
         /// <value>
-        ///   <c>true</c> if it is end game; otherwise, <c>false</c>.
+        ///     <c>true</c> if it is end game; otherwise, <c>false</c>.
         /// </value>
         public bool IsEndGame
         {
             get
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
-                return this.CompletedPercentage >= 0.95m;
+                return CompletedPercentage >= 0.95m;
             }
         }
 
         /// <summary>
-        /// Gets the piece count.
+        ///     Gets the piece count.
         /// </summary>
         /// <value>
-        /// The piece count.
+        ///     The piece count.
         /// </value>
         public int PieceCount
         {
             get
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
-                return this.BitField.Length;
+                return BitField.Length;
             }
         }
 
         /// <summary>
-        /// Gets the length of the piece.
+        ///     Gets the length of the piece.
         /// </summary>
         /// <value>
-        /// The length of the piece.
+        ///     The length of the piece.
         /// </value>
-        public long PieceLength
-        {
-            get;
-            private set;
-        }
+        public long PieceLength { get; }
 
         /// <summary>
-        /// Gets the torrent information hash.
+        ///     Gets the torrent information hash.
         /// </summary>
         /// <value>
-        /// The torrent information hash.
+        ///     The torrent information hash.
         /// </value>
-        public string TorrentInfoHash
-        {
-            get;
-            private set;
-        }
+        public string TorrentInfoHash { get; }
 
         /// <summary>
-        /// Gets the length of the torrent.
+        ///     Gets the length of the torrent.
         /// </summary>
         /// <value>
-        /// The length of the torrent.
+        ///     The length of the torrent.
         /// </value>
-        public long TorrentLength
-        {
-            get;
-            private set;
-        }
+        public long TorrentLength { get; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Checks out the piece.
+        ///     Checks out the piece.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <param name="pieceData">The piece data.</param>
         /// <param name="bitField">The bit field.</param>
         /// <returns>
-        /// The piece.
+        ///     The piece.
         /// </returns>
         public Piece CheckOut(int pieceIndex, byte[] pieceData = null, bool[] bitField = null)
         {
             pieceIndex.MustBeGreaterThanOrEqualTo(0);
-            pieceIndex.MustBeLessThanOrEqualTo(this.PieceCount);
-            pieceData.IsNotNull().Then(() => pieceData.LongLength.MustBeEqualTo(this.GetPieceLength(pieceIndex)));
-            bitField.IsNotNull().Then(() => bitField.Length.MustBeEqualTo(this.GetBlockCount(pieceIndex)));
+            pieceIndex.MustBeLessThanOrEqualTo(PieceCount);
+            pieceData.IsNotNull().Then(() => pieceData.LongLength.MustBeEqualTo(GetPieceLength(pieceIndex)));
+            bitField.IsNotNull().Then(() => bitField.Length.MustBeEqualTo(GetBlockCount(pieceIndex)));
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
             Piece piece = null;
             string hash;
-            long pieceLength = this.PieceLength;
-            int blockCount = this.BlockCount;
+            var pieceLength = PieceLength;
+            var blockCount = BlockCount;
 
             if (pieceData != null)
             {
@@ -321,26 +291,26 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                 Array.Clear(bitField, 0, bitField.Length);
             }
 
-            lock (this.locker)
+            lock (locker)
             {
                 // only missing pieces can be checked out
-                if (this.BitField[pieceIndex] == PieceStatus.Missing ||
-                    (this.BitField[pieceIndex] == PieceStatus.CheckedOut &&
-                     this.IsEndGame))
+                if (BitField[pieceIndex] == PieceStatus.Missing ||
+                    BitField[pieceIndex] == PieceStatus.CheckedOut &&
+                    IsEndGame)
                 {
-                    hash = this.pieceHashes.ElementAt(pieceIndex);
-                    pieceLength = this.GetPieceLength(pieceIndex);
-                    blockCount = this.GetBlockCount(pieceIndex);
+                    hash = pieceHashes.ElementAt(pieceIndex);
+                    pieceLength = GetPieceLength(pieceIndex);
+                    blockCount = GetBlockCount(pieceIndex);
 
-                    piece = new Piece(pieceIndex, hash, pieceLength, this.BlockLength, blockCount, pieceData, bitField);
-                    piece.Completed += this.Piece_Completed;
-                    piece.Corrupted += this.Piece_Corrupted;
+                    piece = new Piece(pieceIndex, hash, pieceLength, BlockLength, blockCount, pieceData, bitField);
+                    piece.Completed += Piece_Completed;
+                    piece.Corrupted += Piece_Corrupted;
 
-                    this.BitField[pieceIndex] = PieceStatus.CheckedOut;
+                    BitField[pieceIndex] = PieceStatus.CheckedOut;
 
-                    if (!this.checkouts.ContainsKey(pieceIndex))
+                    if (!checkouts.ContainsKey(pieceIndex))
                     {
-                        this.checkouts.Add(pieceIndex, DateTime.UtcNow);
+                        checkouts.Add(pieceIndex, DateTime.UtcNow);
                     }
                 }
             }
@@ -349,130 +319,128 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            if (this.timer != null)
+            if (timer != null)
             {
-                this.timer.Stop();
-                this.timer.Enabled = false;
-                this.timer.Dispose();
-                this.timer = null;
+                timer.Stop();
+                timer.Enabled = false;
+                timer.Dispose();
+                timer = null;
             }
         }
 
         /// <summary>
-        /// Gets the block count.
+        ///     Gets the block count.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <returns>The block count.</returns>
         public int GetBlockCount(int pieceIndex)
         {
             pieceIndex.MustBeGreaterThanOrEqualTo(0);
-            pieceIndex.MustBeLessThan(this.PieceCount);
+            pieceIndex.MustBeLessThan(PieceCount);
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            long pieceLength = this.GetPieceLength(pieceIndex);
-            long blockLength = this.BlockLength;
-            long remainder = pieceLength % blockLength;
+            var pieceLength = GetPieceLength(pieceIndex);
+            long blockLength = BlockLength;
+            var remainder = pieceLength % blockLength;
             long blockCount;
 
             blockCount = (pieceLength - remainder) / blockLength;
             blockCount += remainder > 0 ? 1 : 0;
 
-            return (int)blockCount;
+            return (int) blockCount;
         }
 
         /// <summary>
-        /// Gets the length of the block in bytes.
+        ///     Gets the length of the block in bytes.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <param name="blockIndex">The block offset.</param>
         /// <returns>
-        /// The length of the block in bytes.
+        ///     The length of the block in bytes.
         /// </returns>
         public int GetBlockLength(int pieceIndex, int blockIndex)
         {
             pieceIndex.MustBeGreaterThanOrEqualTo(0);
-            pieceIndex.MustBeLessThan(this.PieceCount);
+            pieceIndex.MustBeLessThan(PieceCount);
             blockIndex.MustBeGreaterThanOrEqualTo(0);
-            blockIndex.MustBeLessThan(this.BlockCount);
+            blockIndex.MustBeLessThan(BlockCount);
 
             long pieceLength;
             long blockCount;
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            blockCount = this.GetBlockCount(pieceIndex);
+            blockCount = GetBlockCount(pieceIndex);
 
             if (blockIndex == blockCount - 1)
             {
-                pieceLength = this.GetPieceLength(pieceIndex);
+                pieceLength = GetPieceLength(pieceIndex);
 
-                if (pieceLength % this.BlockLength != 0)
+                if (pieceLength % BlockLength != 0)
                 {
                     // last block can be shorter
-                    return (int)(pieceLength % this.BlockLength);
+                    return (int) (pieceLength % BlockLength);
                 }
             }
 
-            return this.BlockLength;
+            return BlockLength;
         }
 
         /// <summary>
-        /// Gets the piece.
+        ///     Gets the piece.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <returns>The piece.</returns>
         public Piece GetPiece(int pieceIndex)
         {
             pieceIndex.MustBeGreaterThanOrEqualTo(0);
-            pieceIndex.MustBeLessThan(this.PieceCount);
+            pieceIndex.MustBeLessThan(PieceCount);
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            PieceRequestedEventArgs e = new PieceRequestedEventArgs(pieceIndex);
+            var e = new PieceRequestedEventArgs(pieceIndex);
 
-            this.OnPieceRequested(this, e);
+            OnPieceRequested(this, e);
 
             if (e.PieceData != null)
             {
-                return new Piece(pieceIndex, this.pieceHashes.ElementAt(pieceIndex), this.PieceLength, this.BlockLength, this.BlockCount);
+                return new Piece(pieceIndex, pieceHashes.ElementAt(pieceIndex), PieceLength, BlockLength, BlockCount);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
-        /// Gets the length of the piece in bytes.
+        ///     Gets the length of the piece in bytes.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <returns>
-        /// The length of the piece in bytes.
+        ///     The length of the piece in bytes.
         /// </returns>
         public long GetPieceLength(int pieceIndex)
         {
             pieceIndex.MustBeGreaterThanOrEqualTo(0);
-            pieceIndex.MustBeLessThan(this.PieceCount);
+            pieceIndex.MustBeLessThan(PieceCount);
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            if (pieceIndex == this.PieceCount - 1)
+            if (pieceIndex == PieceCount - 1)
             {
-                if (this.TorrentLength % this.PieceLength != 0)
+                if (TorrentLength % PieceLength != 0)
                 {
                     // last piece can be shorter
-                    return this.TorrentLength % this.PieceLength;
+                    return TorrentLength % PieceLength;
                 }
             }
 
-            return this.PieceLength;
+            return PieceLength;
         }
 
         #endregion Public Methods
@@ -480,18 +448,18 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Private Methods
 
         /// <summary>
-        /// Checks if object is disposed.
+        ///     Checks if object is disposed.
         /// </summary>
         private void CheckIfObjectIsDisposed()
         {
-            if (this.IsDisposed)
+            if (IsDisposed)
             {
-                throw new ObjectDisposedException(this.GetType().Name);
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 
         /// <summary>
-        /// Called when piece has completed.
+        ///     Called when piece has completed.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -500,14 +468,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.PieceCompleted != null)
+            if (PieceCompleted != null)
             {
-                this.PieceCompleted(sender, e);
+                PieceCompleted(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when piece is requested.
+        ///     Called when piece is requested.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -516,73 +484,73 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.PieceRequested != null)
+            if (PieceRequested != null)
             {
-                this.PieceRequested(sender, e);
+                PieceRequested(sender, e);
             }
         }
 
         /// <summary>
-        /// Handles the Completed event of the Piece control.
+        ///     Handles the Completed event of the Piece control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="PieceCompletedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="PieceCompletedEventArgs" /> instance containing the event data.</param>
         private void Piece_Completed(object sender, PieceCompletedEventArgs e)
         {
-            lock (this.locker)
+            lock (locker)
             {
                 // only pieces not yet downloaded can be checked in
-                if (this.BitField[e.PieceIndex] == PieceStatus.Missing ||
-                    this.BitField[e.PieceIndex] == PieceStatus.CheckedOut)
+                if (BitField[e.PieceIndex] == PieceStatus.Missing ||
+                    BitField[e.PieceIndex] == PieceStatus.CheckedOut)
                 {
-                    this.BitField[e.PieceIndex] = PieceStatus.Present;
+                    BitField[e.PieceIndex] = PieceStatus.Present;
 
-                    this.presentPiecesCount++;
-                    this.CompletedPercentage = (decimal)this.presentPiecesCount / (decimal)this.piecesCount;
+                    presentPiecesCount++;
+                    CompletedPercentage = presentPiecesCount / (decimal) piecesCount;
 
-                    if (this.checkouts.ContainsKey(e.PieceIndex))
+                    if (checkouts.ContainsKey(e.PieceIndex))
                     {
-                        this.checkouts.Remove(e.PieceIndex);
+                        checkouts.Remove(e.PieceIndex);
                     }
 
-                    this.OnPieceCompleted(this, new PieceCompletedEventArgs(e.PieceIndex, e.PieceData));
+                    OnPieceCompleted(this, new PieceCompletedEventArgs(e.PieceIndex, e.PieceData));
                 }
             }
         }
 
         /// <summary>
-        /// Handles the Corrupted event of the Piece control.
+        ///     Handles the Corrupted event of the Piece control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void Piece_Corrupted(object sender, System.EventArgs e)
         {
             // Ignore
         }
 
         /// <summary>
-        /// Handles the Elapsed event of the Timer control.
+        ///     Handles the Elapsed event of the Timer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Timers.ElapsedEventArgs"/> instance containing the event data.</param>
-        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        /// <param name="e">The <see cref="System.Timers.ElapsedEventArgs" /> instance containing the event data.</param>
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             DateTime checkoutTime;
             int pieceIndex;
-            HashSet<int> checkoutsToRemove = new HashSet<int>();
+            var checkoutsToRemove = new HashSet<int>();
 
             Thread.CurrentThread.Name = "piece manager checker";
 
-            this.timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
+            timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
 
-            lock (this.locker)
+            lock (locker)
             {
-                foreach (var checkOut in this.checkouts)
+                foreach (var checkOut in checkouts)
                 {
                     pieceIndex = checkOut.Key;
                     checkoutTime = checkOut.Value;
 
-                    if (DateTime.UtcNow - checkoutTime > this.checkoutTimeout)
+                    if (DateTime.UtcNow - checkoutTime > checkoutTimeout)
                     {
                         checkoutsToRemove.Add(checkOut.Key);
                     }
@@ -590,14 +558,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 
                 foreach (var checkoutToRemove in checkoutsToRemove)
                 {
-                    this.checkouts.Remove(checkoutToRemove);
+                    checkouts.Remove(checkoutToRemove);
 
                     // checkout timeout -> mark piece as missing, giving other peers a chance to download it
-                    this.BitField[checkoutToRemove] = PieceStatus.Missing;
+                    BitField[checkoutToRemove] = PieceStatus.Missing;
                 }
             }
 
-            this.timer.Interval = this.timerTimeout.TotalMilliseconds;
+            timer.Interval = timerTimeout.TotalMilliseconds;
         }
 
         #endregion Private Methods

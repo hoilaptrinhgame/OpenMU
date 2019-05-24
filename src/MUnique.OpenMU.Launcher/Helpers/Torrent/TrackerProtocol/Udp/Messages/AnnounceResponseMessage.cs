@@ -3,58 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using DefensiveProgrammingFramework;
-using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
     /// <summary>
-    /// The announce response message.
+    ///     The announce response message.
     /// </summary>
     public class AnnounceResponseMessage : TrackerMessage
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The action length in bytes.
-        /// </summary>
-        private const int ActionLength = 4;
-
-        /// <summary>
-        /// The interval length in bytes.
-        /// </summary>
-        private const int IntervalLength = 4;
-
-        /// <summary>
-        /// The IP address length in bytes.
-        /// </summary>
-        private const int IpAddressLength = 4;
-
-        /// <summary>
-        /// The leechers length in bytes.
-        /// </summary>
-        private const int LeechersLength = 4;
-
-        /// <summary>
-        /// The port length in bytes.
-        /// </summary>
-        private const int PortLength = 2;
-
-        /// <summary>
-        /// The seeders length in bytes.
-        /// </summary>
-        private const int SeedersLength = 4;
-
-        /// <summary>
-        /// The transaction identifier length in bytes.
-        /// </summary>
-        private const int TransactionIdLength = 4;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnnounceResponseMessage" /> class.
+        ///     Initializes a new instance of the <see cref="AnnounceResponseMessage" /> class.
         /// </summary>
         /// <param name="transactionId">The transaction unique identifier.</param>
         /// <param name="interval">The interval.</param>
@@ -69,90 +29,107 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             seederCount.MustBeGreaterThanOrEqualTo(0);
             peers.CannotBeNull();
 
-            this.Interval = interval;
-            this.LeecherCount = leecherCount;
-            this.SeederCount = seederCount;
-            this.Peers = peers;
+            Interval = interval;
+            LeecherCount = leecherCount;
+            SeederCount = seederCount;
+            Peers = peers;
         }
 
         #endregion Public Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The action length in bytes.
+        /// </summary>
+        private const int ActionLength = 4;
+
+        /// <summary>
+        ///     The interval length in bytes.
+        /// </summary>
+        private const int IntervalLength = 4;
+
+        /// <summary>
+        ///     The IP address length in bytes.
+        /// </summary>
+        private const int IpAddressLength = 4;
+
+        /// <summary>
+        ///     The leechers length in bytes.
+        /// </summary>
+        private const int LeechersLength = 4;
+
+        /// <summary>
+        ///     The port length in bytes.
+        /// </summary>
+        private const int PortLength = 2;
+
+        /// <summary>
+        ///     The seeders length in bytes.
+        /// </summary>
+        private const int SeedersLength = 4;
+
+        /// <summary>
+        ///     The transaction identifier length in bytes.
+        /// </summary>
+        private const int TransactionIdLength = 4;
+
+        #endregion Private Fields
+
         #region Public Properties
 
         /// <summary>
-        /// Gets the interval.
+        ///     Gets the interval.
         /// </summary>
         /// <value>
-        /// The interval.
+        ///     The interval.
         /// </value>
-        public TimeSpan Interval
-        {
-            get;
-            private set;
-        }
+        public TimeSpan Interval { get; }
 
         /// <summary>
-        /// Gets the leecher count.
+        ///     Gets the leecher count.
         /// </summary>
         /// <value>
-        /// The leecher count.
+        ///     The leecher count.
         /// </value>
-        public int LeecherCount
-        {
-            get;
-            private set;
-        }
+        public int LeecherCount { get; }
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return ActionLength + TransactionIdLength + IntervalLength + LeechersLength + SeedersLength + (this.Peers.Count() * (IpAddressLength + PortLength));
-            }
-        }
+        public override int Length => ActionLength + TransactionIdLength + IntervalLength + LeechersLength + SeedersLength + Peers.Count() * (IpAddressLength + PortLength);
 
         /// <summary>
-        /// Gets the peer id / peer endpoint dictionary.
+        ///     Gets the peer id / peer endpoint dictionary.
         /// </summary>
         /// <value>
-        /// The peers.
+        ///     The peers.
         /// </value>
-        public IEnumerable<IPEndPoint> Peers
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<IPEndPoint> Peers { get; }
 
         /// <summary>
-        /// Gets the seeder count.
+        ///     Gets the seeder count.
         /// </summary>
         /// <value>
-        /// The seeder count.
+        ///     The seeder count.
         /// </value>
-        public int SeederCount
-        {
-            get;
-            private set;
-        }
+        public int SeederCount { get; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="message">The message.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, int offset, out AnnounceResponseMessage message)
         {
@@ -170,13 +147,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                 buffer.Length >= offset + ActionLength + TransactionIdLength + IntervalLength + LeechersLength + SeedersLength &&
                 offset >= 0)
             {
-                action = Message.ReadInt(buffer, ref offset);
-                transactionId = Message.ReadInt(buffer, ref offset);
-                interval = Message.ReadInt(buffer, ref offset);
-                leechers = Message.ReadInt(buffer, ref offset);
-                seeders = Message.ReadInt(buffer, ref offset);
+                action = ReadInt(buffer, ref offset);
+                transactionId = ReadInt(buffer, ref offset);
+                interval = ReadInt(buffer, ref offset);
+                leechers = ReadInt(buffer, ref offset);
+                seeders = ReadInt(buffer, ref offset);
 
-                if (action == (int)TrackingAction.Announce &&
+                if (action == (int) TrackingAction.Announce &&
                     transactionId >= 0 &&
                     interval > 0 &&
                     leechers >= 0 &&
@@ -184,7 +161,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
                 {
                     while (offset <= buffer.Length - IpAddressLength - PortLength)
                     {
-                        endpoint = Message.ReadEndpoint(buffer, ref offset);
+                        endpoint = ReadEndpoint(buffer, ref offset);
 
                         if (!peers.ContainsKey(endpoint.Address.ToString()))
                         {
@@ -200,7 +177,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -211,27 +188,24 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, (int)this.Action);
-            Message.Write(buffer, ref written, this.TransactionId);
-            Message.Write(buffer, ref written, (int)this.Interval.TotalSeconds);
-            Message.Write(buffer, ref written, this.LeecherCount);
-            Message.Write(buffer, ref written, this.SeederCount);
+            Write(buffer, ref written, (int) Action);
+            Write(buffer, ref written, TransactionId);
+            Write(buffer, ref written, (int) Interval.TotalSeconds);
+            Write(buffer, ref written, LeecherCount);
+            Write(buffer, ref written, SeederCount);
 
-            foreach (IPEndPoint peerEndpoint in this.Peers)
-            {
-                Message.Write(buffer, ref written, peerEndpoint);
-            }
+            foreach (var peerEndpoint in Peers) Write(buffer, ref written, peerEndpoint);
 
             return written - offset;
         }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {

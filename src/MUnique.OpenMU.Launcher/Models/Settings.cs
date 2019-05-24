@@ -5,15 +5,14 @@ namespace MUnique.OpenMU.Launcher.Models
 {
     public class Settings : BindableBase
     {
+        private Version localVersion;
         private string userName;
 
-        public string UserNam
+        public string UserName
         {
             get => userName;
             set => SetProperty(ref userName, value);
         }
-
-        private Version localVersion;
 
         public Version LocalVersion
         {

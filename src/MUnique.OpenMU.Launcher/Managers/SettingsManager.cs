@@ -11,14 +11,14 @@ namespace MUnique.OpenMU.Launcher.Managers
     public static class SettingsManager
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        
+
+        public static Settings Settings;
+
         static SettingsManager()
         {
             LoadSettings();
         }
-        
-        public static Settings Settings;
-        
+
         private static void LoadSettings()
         {
             if (Settings != null)
@@ -36,7 +36,7 @@ namespace MUnique.OpenMU.Launcher.Managers
                 Settings = new Settings();
                 SaveSettings();
             }
-            
+
             //Save the settings after any changes made to the object's properties
             Settings.PropertyChanged += SettingsOnPropertyChanged;
         }
@@ -50,7 +50,7 @@ namespace MUnique.OpenMU.Launcher.Managers
         {
             try
             {
-                File.WriteAllText("config.json",JsonConvert.SerializeObject(Settings));
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(Settings));
             }
             catch (Exception e)
             {

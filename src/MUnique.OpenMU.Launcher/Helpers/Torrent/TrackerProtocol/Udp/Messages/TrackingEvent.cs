@@ -1,27 +1,27 @@
 ﻿namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
     /// <summary>
-    /// The tracking event.
+    ///     The tracking event.
     /// </summary>
-    public enum TrackingEvent : int
+    public enum TrackingEvent
     {
         /// <summary>
-        /// The none tracking event.
+        ///     The none tracking event.
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// The started tracking event.
+        ///     The started tracking event.
         /// </summary>
         Started = 2,
 
         /// <summary>
-        /// The stopped tracking event.
+        ///     The stopped tracking event.
         /// </summary>
         Stopped = 3,
 
         /// <summary>
-        /// The completed tracking event.
+        ///     The completed tracking event.
         /// </summary>
         Completed = 1
     }

@@ -1,32 +1,32 @@
 ﻿namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 {
     /// <summary>
-    /// The piece status enumerator.
+    ///     The piece status enumerator.
     /// </summary>
-    public enum PieceStatus : int
+    public enum PieceStatus
     {
         /// <summary>
-        /// The missing piece status.
+        ///     The missing piece status.
         /// </summary>
         Missing = 0,
 
         /// <summary>
-        /// The checked out piece status.
+        ///     The checked out piece status.
         /// </summary>
         CheckedOut = 1,
 
         /// <summary>
-        /// The present piece status.
+        ///     The present piece status.
         /// </summary>
         Present = 2,
 
         /// <summary>
-        /// The partially present piece status.
+        ///     The partially present piece status.
         /// </summary>
         Partial = 3,
 
         /// <summary>
-        /// The ignore piece status.
+        ///     The ignore piece status.
         /// </summary>
         Ignore = 4
     }

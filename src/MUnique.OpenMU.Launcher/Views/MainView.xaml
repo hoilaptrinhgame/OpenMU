@@ -1,33 +1,34 @@
 <mah:MetroWindow x:Class="MUnique.OpenMU.Launcher.Views.MainView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:MUnique.OpenMU.Launcher.Views"
-        xmlns:viewModels="clr-namespace:MUnique.OpenMU.Launcher.ViewModels"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        mc:Ignorable="d"
-        GlowBrush="{DynamicResource AccentColorBrush}"
-        WindowStartupLocation="CenterScreen"
-        Title="Launcher" Height="450" Width="800">
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:local="clr-namespace:MUnique.OpenMU.Launcher.Views"
+                 xmlns:viewModels="clr-namespace:MUnique.OpenMU.Launcher.ViewModels"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                 mc:Ignorable="d"
+                 GlowBrush="{DynamicResource AccentColorBrush}"
+                 WindowStartupLocation="CenterScreen"
+                 Title="Launcher" Height="450" Width="800">
     <Window.DataContext>
-        <viewModels:MainViewModel/>
+        <viewModels:MainViewModel />
     </Window.DataContext>
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
             <Button Content="Settings" />
             <Button Command="{Binding GithubButtonCommand}">
                 <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="GithubFace" VerticalAlignment="Center"/>
+                    <materialDesign:PackIcon Kind="GithubFace" VerticalAlignment="Center" />
                     <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Github" />
                 </StackPanel>
             </Button>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
     <Grid>
-        <TextBlock Text="{Binding TestModel.Message}"></TextBlock>
-        <Button Content="{Binding TestModel.Message}" Width="160" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" Command="{Binding CheckForUpdatesCommand}"></Button>
-        <ProgressBar Width="400" Height="10" Value="{Binding Progress}"></ProgressBar>
+        <TextBlock Text="{Binding TestModel.Message}" />
+        <Button Content="{Binding TestModel.Message}" Width="160" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"
+                Command="{Binding CheckForUpdatesCommand}" />
+        <ProgressBar Width="400" Height="10" Value="{Binding Progress}" />
     </Grid>
 </mah:MetroWindow>

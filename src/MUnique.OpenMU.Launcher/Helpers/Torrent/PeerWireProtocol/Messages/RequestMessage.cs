@@ -4,57 +4,23 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 {
     /// <summary>
-    /// The request message.
+    ///     The request message.
     /// </summary>
     public class RequestMessage : PeerMessage
     {
         #region Public Fields
 
         /// <summary>
-        /// The message unique identifier.
+        ///     The message unique identifier.
         /// </summary>
         public const byte MessageId = 6;
 
         #endregion Public Fields
 
-        #region Private Fields
-
-        /// <summary>
-        /// The block length length in bytes.
-        /// </summary>
-        private const int BlockLengthLength = 4;
-
-        /// <summary>
-        /// The block offset length in bytes.
-        /// </summary>
-        private const int BlockOffsetLength = 4;
-
-        /// <summary>
-        /// The message unique identifier length in bytes.
-        /// </summary>
-        private const int MessageIdLength = 1;
-
-        /// <summary>
-        /// The message length in bytes.
-        /// </summary>
-        private const int MessageLength = 13;
-
-        /// <summary>
-        /// The message length in bytes.
-        /// </summary>
-        private const int MessageLengthLength = 4;
-
-        /// <summary>
-        /// The piece index length in bytes.
-        /// </summary>
-        private const int PieceIndexLength = 4;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequestMessage" /> class.
+        ///     Initializes a new instance of the <see cref="RequestMessage" /> class.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <param name="blockOffset">The block offset.</param>
@@ -65,9 +31,9 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             blockOffset.MustBeGreaterThanOrEqualTo(0);
             blockLength.MustBeGreaterThanOrEqualTo(0);
 
-            this.PieceIndex = pieceIndex;
-            this.BlockOffset = blockOffset;
-            this.BlockLength = blockLength;
+            PieceIndex = pieceIndex;
+            BlockOffset = blockOffset;
+            BlockLength = blockLength;
         }
 
         #endregion Public Constructors
@@ -75,7 +41,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="RequestMessage"/> class from being created.
+        ///     Prevents a default instance of the <see cref="RequestMessage" /> class from being created.
         /// </summary>
         private RequestMessage()
         {
@@ -83,64 +49,80 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 
         #endregion Private Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The block length length in bytes.
+        /// </summary>
+        private const int BlockLengthLength = 4;
+
+        /// <summary>
+        ///     The block offset length in bytes.
+        /// </summary>
+        private const int BlockOffsetLength = 4;
+
+        /// <summary>
+        ///     The message unique identifier length in bytes.
+        /// </summary>
+        private const int MessageIdLength = 1;
+
+        /// <summary>
+        ///     The message length in bytes.
+        /// </summary>
+        private const int MessageLength = 13;
+
+        /// <summary>
+        ///     The message length in bytes.
+        /// </summary>
+        private const int MessageLengthLength = 4;
+
+        /// <summary>
+        ///     The piece index length in bytes.
+        /// </summary>
+        private const int PieceIndexLength = 4;
+
+        #endregion Private Fields
+
         #region Public Properties
 
         /// <summary>
-        /// Gets the length of the block.
+        ///     Gets the length of the block.
         /// </summary>
         /// <value>
-        /// The length of the block.
+        ///     The length of the block.
         /// </value>
-        public int BlockLength
-        {
-            get;
-            private set;
-        }
+        public int BlockLength { get; }
 
         /// <summary>
-        /// Gets the block offset.
+        ///     Gets the block offset.
         /// </summary>
         /// <value>
-        /// The block offset.
+        ///     The block offset.
         /// </value>
-        public int BlockOffset
-        {
-            get;
-            private set;
-        }
+        public int BlockOffset { get; }
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return MessageLengthLength + MessageIdLength + PieceIndexLength + BlockOffsetLength + BlockLengthLength;
-            }
-        }
+        public override int Length => MessageLengthLength + MessageIdLength + PieceIndexLength + BlockOffsetLength + BlockLengthLength;
 
         /// <summary>
-        /// Gets the index of the piece.
+        ///     Gets the index of the piece.
         /// </summary>
         /// <value>
-        /// The index of the piece.
+        ///     The index of the piece.
         /// </value>
-        public int PieceIndex
-        {
-            get;
-            private set;
-        }
+        public int PieceIndex { get; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offsetFrom">The offset.</param>
@@ -148,7 +130,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         /// <param name="message">The message.</param>
         /// <param name="isIncomplete">if set to <c>true</c> the message is incomplete.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, ref int offsetFrom, int offsetTo, out RequestMessage message, out bool isIncomplete)
         {
@@ -167,11 +149,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
                 offsetTo >= offsetFrom &&
                 offsetTo <= buffer.Length)
             {
-                messageLength = Message.ReadInt(buffer, ref offsetFrom);
-                messageId = Message.ReadByte(buffer, ref offsetFrom);
-                pieceIndex = Message.ReadInt(buffer, ref offsetFrom);
-                blockOffset = Message.ReadInt(buffer, ref offsetFrom);
-                blockLength = Message.ReadInt(buffer, ref offsetFrom);
+                messageLength = ReadInt(buffer, ref offsetFrom);
+                messageId = ReadByte(buffer, ref offsetFrom);
+                pieceIndex = ReadInt(buffer, ref offsetFrom);
+                blockOffset = ReadInt(buffer, ref offsetFrom);
+                blockLength = ReadInt(buffer, ref offsetFrom);
 
                 if (messageLength == MessageIdLength + PieceIndexLength + BlockOffsetLength + BlockLengthLength &&
                     messageId == MessageId &&
@@ -194,12 +176,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <returns>
-        /// The encoded peer message.
+        ///     The encoded peer message.
         /// </returns>
         public override int Encode(byte[] buffer, int offset)
         {
@@ -207,61 +189,63 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, MessageLength);
-            Message.Write(buffer, ref written, MessageId);
-            Message.Write(buffer, ref written, this.PieceIndex);
-            Message.Write(buffer, ref written, this.BlockOffset);
-            Message.Write(buffer, ref written, this.BlockLength);
+            Write(buffer, ref written, MessageLength);
+            Write(buffer, ref written, MessageId);
+            Write(buffer, ref written, PieceIndex);
+            Write(buffer, ref written, BlockOffset);
+            Write(buffer, ref written, BlockLength);
 
-            return this.CheckWritten(written - offset);
+            return CheckWritten(written - offset);
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="object" />, is equal to this instance.
+        ///     Determines whether the specified <see cref="object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
-            RequestMessage msg = obj as RequestMessage;
+            var msg = obj as RequestMessage;
 
-            return msg == null ? false : this.PieceIndex == msg.PieceIndex &&
-                                         this.BlockOffset == msg.BlockOffset &&
-                                         this.BlockLength == msg.BlockLength;
+            return msg == null
+                ? false
+                : PieceIndex == msg.PieceIndex &&
+                  BlockOffset == msg.BlockOffset &&
+                  BlockLength == msg.BlockLength;
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        ///     Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
-            return this.PieceIndex.GetHashCode() ^
-                   this.BlockLength.GetHashCode() ^
-                   this.BlockOffset.GetHashCode();
+            return PieceIndex.GetHashCode() ^
+                   BlockLength.GetHashCode() ^
+                   BlockOffset.GetHashCode();
         }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
             StringBuilder sb;
 
-            sb = new System.Text.StringBuilder();
+            sb = new StringBuilder();
             sb.Append("RequestMessage: ");
-            sb.Append($"PieceIndex = {this.PieceIndex}, ");
-            sb.Append($"BlockOffset = {this.BlockOffset}, ");
-            sb.Append($"BlockLength = {this.BlockLength}");
+            sb.Append($"PieceIndex = {PieceIndex}, ");
+            sb.Append($"BlockOffset = {BlockOffset}, ");
+            sb.Append($"BlockLength = {BlockLength}");
 
             return sb.ToString();
         }

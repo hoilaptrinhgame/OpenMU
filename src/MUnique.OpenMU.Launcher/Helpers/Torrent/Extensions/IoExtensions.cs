@@ -4,14 +4,14 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
 {
     /// <summary>
-    /// The input / output extensions.
+    ///     The input / output extensions.
     /// </summary>
     public static class IoExtensions
     {
         #region Public Methods
 
         /// <summary>
-        /// Deletes the directory recursively.
+        ///     Deletes the directory recursively.
         /// </summary>
         /// <param name="directoryPath">The directory path.</param>
         /// <param name="deleteOnlyDirectoryContents">if set to <c>true</c> delete only directory contents.</param>
@@ -22,17 +22,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
             if (Directory.Exists(directoryPath))
             {
                 // delete files
-                foreach (string file in Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories))
+                foreach (var file in Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories))
                 {
                     File.SetAttributes(file, FileAttributes.Normal);
                     File.Delete(file);
                 }
 
                 // delete subdirectories
-                foreach (string subDirectory in Directory.GetDirectories(directoryPath))
-                {
-                    DeleteDirectoryRecursively(subDirectory);
-                }
+                foreach (var subDirectory in Directory.GetDirectories(directoryPath)) DeleteDirectoryRecursively(subDirectory);
 
                 if (!deleteOnlyDirectoryContents)
                 {

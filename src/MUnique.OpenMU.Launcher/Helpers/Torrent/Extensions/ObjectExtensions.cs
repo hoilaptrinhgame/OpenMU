@@ -3,14 +3,14 @@
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
 {
     /// <summary>
-    /// The object extenstions.
+    ///     The object extenstions.
     /// </summary>
     public static class ObjectExtensions
     {
         #region Public Methods
 
         /// <summary>
-        /// Asynchronouses the specified value.
+        ///     Asynchronouses the specified value.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="value">The value.</param>
@@ -20,12 +20,10 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions
         {
             if (value is T)
             {
-                return (T)value;
+                return (T) value;
             }
-            else
-            {
-                throw new ArgumentException("Value is of incorrect type");
-            }
+
+            throw new ArgumentException("Value is of incorrect type");
         }
 
         #endregion Public Methods

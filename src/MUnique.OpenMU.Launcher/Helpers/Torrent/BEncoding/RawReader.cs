@@ -5,38 +5,38 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 {
     /// <summary>
-    /// The raw reader.
+    ///     The raw reader.
     /// </summary>
     public class RawReader : Stream
     {
         #region Private Fields
 
         /// <summary>
-        /// The has peek flag.
+        ///     The has peek flag.
         /// </summary>
         private bool hasPeek;
 
         /// <summary>
-        /// The input stream.
+        ///     The input stream.
         /// </summary>
-        private Stream input;
+        private readonly Stream input;
 
         /// <summary>
-        /// The peeked data.
+        ///     The peeked data.
         /// </summary>
-        private byte[] peeked;
+        private readonly byte[] peeked;
 
         /// <summary>
-        /// The strict decoding flag.
+        ///     The strict decoding flag.
         /// </summary>
-        private bool strictDecoding;
+        private readonly bool strictDecoding;
 
         #endregion Private Fields
 
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RawReader"/> class.
+        ///     Initializes a new instance of the <see cref="RawReader" /> class.
         /// </summary>
         /// <param name="input">The input.</param>
         public RawReader(Stream input)
@@ -45,7 +45,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RawReader"/> class.
+        ///     Initializes a new instance of the <see cref="RawReader" /> class.
         /// </summary>
         /// <param name="input">The input.</param>
         /// <param name="strictDecoding">if set to <c>true</c> [strict decoding].</param>
@@ -54,7 +54,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
             input.CannotBeNull();
 
             this.input = input;
-            this.peeked = new byte[1];
+            peeked = new byte[1];
             this.strictDecoding = strictDecoding;
         }
 
@@ -63,99 +63,69 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         #region Public Properties
 
         /// <summary>
-        /// Gets a value indicating whether the current stream supports reading.
+        ///     Gets a value indicating whether the current stream supports reading.
         /// </summary>
         /// <value>true if the stream supports reading; otherwise, false.</value>
-        public override bool CanRead
-        {
-            get
-            {
-                return this.input.CanRead;
-            }
-        }
+        public override bool CanRead => input.CanRead;
 
         /// <summary>
-        /// Gets a value indicating whether the current stream supports seeking.
+        ///     Gets a value indicating whether the current stream supports seeking.
         /// </summary>
         /// <value>true if the stream supports seeking; otherwise, false.</value>
-        public override bool CanSeek
-        {
-            get
-            {
-                return this.input.CanSeek;
-            }
-        }
+        public override bool CanSeek => input.CanSeek;
 
         /// <summary>
-        /// Gets a value indicating whether the current stream supports writing.
+        ///     Gets a value indicating whether the current stream supports writing.
         /// </summary>
         /// <value>true if the stream supports writing; otherwise, false.</value>
-        public override bool CanWrite
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanWrite => false;
 
         /// <summary>
-        /// Gets the length in bytes of the stream.
+        ///     Gets the length in bytes of the stream.
         /// </summary>
         /// <value>A value representing the length of the stream in bytes.</value>
-        public override long Length
-        {
-            get
-            {
-                return this.input.Length;
-            }
-        }
+        public override long Length => input.Length;
 
         /// <summary>
-        /// Gets or sets the position within the current stream.
+        ///     Gets or sets the position within the current stream.
         /// </summary>
         /// <value>The current position within the stream.</value>
         public override long Position
         {
             get
             {
-                if (this.hasPeek)
+                if (hasPeek)
                 {
-                    return this.input.Position - 1;
+                    return input.Position - 1;
                 }
 
-                return this.input.Position;
+                return input.Position;
             }
 
             set
             {
-                if (value != this.Position)
+                if (value != Position)
                 {
-                    this.hasPeek = false;
-                    this.input.Position = value;
+                    hasPeek = false;
+                    input.Position = value;
                 }
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether to use strict decoding.
+        ///     Gets a value indicating whether to use strict decoding.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if to use strict decoding; otherwise, <c>false</c>.
+        ///     <c>true</c> if to use strict decoding; otherwise, <c>false</c>.
         /// </value>
-        public bool StrictDecoding
-        {
-            get
-            {
-                return this.strictDecoding;
-            }
-        }
+        public bool StrictDecoding => strictDecoding;
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
+        ///     When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
         /// </summary>
         public override void Flush()
         {
@@ -163,27 +133,31 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         }
 
         /// <summary>
-        /// Peeks the byte.
+        ///     Peeks the byte.
         /// </summary>
         /// <returns>The peek byte.</returns>
         public int PeekByte()
         {
-            if (!this.hasPeek)
+            if (!hasPeek)
             {
-                this.hasPeek = this.Read(this.peeked, 0, 1) == 1;
+                hasPeek = Read(peeked, 0, 1) == 1;
             }
 
-            return this.hasPeek ? this.peeked[0] : -1;
+            return hasPeek ? peeked[0] : -1;
         }
 
         /// <summary>
-        /// When overridden in a derived class, reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
+        ///     When overridden in a derived class, reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
         /// </summary>
-        /// <param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between <paramref name="offset" /> and (<paramref name="offset" /> + <paramref name="count" /> - 1) replaced by the bytes read from the current source.</param>
+        /// <param name="buffer">
+        ///     An array of bytes. When this method returns, the buffer contains the specified byte array with the values between <paramref name="offset" /> and (
+        ///     <paramref name="offset" /> + <paramref name="count" /> - 1) replaced by the bytes read from the current source.
+        /// </param>
         /// <param name="offset">The zero-based byte offset in <paramref name="buffer" /> at which to begin storing the data read from the current stream.</param>
         /// <param name="count">The maximum number of bytes to be read from the current stream.</param>
         /// <returns>
-        /// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.
+        ///     The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of
+        ///     the stream has been reached.
         /// </returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
@@ -191,50 +165,48 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
             offset.MustBeGreaterThanOrEqualTo(0);
             count.MustBeGreaterThanOrEqualTo(0);
 
-            int read = 0;
+            var read = 0;
 
-            if (this.hasPeek &&
+            if (hasPeek &&
                 count > 0)
             {
-                this.hasPeek = false;
-                buffer[offset] = this.peeked[0];
+                hasPeek = false;
+                buffer[offset] = peeked[0];
                 offset++;
                 count--;
                 read++;
             }
 
-            read += this.input.Read(buffer, offset, count);
+            read += input.Read(buffer, offset, count);
 
             return read;
         }
 
         /// <summary>
-        /// Reads a byte from the stream and advances the position within the stream by one byte, or returns -1 if at the end of the stream.
+        ///     Reads a byte from the stream and advances the position within the stream by one byte, or returns -1 if at the end of the stream.
         /// </summary>
         /// <returns>
-        /// The unsigned byte cast to an integer, or -1 if at the end of the stream.
+        ///     The unsigned byte cast to an integer, or -1 if at the end of the stream.
         /// </returns>
         public override int ReadByte()
         {
-            if (this.hasPeek)
+            if (hasPeek)
             {
-                this.hasPeek = false;
+                hasPeek = false;
 
-                return this.peeked[0];
+                return peeked[0];
             }
-            else
-            {
-                return base.ReadByte();
-            }
+
+            return base.ReadByte();
         }
 
         /// <summary>
-        /// When overridden in a derived class, sets the position within the current stream.
+        ///     When overridden in a derived class, sets the position within the current stream.
         /// </summary>
         /// <param name="offset">A byte offset relative to the <paramref name="origin" /> parameter.</param>
-        /// <param name="origin">A value of type <see cref="<see cref="System.IO.SeekOrigin"/>" /> indicating the reference point used to obtain the new position.</param>
+        /// <param name="origin">A value of type <see cref="<see cref="System.IO.SeekOrigin" />" /> indicating the reference point used to obtain the new position.</param>
         /// <returns>
-        /// The new position within the current stream.
+        ///     The new position within the current stream.
         /// </returns>
         public override long Seek(long offset, SeekOrigin origin)
         {
@@ -242,23 +214,23 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 
             long val;
 
-            if (this.hasPeek &&
+            if (hasPeek &&
                 origin == SeekOrigin.Current)
             {
-                val = this.input.Seek(offset - 1, origin);
+                val = input.Seek(offset - 1, origin);
             }
             else
             {
-                val = this.input.Seek(offset, origin);
+                val = input.Seek(offset, origin);
             }
 
-            this.hasPeek = false;
+            hasPeek = false;
 
             return val;
         }
 
         /// <summary>
-        /// When overridden in a derived class, sets the length of the current stream.
+        ///     When overridden in a derived class, sets the length of the current stream.
         /// </summary>
         /// <param name="value">The desired length of the current stream in bytes.</param>
         public override void SetLength(long value)
@@ -269,7 +241,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         }
 
         /// <summary>
-        /// When overridden in a derived class, writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
+        ///     When overridden in a derived class, writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
         /// </summary>
         /// <param name="buffer">An array of bytes. This method copies <paramref name="count" /> bytes from <paramref name="buffer" /> to the current stream.</param>
         /// <param name="offset">The zero-based byte offset in <paramref name="buffer" /> at which to begin copying bytes to the current stream.</param>

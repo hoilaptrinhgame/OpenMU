@@ -3,14 +3,14 @@
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
 {
     /// <summary>
-    /// The peer communication error event arguments.
+    ///     The peer communication error event arguments.
     /// </summary>
     public sealed class PeerCommunicationErrorEventArgs : System.EventArgs
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PeerCommunicationErrorEventArgs" /> class.
+        ///     Initializes a new instance of the <see cref="PeerCommunicationErrorEventArgs" /> class.
         /// </summary>
         /// <param name="errorMessage">The error message.</param>
         /// <param name="isFatal">if set to <c>true</c> the error is fatal.</param>
@@ -18,8 +18,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
         {
             errorMessage.CannotBeNullOrEmpty();
 
-            this.ErrorMessage = errorMessage;
-            this.IsFatal = isFatal;
+            ErrorMessage = errorMessage;
+            IsFatal = isFatal;
         }
 
         #endregion Public Constructors
@@ -27,7 +27,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="PeerCommunicationErrorEventArgs"/> class from being created.
+        ///     Prevents a default instance of the <see cref="PeerCommunicationErrorEventArgs" /> class from being created.
         /// </summary>
         private PeerCommunicationErrorEventArgs()
         {
@@ -38,28 +38,20 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
         #region Public Properties
 
         /// <summary>
-        /// Gets the error message.
+        ///     Gets the error message.
         /// </summary>
         /// <value>
-        /// The error message.
+        ///     The error message.
         /// </value>
-        public string ErrorMessage
-        {
-            get;
-            private set;
-        }
+        public string ErrorMessage { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the error is fatal.
+        ///     Gets a value indicating whether the error is fatal.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if is fatal; otherwise, <c>false</c>.
+        ///     <c>true</c> if is fatal; otherwise, <c>false</c>.
         /// </value>
-        public bool IsFatal
-        {
-            get;
-            private set;
-        }
+        public bool IsFatal { get; }
 
         #endregion Public Properties
     }

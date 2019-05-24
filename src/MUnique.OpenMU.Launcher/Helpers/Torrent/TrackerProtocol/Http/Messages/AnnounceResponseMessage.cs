@@ -10,21 +10,21 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
 {
     /// <summary>
-    /// The announce message.
+    ///     The announce message.
     /// </summary>
     public class AnnounceResponseMessage
     {
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="AnnounceResponseMessage"/> class from being created.
+        ///     Prevents a default instance of the <see cref="AnnounceResponseMessage" /> class from being created.
         /// </summary>
         private AnnounceResponseMessage()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnnounceResponseMessage" /> class.
+        ///     Initializes a new instance of the <see cref="AnnounceResponseMessage" /> class.
         /// </summary>
         /// <param name="failureReason">The failure reason.</param>
         /// <param name="updateInterval">The update interval.</param>
@@ -38,11 +38,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
             leecherCount.MustBeGreaterThanOrEqualTo(0);
             peers.CannotBeNull();
 
-            this.FailureReason = failureReason;
-            this.UpdateInterval = updateInterval;
-            this.SeederCount = seedersCount;
-            this.LeecherCount = leecherCount;
-            this.Peers = peers;
+            FailureReason = failureReason;
+            UpdateInterval = updateInterval;
+            SeederCount = seedersCount;
+            LeecherCount = leecherCount;
+            Peers = peers;
         }
 
         #endregion Private Constructors
@@ -50,83 +50,59 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
         #region Public Properties
 
         /// <summary>
-        /// Gets the failure reason.
+        ///     Gets the failure reason.
         /// </summary>
         /// <value>
-        /// The failure reason.
+        ///     The failure reason.
         /// </value>
-        public string FailureReason
-        {
-            get;
-            private set;
-        }
+        public string FailureReason { get; }
 
         /// <summary>
-        /// Gets the leecher count.
+        ///     Gets the leecher count.
         /// </summary>
         /// <value>
-        /// The leecher count.
+        ///     The leecher count.
         /// </value>
-        public int LeecherCount
-        {
-            get;
-            private set;
-        }
+        public int LeecherCount { get; }
 
         /// <summary>
-        /// Gets the peer id / peer endpoint dictionary.
+        ///     Gets the peer id / peer endpoint dictionary.
         /// </summary>
         /// <value>
-        /// The peers.
+        ///     The peers.
         /// </value>
-        public IEnumerable<IPEndPoint> Peers
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<IPEndPoint> Peers { get; }
 
         /// <summary>
-        /// Gets the seeder count.
+        ///     Gets the seeder count.
         /// </summary>
         /// <value>
-        /// The seeder count.
+        ///     The seeder count.
         /// </value>
-        public int SeederCount
-        {
-            get;
-            private set;
-        }
+        public int SeederCount { get; }
 
         /// <summary>
-        /// Gets the update interval.
+        ///     Gets the update interval.
         /// </summary>
         /// <value>
-        /// The update interval.
+        ///     The update interval.
         /// </value>
-        public TimeSpan UpdateInterval
-        {
-            get;
-            private set;
-        }
+        public TimeSpan UpdateInterval { get; }
 
         /// <summary>
-        /// Gets the warning message.
+        ///     Gets the warning message.
         /// </summary>
         /// <value>
-        /// The warning message.
+        ///     The warning message.
         /// </value>
-        public string WarningMessage
-        {
-            get;
-            private set;
-        }
+        public string WarningMessage { get; private set; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Tries to decode the message from the specified data.
+        ///     Tries to decode the message from the specified data.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="message">The message.</param>
@@ -135,23 +111,23 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
         {
             BEncodedValue value;
             string faliureReason = null;
-            TimeSpan interval = TimeSpan.Zero;
-            int complete = -1;
-            int incomplete = -1;
+            var interval = TimeSpan.Zero;
+            var complete = -1;
+            var incomplete = -1;
             string peerId = null;
             string peerIp = null;
-            int peerPort = -1;
+            var peerPort = -1;
             IDictionary<string, IPEndPoint> peers = new Dictionary<string, IPEndPoint>();
             IPAddress tmpIpAddress;
             IPEndPoint endpoint;
-            BEncodedString failureReasonKey = new BEncodedString("failure reason");
-            BEncodedString intervalKey = new BEncodedString("interval");
-            BEncodedString completeKey = new BEncodedString("complete");
-            BEncodedString incompleteKey = new BEncodedString("incomplete");
-            BEncodedString peersKey = new BEncodedString("peers");
-            BEncodedString peerIdKey = new BEncodedString("peer id");
-            BEncodedString ipaddressKey = new BEncodedString("ip");
-            BEncodedString portKey = new BEncodedString("port");
+            var failureReasonKey = new BEncodedString("failure reason");
+            var intervalKey = new BEncodedString("interval");
+            var completeKey = new BEncodedString("complete");
+            var incompleteKey = new BEncodedString("incomplete");
+            var peersKey = new BEncodedString("peers");
+            var peerIdKey = new BEncodedString("peer id");
+            var ipaddressKey = new BEncodedString("ip");
+            var portKey = new BEncodedString("port");
 
             message = null;
 
@@ -180,7 +156,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
                     if (value.As<BEncodedDictionary>().ContainsKey(completeKey) &&
                         value.As<BEncodedDictionary>()[completeKey] is BEncodedNumber)
                     {
-                        complete = (int)value.As<BEncodedDictionary>()[completeKey].As<BEncodedNumber>().Number;
+                        complete = (int) value.As<BEncodedDictionary>()[completeKey].As<BEncodedNumber>().Number;
                     }
                     else
                     {
@@ -190,7 +166,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
                     if (value.As<BEncodedDictionary>().ContainsKey(incompleteKey) &&
                         value.As<BEncodedDictionary>()[incompleteKey] is BEncodedNumber)
                     {
-                        incomplete = (int)value.As<BEncodedDictionary>()[incompleteKey].As<BEncodedNumber>().Number;
+                        incomplete = (int) value.As<BEncodedDictionary>()[incompleteKey].As<BEncodedNumber>().Number;
                     }
                     else
                     {
@@ -201,7 +177,6 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
                         value.As<BEncodedDictionary>()[peersKey] is BEncodedList)
                     {
                         foreach (var item in value.As<BEncodedDictionary>()[peersKey].As<BEncodedList>())
-                        {
                             if (item is BEncodedDictionary)
                             {
                                 if (item.As<BEncodedDictionary>().ContainsKey(peerIdKey) &&
@@ -213,13 +188,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
                                 {
                                     peerId = Message.ToPeerId(Encoding.ASCII.GetBytes(item.As<BEncodedDictionary>()[peerIdKey].As<BEncodedString>().Text));
                                     peerIp = item.As<BEncodedDictionary>()[ipaddressKey].As<BEncodedString>().Text;
-                                    peerPort = (int)item.As<BEncodedDictionary>()[portKey].As<BEncodedNumber>().Number;
+                                    peerPort = (int) item.As<BEncodedDictionary>()[portKey].As<BEncodedNumber>().Number;
 
                                     if (IPAddress.TryParse(peerIp, out tmpIpAddress) &&
                                         peerPort >= IPEndPoint.MinPort &&
                                         peerPort <= IPEndPoint.MaxPort)
                                     {
-                                        endpoint = new IPEndPoint(tmpIpAddress, (ushort)peerPort);
+                                        endpoint = new IPEndPoint(tmpIpAddress, (ushort) peerPort);
 
                                         if (!peers.ContainsKey(endpoint.ToString()))
                                         {
@@ -232,9 +207,10 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
                             {
                                 var data2 = item.Encode();
 
-                                for (int i = 0; i < data2.Length; i += 6)
+                                for (var i = 0; i < data2.Length; i += 6)
                                 {
-                                    endpoint = new IPEndPoint(new IPAddress(IPAddress.NetworkToHostOrder(BitConverter.ToInt32(data2, i))), IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data2, i + 4)));
+                                    endpoint = new IPEndPoint(new IPAddress(IPAddress.NetworkToHostOrder(BitConverter.ToInt32(data2, i))),
+                                        IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data2, i + 4)));
 
                                     if (!peers.ContainsKey(endpoint.ToString()))
                                     {
@@ -242,7 +218,6 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
                                     }
                                 }
                             }
-                        }
                     }
                     else
                     {
@@ -259,10 +234,10 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Http.Messages
         }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {

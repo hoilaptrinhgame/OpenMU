@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using MUnique.OpenMU.Launcher.Managers;
 using MUnique.OpenMU.Launcher.Models;
@@ -10,25 +9,26 @@ namespace MUnique.OpenMU.Launcher.ViewModels
 {
     public class MainViewModel : BindableBase
     {
+        private ICommand checkForUpdatesCommand;
+
+        private ICommand githubButtonCommand;
+
+        private int progress;
+
+        private TestModel testModel;
+
         public MainViewModel()
         {
             testModel = new TestModel
             {
                 Message = "Hello World"
             };
-            
+
             githubButtonCommand = new DelegateCommand(OpenGithubURL);
             checkForUpdatesCommand = new DelegateCommand(UpdateManager.CheckForUpdates);
-            
+
             UpdateManager.OnProgressChanged += UpdateManagerOnOnProgressChanged;
         }
-
-        private void UpdateManagerOnOnProgressChanged(int _progress)
-        {
-            Progress = _progress;
-        }
-
-        private int progress;
 
         public int Progress
         {
@@ -36,15 +36,11 @@ namespace MUnique.OpenMU.Launcher.ViewModels
             set => SetProperty(ref progress, value);
         }
 
-        private TestModel testModel;
-
         public TestModel TestModel
         {
             get => testModel;
             set => SetProperty(ref testModel, value);
         }
-
-        private ICommand githubButtonCommand;
 
         public ICommand GithubButtonCommand
         {
@@ -52,12 +48,15 @@ namespace MUnique.OpenMU.Launcher.ViewModels
             set => SetProperty(ref githubButtonCommand, value);
         }
 
-        private ICommand checkForUpdatesCommand;
-
         public ICommand CheckForUpdatesCommand
         {
             get => checkForUpdatesCommand;
             set => SetProperty(ref checkForUpdatesCommand, value);
+        }
+
+        private void UpdateManagerOnOnProgressChanged(int _progress)
+        {
+            Progress = _progress;
         }
 
         public void OpenGithubURL()

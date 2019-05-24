@@ -4,14 +4,14 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs
 {
     /// <summary>
-    /// The tracking failed event arguments.
+    ///     The tracking failed event arguments.
     /// </summary>
     public sealed class TrackingFailedEventArgs : System.EventArgs
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TrackingFailedEventArgs"/> class.
+        ///     Initializes a new instance of the <see cref="TrackingFailedEventArgs" /> class.
         /// </summary>
         /// <param name="trackingUri">The tracking URI.</param>
         /// <param name="failureReason">The failure reason.</param>
@@ -20,8 +20,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs
             trackingUri.CannotBeNull();
             failureReason.CannotBeNullOrEmpty();
 
-            this.TrackerUri = trackingUri;
-            this.FailureReason = failureReason;
+            TrackerUri = trackingUri;
+            FailureReason = failureReason;
         }
 
         #endregion Public Constructors
@@ -29,7 +29,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="TrackingFailedEventArgs"/> class from being created.
+        ///     Prevents a default instance of the <see cref="TrackingFailedEventArgs" /> class from being created.
         /// </summary>
         private TrackingFailedEventArgs()
         {
@@ -40,28 +40,20 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs
         #region Public Properties
 
         /// <summary>
-        /// Gets the failure reason.
+        ///     Gets the failure reason.
         /// </summary>
         /// <value>
-        /// The failure reason.
+        ///     The failure reason.
         /// </value>
-        public string FailureReason
-        {
-            get;
-            private set;
-        }
+        public string FailureReason { get; }
 
         /// <summary>
-        /// Gets the tracker URI.
+        ///     Gets the tracker URI.
         /// </summary>
         /// <value>
-        /// The tracker URI.
+        ///     The tracker URI.
         /// </value>
-        public Uri TrackerUri
-        {
-            get;
-            private set;
-        }
+        public Uri TrackerUri { get; }
 
         #endregion Public Properties
     }

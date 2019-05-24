@@ -7,7 +7,7 @@ namespace MUnique.OpenMU.Launcher.Models.Updaters
     public class HTTPSUpdater : IUpdater
     {
         public int TotalProgress { get; set; }
-        
+
         public bool CheckingForUpdates { get; set; }
 
         public void CheckForUpdates()
@@ -30,9 +30,8 @@ namespace MUnique.OpenMU.Launcher.Models.Updaters
                 await Task.Delay(50);
                 TotalProgress++;
                 UpdateManager.NotifyProgressChanged(TotalProgress);
-                
             }
-            
+
             CheckingForUpdates = false;
         }
     }

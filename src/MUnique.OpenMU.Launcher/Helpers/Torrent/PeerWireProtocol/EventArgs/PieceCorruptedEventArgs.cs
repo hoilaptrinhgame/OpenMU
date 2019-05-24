@@ -3,21 +3,21 @@
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
 {
     /// <summary>
-    /// The piece corrupted event arguments.
+    ///     The piece corrupted event arguments.
     /// </summary>
     public sealed class PieceCorruptedEventArgs : System.EventArgs
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PieceCorruptedEventArgs" /> class.
+        ///     Initializes a new instance of the <see cref="PieceCorruptedEventArgs" /> class.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         public PieceCorruptedEventArgs(int pieceIndex)
         {
             pieceIndex.MustBeGreaterThanOrEqualTo(0);
 
-            this.PieceIndex = pieceIndex;
+            PieceIndex = pieceIndex;
         }
 
         #endregion Public Constructors
@@ -25,7 +25,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="PieceCorruptedEventArgs"/> class from being created.
+        ///     Prevents a default instance of the <see cref="PieceCorruptedEventArgs" /> class from being created.
         /// </summary>
         private PieceCorruptedEventArgs()
         {
@@ -36,16 +36,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
         #region Public Properties
 
         /// <summary>
-        /// Gets the index of the piece.
+        ///     Gets the index of the piece.
         /// </summary>
         /// <value>
-        /// The index of the piece.
+        ///     The index of the piece.
         /// </value>
-        public int PieceIndex
-        {
-            get;
-            private set;
-        }
+        public int PieceIndex { get; }
 
         #endregion Public Properties
     }

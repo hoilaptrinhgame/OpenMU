@@ -6,14 +6,14 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs
 {
     /// <summary>
-    /// The announced event arguments.
+    ///     The announced event arguments.
     /// </summary>
     public sealed class AnnouncedEventArgs : System.EventArgs
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnnouncedEventArgs" /> class.
+        ///     Initializes a new instance of the <see cref="AnnouncedEventArgs" /> class.
         /// </summary>
         /// <param name="interval">The interval.</param>
         /// <param name="leecherCount">The leecher count.</param>
@@ -26,10 +26,10 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs
             seederCount.MustBeGreaterThanOrEqualTo(0);
             peers.CannotContainOnlyNull();
 
-            this.Interval = interval;
-            this.LeecherCount = leecherCount;
-            this.SeederCount = seederCount;
-            this.Peers = peers;
+            Interval = interval;
+            LeecherCount = leecherCount;
+            SeederCount = seederCount;
+            Peers = peers;
         }
 
         #endregion Public Constructors
@@ -37,7 +37,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="AnnouncedEventArgs"/> class from being created.
+        ///     Prevents a default instance of the <see cref="AnnouncedEventArgs" /> class from being created.
         /// </summary>
         private AnnouncedEventArgs()
         {
@@ -48,52 +48,36 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.EventArgs
         #region Public Properties
 
         /// <summary>
-        /// Gets the interval.
+        ///     Gets the interval.
         /// </summary>
         /// <value>
-        /// The interval.
+        ///     The interval.
         /// </value>
-        public TimeSpan Interval
-        {
-            get;
-            private set;
-        }
+        public TimeSpan Interval { get; }
 
         /// <summary>
-        /// Gets the leecher count.
+        ///     Gets the leecher count.
         /// </summary>
         /// <value>
-        /// The leecher count.
+        ///     The leecher count.
         /// </value>
-        public int LeecherCount
-        {
-            get;
-            private set;
-        }
+        public int LeecherCount { get; }
 
         /// <summary>
-        /// Gets the peers.
+        ///     Gets the peers.
         /// </summary>
         /// <value>
-        /// The peers.
+        ///     The peers.
         /// </value>
-        public IEnumerable<IPEndPoint> Peers
-        {
-            get;
-            private set;
-        }
+        public IEnumerable<IPEndPoint> Peers { get; }
 
         /// <summary>
-        /// Gets the seeder count.
+        ///     Gets the seeder count.
         /// </summary>
         /// <value>
-        /// The seeder count.
+        ///     The seeder count.
         /// </value>
-        public int SeederCount
-        {
-            get;
-            private set;
-        }
+        public int SeederCount { get; }
 
         #endregion Public Properties
     }

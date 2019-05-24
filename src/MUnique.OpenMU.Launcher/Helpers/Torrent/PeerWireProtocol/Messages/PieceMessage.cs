@@ -4,47 +4,23 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 {
     /// <summary>
-    /// The piece message.
+    ///     The piece message.
     /// </summary>
     public class PieceMessage : PeerMessage
     {
         #region Public Fields
 
         /// <summary>
-        /// The message unique identifier.
+        ///     The message unique identifier.
         /// </summary>
         public const byte MessageId = 7;
 
         #endregion Public Fields
 
-        #region Private Fields
-
-        /// <summary>
-        /// The block offset length.
-        /// </summary>
-        private const int BlockOffsetLength = 4;
-
-        /// <summary>
-        /// The message unique identifier length in bytes.
-        /// </summary>
-        private const int MessageIdLength = 1;
-
-        /// <summary>
-        /// The message length in bytes.
-        /// </summary>
-        private const int MessageLengthLength = 4;
-
-        /// <summary>
-        /// The piece index length.
-        /// </summary>
-        private const int PieiceIndexLength = 4;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PieceMessage" /> class.
+        ///     Initializes a new instance of the <see cref="PieceMessage" /> class.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <param name="blockOffset">The block offset.</param>
@@ -57,10 +33,10 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             blockDataLength.MustBeGreaterThan(0);
             data.CannotBeNullOrEmpty();
 
-            this.PieceIndex = pieceIndex;
-            this.BlockOffset = blockOffset;
-            this.BlockDataLength = blockDataLength;
-            this.Data = data;
+            PieceIndex = pieceIndex;
+            BlockOffset = blockOffset;
+            BlockDataLength = blockDataLength;
+            Data = data;
         }
 
         #endregion Public Constructors
@@ -68,7 +44,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="PieceMessage"/> class from being created.
+        ///     Prevents a default instance of the <see cref="PieceMessage" /> class from being created.
         /// </summary>
         private PieceMessage()
         {
@@ -76,76 +52,78 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 
         #endregion Private Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The block offset length.
+        /// </summary>
+        private const int BlockOffsetLength = 4;
+
+        /// <summary>
+        ///     The message unique identifier length in bytes.
+        /// </summary>
+        private const int MessageIdLength = 1;
+
+        /// <summary>
+        ///     The message length in bytes.
+        /// </summary>
+        private const int MessageLengthLength = 4;
+
+        /// <summary>
+        ///     The piece index length.
+        /// </summary>
+        private const int PieiceIndexLength = 4;
+
+        #endregion Private Fields
+
         #region Public Properties
 
         /// <summary>
-        /// Gets the length of the block data.
+        ///     Gets the length of the block data.
         /// </summary>
         /// <value>
-        /// The length of the block data.
+        ///     The length of the block data.
         /// </value>
-        public int BlockDataLength
-        {
-            get;
-            private set;
-        }
+        public int BlockDataLength { get; }
 
         /// <summary>
-        /// Gets the block offset.
+        ///     Gets the block offset.
         /// </summary>
         /// <value>
-        /// The block offset.
+        ///     The block offset.
         /// </value>
-        public int BlockOffset
-        {
-            get;
-            private set;
-        }
+        public int BlockOffset { get; }
 
         /// <summary>
-        /// Gets the data.
+        ///     Gets the data.
         /// </summary>
         /// <value>
-        /// The data.
+        ///     The data.
         /// </value>
-        public byte[] Data
-        {
-            get;
-            private set;
-        }
+        public byte[] Data { get; }
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return MessageLengthLength + MessageIdLength + PieiceIndexLength + BlockOffsetLength + this.BlockDataLength;
-            }
-        }
+        public override int Length => MessageLengthLength + MessageIdLength + PieiceIndexLength + BlockOffsetLength + BlockDataLength;
 
         /// <summary>
-        /// Gets the index of the piece.
+        ///     Gets the index of the piece.
         /// </summary>
         /// <value>
-        /// The index of the piece.
+        ///     The index of the piece.
         /// </value>
-        public int PieceIndex
-        {
-            get;
-            private set;
-        }
+        public int PieceIndex { get; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offsetFrom">The offset from.</param>
@@ -154,7 +132,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         /// <param name="isIncomplete">if set to <c>true</c> the message is incomplete.</param>
         /// <param name="destination">The destination data array.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, ref int offsetFrom, int offsetTo, out PieceMessage message, out bool isIncomplete, byte[] destination = null)
         {
@@ -162,9 +140,9 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             byte messageId;
             int pieceIndex;
             int blockOffset;
-            int blockDataLength = 0;
-            int destinationOffset = 0;
-            int offsetFrom2 = offsetFrom;
+            var blockDataLength = 0;
+            var destinationOffset = 0;
+            var offsetFrom2 = offsetFrom;
 
             message = null;
             isIncomplete = false;
@@ -176,10 +154,10 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
                 offsetTo >= offsetFrom2 &&
                 offsetTo <= buffer.Length)
             {
-                messageLength = Message.ReadInt(buffer, ref offsetFrom2);
-                messageId = Message.ReadByte(buffer, ref offsetFrom2);
-                pieceIndex = Message.ReadInt(buffer, ref offsetFrom2);
-                blockOffset = Message.ReadInt(buffer, ref offsetFrom2);
+                messageLength = ReadInt(buffer, ref offsetFrom2);
+                messageId = ReadByte(buffer, ref offsetFrom2);
+                pieceIndex = ReadInt(buffer, ref offsetFrom2);
+                blockOffset = ReadInt(buffer, ref offsetFrom2);
                 blockDataLength = messageLength - MessageIdLength - PieiceIndexLength - BlockOffsetLength;
 
                 if (messageLength > MessageIdLength + PieiceIndexLength + BlockOffsetLength &&
@@ -200,7 +178,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
                             destinationOffset = blockOffset;
                         }
 
-                        Message.Copy(buffer, offsetFrom2, destination, ref destinationOffset, blockDataLength);
+                        Copy(buffer, offsetFrom2, destination, ref destinationOffset, blockDataLength);
 
                         message = new PieceMessage(pieceIndex, blockOffset, blockDataLength, destination);
                         offsetFrom = offsetFrom2 + blockDataLength;
@@ -216,12 +194,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <returns>
-        /// The encoded peer message.
+        ///     The encoded peer message.
         /// </returns>
         public override int Encode(byte[] buffer, int offset)
         {
@@ -229,70 +207,69 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, MessageIdLength + PieiceIndexLength + BlockOffsetLength + this.Data.Length);
-            Message.Write(buffer, ref written, MessageId);
-            Message.Write(buffer, ref written, this.PieceIndex);
-            Message.Write(buffer, ref written, this.BlockOffset);
-            Message.Write(buffer, ref written, this.Data);
+            Write(buffer, ref written, MessageIdLength + PieiceIndexLength + BlockOffsetLength + Data.Length);
+            Write(buffer, ref written, MessageId);
+            Write(buffer, ref written, PieceIndex);
+            Write(buffer, ref written, BlockOffset);
+            Write(buffer, ref written, Data);
 
-            return this.CheckWritten(written - offset);
+            return CheckWritten(written - offset);
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="object" />, is equal to this instance.
+        ///     Determines whether the specified <see cref="object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
-            PieceMessage msg = obj as PieceMessage;
+            var msg = obj as PieceMessage;
 
             if (msg == null)
             {
                 return false;
             }
-            else if (this.PieceIndex == msg.PieceIndex &&
-                     this.BlockOffset == msg.BlockOffset &&
-                     this.Data.ToHexaDecimalString() == msg.Data.ToHexaDecimalString())
+
+            if (PieceIndex == msg.PieceIndex &&
+                BlockOffset == msg.BlockOffset &&
+                Data.ToHexaDecimalString() == msg.Data.ToHexaDecimalString())
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        ///     Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
             int hash;
 
-            hash = this.PieceIndex.GetHashCode() ^
-                   this.BlockOffset.GetHashCode() ^
-                   this.Data.ToHexaDecimalString().GetHashCode();
+            hash = PieceIndex.GetHashCode() ^
+                   BlockOffset.GetHashCode() ^
+                   Data.ToHexaDecimalString().GetHashCode();
 
             return hash;
         }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
-            return $"PieceMessage: PieceIndex = {this.PieceIndex}, BlockOffset = {this.BlockOffset}, BlockData = byte[{this.Data.Length}]";
+            return $"PieceMessage: PieceIndex = {PieceIndex}, BlockOffset = {BlockOffset}, BlockData = byte[{Data.Length}]";
         }
 
         #endregion Public Methods

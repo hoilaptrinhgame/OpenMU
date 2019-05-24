@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using MUnique.OpenMU.Launcher.Models;
 using Newtonsoft.Json;
@@ -12,13 +11,13 @@ namespace MUnique.OpenMU.Launcher.Managers
     public static class LauncherSettingsManager
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        
+        public static LauncherSettings Settings;
+
         static LauncherSettingsManager()
         {
             LoadSettings();
         }
-        public static LauncherSettings Settings;
-        
+
         private static void LoadSettings()
         {
             if (Settings != null)
@@ -36,11 +35,11 @@ namespace MUnique.OpenMU.Launcher.Managers
                 Settings = new LauncherSettings();
                 SaveSettings();
             }
-            
+
             //Save the settings after any changes made to the object's properties
             Settings.PropertyChanged += SettingsOnPropertyChanged;
         }
-        
+
         private static void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             SaveSettings();
@@ -50,7 +49,7 @@ namespace MUnique.OpenMU.Launcher.Managers
         {
             try
             {
-                File.WriteAllText("config.json",JsonConvert.SerializeObject(Settings));
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(Settings));
             }
             catch (Exception e)
             {

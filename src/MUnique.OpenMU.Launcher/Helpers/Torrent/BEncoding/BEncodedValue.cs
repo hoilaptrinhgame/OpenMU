@@ -5,14 +5,14 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.Exceptions;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 {
     /// <summary>
-    /// The Base class for all BEncoded values.
+    ///     The Base class for all BEncoded values.
     /// </summary>
     public abstract class BEncodedValue
     {
         #region Public Methods
 
         /// <summary>
-        /// Clones the specified value.
+        ///     Clones the specified value.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="value">The value.</param>
@@ -21,11 +21,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         {
             value.CannotBeNull();
 
-            return (T)BEncodedValue.Decode(value.Encode());
+            return (T) Decode(value.Encode());
         }
 
         /// <summary>
-        /// Interface for all BEncoded values
+        ///     Interface for all BEncoded values
         /// </summary>
         /// <param name="data">The byte array containing the BEncoded data</param>
         /// <returns>The decoded BEncoded value.</returns>
@@ -35,9 +35,9 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 
             BEncodedValue value = null;
 
-            using (MemoryStream ms = new MemoryStream(data))
+            using (var ms = new MemoryStream(data))
             {
-                using (RawReader stream = new RawReader(ms))
+                using (var stream = new RawReader(ms))
                 {
                     value = Decode(stream);
                 }
@@ -47,7 +47,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         }
 
         /// <summary>
-        /// Decode BEncoded data in the given byte array
+        ///     Decode BEncoded data in the given byte array
         /// </summary>
         /// <param name="buffer">The byte array containing the BEncoded data</param>
         /// <param name="offset">The offset at which the data starts at</param>
@@ -63,7 +63,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         }
 
         /// <summary>
-        /// Decodes the specified buffer.
+        ///     Decodes the specified buffer.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -79,16 +79,16 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 
             BEncodedValue value = null;
 
-            using (RawReader reader = new RawReader(new MemoryStream(buffer, offset, length), strictDecoding))
+            using (var reader = new RawReader(new MemoryStream(buffer, offset, length), strictDecoding))
             {
-                value = BEncodedValue.Decode(reader);
+                value = Decode(reader);
             }
 
             return value;
         }
 
         /// <summary>
-        /// Decoded the stream into a BEncoded value.
+        ///     Decoded the stream into a BEncoded value.
         /// </summary>
         /// <param name="stream">The stream containing the BEncoded data</param>
         /// <returns>The BEncoded value.</returns>
@@ -100,7 +100,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         }
 
         /// <summary>
-        /// Decode BEncoded data in the given RawReader
+        ///     Decode BEncoded data in the given RawReader
         /// </summary>
         /// <param name="reader">The RawReader containing the BEncoded data</param>
         /// <returns>BEncodedValue containing the data that was in the stream</returns>
@@ -109,7 +109,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
             reader.CannotBeNull();
 
             BEncodedValue data;
-            int peekByte = reader.PeekByte();
+            var peekByte = reader.PeekByte();
 
             if (peekByte == 'i')
             {
@@ -119,7 +119,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 
                 return data;
             }
-            else if (peekByte == 'd')
+
+            if (peekByte == 'd')
             {
                 // dictionary
                 data = new BEncodedDictionary();
@@ -127,7 +128,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 
                 return data;
             }
-            else if (peekByte == 'l')
+
+            if (peekByte == 'l')
             {
                 // list
                 data = new BEncodedList();
@@ -135,16 +137,17 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 
                 return data;
             }
-            else if (peekByte == '0' ||
-                     peekByte == '1' ||
-                     peekByte == '2' ||
-                     peekByte == '3' ||
-                     peekByte == '4' ||
-                     peekByte == '5' ||
-                     peekByte == '6' ||
-                     peekByte == '7' ||
-                     peekByte == '8' ||
-                     peekByte == '9')
+
+            if (peekByte == '0' ||
+                peekByte == '1' ||
+                peekByte == '2' ||
+                peekByte == '3' ||
+                peekByte == '4' ||
+                peekByte == '5' ||
+                peekByte == '6' ||
+                peekByte == '7' ||
+                peekByte == '8' ||
+                peekByte == '9')
             {
                 // string
                 data = new BEncodedString();
@@ -152,14 +155,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
 
                 return data;
             }
-            else
-            {
-                throw new BEncodingException("Could not find what value to decode.");
-            }
+
+            throw new BEncodingException("Could not find what value to decode.");
         }
 
         /// <summary>
-        /// Decodes the specified data.
+        ///     Decodes the specified data.
         /// </summary>
         /// <typeparam name="T">The BEncoded value type.</typeparam>
         /// <param name="data">The data.</param>
@@ -168,11 +169,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         {
             data.CannotBeNull();
 
-            return (T)BEncodedValue.Decode(data);
+            return (T) Decode(data);
         }
 
         /// <summary>
-        /// Decodes the specified buffer.
+        ///     Decodes the specified buffer.
         /// </summary>
         /// <typeparam name="T">The BEncoded value type.</typeparam>
         /// <param name="buffer">The buffer.</param>
@@ -185,11 +186,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
             offset.MustBeGreaterThanOrEqualTo(0);
             length.MustBeGreaterThanOrEqualTo(0);
 
-            return BEncodedValue.Decode<T>(buffer, offset, length, true);
+            return Decode<T>(buffer, offset, length, true);
         }
 
         /// <summary>
-        /// Decodes the specified buffer.
+        ///     Decodes the specified buffer.
         /// </summary>
         /// <typeparam name="T">The BEncoded value type.</typeparam>
         /// <param name="buffer">The buffer.</param>
@@ -197,7 +198,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         /// <param name="length">The length.</param>
         /// <param name="strictDecoding">if set to <c>true</c> [strict decoding].</param>
         /// <returns>
-        /// The BEncoded value.
+        ///     The BEncoded value.
         /// </returns>
         public static T Decode<T>(byte[] buffer, int offset, int length, bool strictDecoding) where T : BEncodedValue
         {
@@ -205,48 +206,48 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
             offset.MustBeGreaterThanOrEqualTo(0);
             length.MustBeGreaterThanOrEqualTo(0);
 
-            return (T)BEncodedValue.Decode(buffer, offset, length, strictDecoding);
+            return (T) Decode(buffer, offset, length, strictDecoding);
         }
 
         /// <summary>
-        /// Decodes the specified stream.
+        ///     Decodes the specified stream.
         /// </summary>
         /// <typeparam name="T">The BEncoded value type.</typeparam>
         /// <param name="stream">The stream.</param>
         /// <returns>
-        /// The BEncoded value.
+        ///     The BEncoded value.
         /// </returns>
         public static T Decode<T>(Stream stream) where T : BEncodedValue
         {
             stream.CannotBeNull();
 
-            return (T)BEncodedValue.Decode(stream);
+            return (T) Decode(stream);
         }
 
         /// <summary>
-        /// Decodes the specified reader.
+        ///     Decodes the specified reader.
         /// </summary>
         /// <typeparam name="T">The BEncoded value type.</typeparam>
         /// <param name="reader">The reader.</param>
         /// <returns>
-        /// The BEncoded value.
+        ///     The BEncoded value.
         /// </returns>
         public static T Decode<T>(RawReader reader) where T : BEncodedValue
         {
             reader.CannotBeNull();
 
-            return (T)BEncodedValue.Decode(reader);
+            return (T) Decode(reader);
         }
 
         /// <summary>
-        /// Encodes the BEncodedValue into a byte array.
+        ///     Encodes the BEncodedValue into a byte array.
         /// </summary>
         /// <returns>Byte array containing the BEncoded Data.</returns>
         public byte[] Encode()
         {
-            byte[] buffer = new byte[this.LengthInBytes()];
+            var buffer = new byte[LengthInBytes()];
 
-            if (this.Encode(buffer, 0) != buffer.Length)
+            if (Encode(buffer, 0) != buffer.Length)
             {
                 throw new BEncodingException("Error encoding the data");
             }
@@ -255,7 +256,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         }
 
         /// <summary>
-        /// Encodes the BEncodedValue into the supplied buffer
+        ///     Encodes the BEncodedValue into the supplied buffer
         /// </summary>
         /// <param name="buffer">The buffer to encode the information to</param>
         /// <param name="offset">The offset in the buffer to start writing the data</param>
@@ -263,7 +264,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         public abstract int Encode(byte[] buffer, int offset);
 
         /// <summary>
-        /// Returns the size of the byte[] needed to encode this BEncodedValue
+        ///     Returns the size of the byte[] needed to encode this BEncodedValue
         /// </summary>
         /// <returns>The length in bytes.</returns>
         public abstract int LengthInBytes();
@@ -273,7 +274,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         #region Internal Methods
 
         /// <summary>
-        /// Decodes the specified buffer.
+        ///     Decodes the specified buffer.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="strictDecoding">if set to <c>true</c> use strict decoding.</param>
@@ -286,7 +287,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.BEncoding
         }
 
         /// <summary>
-        /// Decodes the stream into respected value.
+        ///     Decodes the stream into respected value.
         /// </summary>
         /// <param name="reader">The reader.</param>
         internal abstract void DecodeInternal(RawReader reader);

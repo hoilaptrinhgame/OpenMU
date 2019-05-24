@@ -11,112 +11,112 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 {
     /// <summary>
-    /// The peer.
+    ///     The peer.
     /// </summary>
     public sealed class Peer : IDisposable
     {
         /// <summary>
-        /// The thread locking object.
+        ///     The thread locking object.
         /// </summary>
         private readonly object locker = new object();
 
         /// <summary>
-        /// The communicator.
+        ///     The communicator.
         /// </summary>
         private PeerCommunicator communicator;
 
         /// <summary>
-        /// The download message queue locker
-        /// </summary>
-        private object downloadMessageQueueLocker = new object();
-
-        /// <summary>
-        /// The download message queue.
+        ///     The download message queue.
         /// </summary>
         private Queue<PeerMessage> downloadMessageQueue = new Queue<PeerMessage>();
 
         /// <summary>
-        /// The download speed in bytes per second.
+        ///     The download message queue locker
         /// </summary>
-        private decimal downloadSpeed = 0;
+        private readonly object downloadMessageQueueLocker = new object();
 
         /// <summary>
-        /// The peer is currently downloading flag.
+        ///     The download speed in bytes per second.
         /// </summary>
-        private bool isDownloading = false;
+        private decimal downloadSpeed;
 
         /// <summary>
-        /// The peer is keeping alive flag.
+        ///     The peer is currently downloading flag.
         /// </summary>
-        private bool isKeepingAlive = false;
+        private bool isDownloading;
 
         /// <summary>
-        /// The the peer is currently uploading flag.
+        ///     The peer is keeping alive flag.
         /// </summary>
-        private bool isUploading = false;
+        private bool isKeepingAlive;
 
         /// <summary>
-        /// The last message received time.
+        ///     The the peer is currently uploading flag.
+        /// </summary>
+        private bool isUploading;
+
+        /// <summary>
+        ///     The last message received time.
         /// </summary>
         private DateTime? lastMessageReceivedTime;
 
         /// <summary>
-        /// The last message sent time.
+        ///     The last message sent time.
         /// </summary>
         private DateTime? lastMessageSentTime;
 
         /// <summary>
-        /// The local peer identifier.
+        ///     The local peer identifier.
         /// </summary>
-        private string localPeerId;
+        private readonly string localPeerId;
 
         /// <summary>
-        /// The piece manager.
+        ///     The piece manager.
         /// </summary>
-        private PieceManager pieceManager;
+        private readonly PieceManager pieceManager;
 
         /// <summary>
-        /// The previously downloaded byte count.
+        ///     The previously downloaded byte count.
         /// </summary>
-        private long previouslyDownloaded = 0;
+        private long previouslyDownloaded;
 
         /// <summary>
-        /// The previously uploaded byte count.
+        ///     The previously uploaded byte count.
         /// </summary>
-        private long previouslyUploaded = 0;
+        private long previouslyUploaded;
 
         /// <summary>
-        /// The send message queue locker.
-        /// </summary>
-        private object sendMessageQueueLocker = new object();
-
-        /// <summary>
-        /// The send message queue.
+        ///     The send message queue.
         /// </summary>
         private Queue<PeerMessage> sendMessageQueue = new Queue<PeerMessage>();
 
         /// <summary>
-        /// The stopwatch.
+        ///     The send message queue locker.
         /// </summary>
-        private Stopwatch stopwatch = Stopwatch.StartNew();
+        private readonly object sendMessageQueueLocker = new object();
 
         /// <summary>
-        /// The upload message queue locker.
+        ///     The stopwatch.
         /// </summary>
-        private object uploadMessageQueueLocker = new object();
+        private readonly Stopwatch stopwatch = Stopwatch.StartNew();
 
         /// <summary>
-        /// The upload message queue.
+        ///     The upload message queue.
         /// </summary>
         private Queue<PeerMessage> uploadMessageQueue = new Queue<PeerMessage>();
 
         /// <summary>
-        /// The upload speed in bytes per second.
+        ///     The upload message queue locker.
         /// </summary>
-        private decimal uploadSpeed = 0;
+        private readonly object uploadMessageQueueLocker = new object();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Peer" /> class.
+        ///     The upload speed in bytes per second.
+        /// </summary>
+        private decimal uploadSpeed;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Peer" /> class.
         /// </summary>
         /// <param name="communicator">The communicator.</param>
         /// <param name="pieceManager">The piece manager.</param>
@@ -128,340 +128,303 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             pieceManager.CannotBeNull();
             localPeerId.CannotBeNullOrEmpty();
 
-            this.PeerId = peerId;
+            PeerId = peerId;
 
             this.localPeerId = localPeerId;
 
-            this.BitField = new bool[pieceManager.PieceCount];
+            BitField = new bool[pieceManager.PieceCount];
 
-            this.HandshakeState = peerId == null ? HandshakeState.SentButNotReceived : HandshakeState.SendAndReceived;
-            this.SeedingState = SeedingState.Choked;
-            this.LeechingState = LeechingState.Uninterested;
+            HandshakeState = peerId == null ? HandshakeState.SentButNotReceived : HandshakeState.SendAndReceived;
+            SeedingState = SeedingState.Choked;
+            LeechingState = LeechingState.Uninterested;
 
-            this.Downloaded = 0;
-            this.Uploaded = 0;
+            Downloaded = 0;
+            Uploaded = 0;
 
             this.communicator = communicator;
-            this.communicator.MessageReceived += this.Communicator_MessageReceived;
-            this.communicator.CommunicationError += this.Communicator_CommunicationError;
+            this.communicator.MessageReceived += Communicator_MessageReceived;
+            this.communicator.CommunicationError += Communicator_CommunicationError;
 
             this.pieceManager = pieceManager;
-            this.pieceManager.PieceCompleted += this.PieceManager_PieceCompleted;
+            this.pieceManager.PieceCompleted += PieceManager_PieceCompleted;
 
-            this.Endpoint = this.communicator.Endpoint;
+            Endpoint = this.communicator.Endpoint;
 
-            this.StartSending();
-            this.StartDownloading();
-            this.StartUploading();
-            this.StartKeepingConnectionAlive();
+            StartSending();
+            StartDownloading();
+            StartUploading();
+            StartKeepingConnectionAlive();
 
             // send handshake
-            this.EnqueueSendMessage(new HandshakeMessage(this.pieceManager.TorrentInfoHash, localPeerId, HandshakeMessage.ProtocolName));
+            EnqueueSendMessage(new HandshakeMessage(this.pieceManager.TorrentInfoHash, localPeerId));
         }
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="Peer"/> class from being created.
+        ///     Prevents a default instance of the <see cref="Peer" /> class from being created.
         /// </summary>
         private Peer()
         {
         }
 
         /// <summary>
-        /// Occurs when peer communication error has occurred.
-        /// </summary>
-        public event EventHandler<PeerCommunicationErrorEventArgs> CommunicationErrorOccurred;
-
-        /// <summary>
-        /// Gets the bit field.
+        ///     Gets the bit field.
         /// </summary>
         /// <value>
-        /// The bit field.
+        ///     The bit field.
         /// </value>
-        public bool[] BitField
-        {
-            get;
-            private set;
-        }
+        public bool[] BitField { get; }
 
         /// <summary>
-        /// Gets the downloaded byte count.
+        ///     Gets the downloaded byte count.
         /// </summary>
         /// <value>
-        /// The bytes downloaded.
+        ///     The bytes downloaded.
         /// </value>
-        public long Downloaded
-        {
-            get;
-            private set;
-        }
+        public long Downloaded { get; private set; }
 
         /// <summary>
-        /// Gets the download speed in bytes per second.
+        ///     Gets the download speed in bytes per second.
         /// </summary>
         /// <value>
-        /// The download speed in bytes per second.
+        ///     The download speed in bytes per second.
         /// </value>
         public decimal DownloadSpeed
         {
             get
             {
-                this.UpdateTrafficParameters(0, 0);
+                UpdateTrafficParameters(0, 0);
 
-                return this.downloadSpeed;
+                return downloadSpeed;
             }
         }
 
         /// <summary>
-        /// Gets the endpoint.
+        ///     Gets the endpoint.
         /// </summary>
         /// <value>
-        /// The endpoint.
+        ///     The endpoint.
         /// </value>
-        public IPEndPoint Endpoint
-        {
-            get;
-            private set;
-        }
+        public IPEndPoint Endpoint { get; }
 
         /// <summary>
-        /// Gets the state of the handshake.
+        ///     Gets the state of the handshake.
         /// </summary>
         /// <value>
-        /// The state of the handshake.
+        ///     The state of the handshake.
         /// </value>
-        public HandshakeState HandshakeState
-        {
-            get;
-            private set;
-        }
+        public HandshakeState HandshakeState { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether this object is disposed.
+        ///     Gets a value indicating whether this object is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this object is disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if this object is disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool IsDisposed
-        {
-            get;
-            private set;
-        }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets the state of the leeching.
+        ///     Gets the state of the leeching.
         /// </summary>
         /// <value>
-        /// The state of the leeching.
+        ///     The state of the leeching.
         /// </value>
-        public LeechingState LeechingState
-        {
-            get;
-            private set;
-        }
+        public LeechingState LeechingState { get; private set; }
 
         /// <summary>
-        /// Gets the peer identifier.
+        ///     Gets the peer identifier.
         /// </summary>
         /// <value>
-        /// The peer identifier.
+        ///     The peer identifier.
         /// </value>
-        public string PeerId
-        {
-            get;
-            private set;
-        }
+        public string PeerId { get; private set; }
 
         /// <summary>
-        /// Gets the state of the seeding.
+        ///     Gets the state of the seeding.
         /// </summary>
         /// <value>
-        /// The state of the seeding.
+        ///     The state of the seeding.
         /// </value>
-        public SeedingState SeedingState
-        {
-            get;
-            private set;
-        }
+        public SeedingState SeedingState { get; private set; }
 
         /// <summary>
-        /// Gets the uploaded byte count.
+        ///     Gets the uploaded byte count.
         /// </summary>
         /// <value>
-        /// The uploaded byte count.
+        ///     The uploaded byte count.
         /// </value>
-        public long Uploaded
-        {
-            get;
-            private set;
-        }
+        public long Uploaded { get; private set; }
 
         /// <summary>
-        /// Gets the upload speed in bytes per second.
+        ///     Gets the upload speed in bytes per second.
         /// </summary>
         /// <value>
-        /// The upload speed in bytes per second.
+        ///     The upload speed in bytes per second.
         /// </value>
         public decimal UploadSpeed
         {
             get
             {
-                this.UpdateTrafficParameters(0, 0);
+                UpdateTrafficParameters(0, 0);
 
-                return this.uploadSpeed;
+                return uploadSpeed;
             }
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            if (!this.IsDisposed)
+            if (!IsDisposed)
             {
-                this.IsDisposed = true;
+                IsDisposed = true;
 
-                Debug.WriteLine($"disposing peer {this.Endpoint}");
+                Debug.WriteLine($"disposing peer {Endpoint}");
 
-                if (this.communicator != null &&
-                    !this.communicator.IsDisposed)
+                if (communicator != null &&
+                    !communicator.IsDisposed)
                 {
-                    this.communicator.Dispose();
-                    this.communicator = null;
+                    communicator.Dispose();
+                    communicator = null;
                 }
             }
         }
 
         /// <summary>
-        /// Checks if object is disposed.
+        ///     Occurs when peer communication error has occurred.
+        /// </summary>
+        public event EventHandler<PeerCommunicationErrorEventArgs> CommunicationErrorOccurred;
+
+        /// <summary>
+        ///     Checks if object is disposed.
         /// </summary>
         private void CheckIfObjectIsDisposed()
         {
-            if (this.IsDisposed)
+            if (IsDisposed)
             {
-                throw new ObjectDisposedException(this.GetType().Name);
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 
         /// <summary>
-        /// Handles the CommunicationError event of the communicator control.
+        ///     Handles the CommunicationError event of the communicator control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void Communicator_CommunicationError(object sender, CommunicationErrorEventArgs e)
         {
-            this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs(e.ErrorMessage, true));
+            OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs(e.ErrorMessage, true));
         }
 
         /// <summary>
-        /// Handles the MessageReceived event of the Communicator control.
+        ///     Handles the MessageReceived event of the Communicator control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="PeerMessgeReceivedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="PeerMessgeReceivedEventArgs" /> instance containing the event data.</param>
         private void Communicator_MessageReceived(object sender, PeerMessgeReceivedEventArgs e)
         {
-            this.ProcessRecievedMessage(e.Message);
+            ProcessRecievedMessage(e.Message);
 
-            this.UpdateTrafficParameters(e.Message.Length, 0);
+            UpdateTrafficParameters(e.Message.Length, 0);
         }
 
         /// <summary>
-        /// De-queues the download messages.
+        ///     De-queues the download messages.
         /// </summary>
         /// <returns>
-        /// The de-queued messages.
+        ///     The de-queued messages.
         /// </returns>
         private IEnumerable<PeerMessage> DequeueDownloadMessages()
         {
             IEnumerable<PeerMessage> messages;
 
-            lock (this.downloadMessageQueueLocker)
+            lock (downloadMessageQueueLocker)
             {
-                messages = this.downloadMessageQueue;
+                messages = downloadMessageQueue;
 
                 // TODO: optimize this by using a wait handler
-                this.downloadMessageQueue = new Queue<PeerMessage>();
+                downloadMessageQueue = new Queue<PeerMessage>();
             }
 
             return messages;
         }
 
         /// <summary>
-        /// De-queues the send messages.
+        ///     De-queues the send messages.
         /// </summary>
         /// <returns>
-        /// The de-queued messages.
+        ///     The de-queued messages.
         /// </returns>
         private IEnumerable<PeerMessage> DequeueSendMessages()
         {
             IEnumerable<PeerMessage> messages;
 
-            lock (this.sendMessageQueueLocker)
+            lock (sendMessageQueueLocker)
             {
-                messages = this.sendMessageQueue;
+                messages = sendMessageQueue;
 
-                this.sendMessageQueue = new Queue<PeerMessage>();
+                sendMessageQueue = new Queue<PeerMessage>();
             }
 
             return messages;
         }
 
         /// <summary>
-        /// De-queues the upload messages.
+        ///     De-queues the upload messages.
         /// </summary>
         /// <returns>
-        /// The de-queued messages.
+        ///     The de-queued messages.
         /// </returns>
         private IEnumerable<PeerMessage> DequeueUploadMessages()
         {
             IEnumerable<PeerMessage> messages;
 
-            lock (this.uploadMessageQueueLocker)
+            lock (uploadMessageQueueLocker)
             {
-                messages = this.uploadMessageQueue;
+                messages = uploadMessageQueue;
 
-                this.uploadMessageQueue = new Queue<PeerMessage>();
+                uploadMessageQueue = new Queue<PeerMessage>();
             }
 
             return messages;
         }
 
         /// <summary>
-        /// The downloading thread.
+        ///     The downloading thread.
         /// </summary>
         private void Download()
         {
-            TimeSpan timeout = TimeSpan.FromMilliseconds(250);
-            TimeSpan chokeTimeout = TimeSpan.FromSeconds(10);
-            Stopwatch stopwatch = Stopwatch.StartNew();
+            var timeout = TimeSpan.FromMilliseconds(250);
+            var chokeTimeout = TimeSpan.FromSeconds(10);
+            var stopwatch = Stopwatch.StartNew();
             PieceMessage pm;
             Piece piece = null;
-            bool[] bitFieldData = Array.Empty<bool>();
-            byte[] pieceData = Array.Empty<byte>();
-            int unchokeMessagesSent = 0;
+            var bitFieldData = Array.Empty<bool>();
+            var pieceData = Array.Empty<byte>();
+            var unchokeMessagesSent = 0;
 
-            if (!this.isDownloading)
+            if (!isDownloading)
             {
-                this.isDownloading = true;
+                isDownloading = true;
 
-                this.communicator.PieceData = new byte[this.pieceManager.PieceLength];
+                communicator.PieceData = new byte[pieceManager.PieceLength];
 
-                while (!this.IsDisposed)
+                while (!IsDisposed)
                 {
-                    if (this.pieceManager.IsComplete)
+                    if (pieceManager.IsComplete)
                     {
                         break;
                     }
 
                     // process messages
-                    foreach (PeerMessage message in this.DequeueDownloadMessages())
-                    {
+                    foreach (var message in DequeueDownloadMessages())
                         if (message is PieceMessage)
                         {
                             pm = message as PieceMessage;
 
                             if (piece != null &&
                                 piece.PieceIndex == pm.PieceIndex &&
-                                piece.BitField[pm.BlockOffset / this.pieceManager.BlockLength] == false)
+                                piece.BitField[pm.BlockOffset / pieceManager.BlockLength] == false)
                             {
                                 // update piece
                                 piece.PutBlock(pm.BlockOffset);
@@ -476,30 +439,30 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                         }
                         else if (message is ChokeMessage)
                         {
-                            this.SeedingState = SeedingState.Choked;
+                            SeedingState = SeedingState.Choked;
 
                             piece = null;
                         }
                         else if (message is UnchokeMessage)
                         {
-                            this.SeedingState = SeedingState.Unchoked;
+                            SeedingState = SeedingState.Unchoked;
 
                             unchokeMessagesSent = 0;
                         }
-                    }
 
-                    if (this.HandshakeState == HandshakeState.SendAndReceived)
+                    if (HandshakeState == HandshakeState.SendAndReceived)
                     {
-                        if (this.SeedingState == SeedingState.Choked)
+                        if (SeedingState == SeedingState.Choked)
                         {
                             if (stopwatch.Elapsed > chokeTimeout)
                             {
                                 // choked -> send interested
-                                this.EnqueueSendMessage(new InterestedMessage());
+                                EnqueueSendMessage(new InterestedMessage());
 
                                 if (++unchokeMessagesSent > 10)
                                 {
-                                    this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs($"Choked for more than {TimeSpan.FromSeconds(chokeTimeout.TotalSeconds * 10)}.", true));
+                                    OnCommunicationErrorOccurred(this,
+                                        new PeerCommunicationErrorEventArgs($"Choked for more than {TimeSpan.FromSeconds(chokeTimeout.TotalSeconds * 10)}.", true));
                                 }
 
                                 stopwatch.Restart();
@@ -509,44 +472,43 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                                 Thread.Sleep(timeout);
                             }
                         }
-                        else if (this.SeedingState == SeedingState.Unchoked)
+                        else if (SeedingState == SeedingState.Unchoked)
                         {
                             if (piece == null)
                             {
                                 // find a missing piece
-                                for (int pieceIndex = 0; pieceIndex < this.BitField.Length; pieceIndex++)
-                                {
-                                    if (this.pieceManager.BitField[pieceIndex] == PieceStatus.Missing)
+                                for (var pieceIndex = 0; pieceIndex < BitField.Length; pieceIndex++)
+                                    if (pieceManager.BitField[pieceIndex] == PieceStatus.Missing)
                                     {
-                                        if (this.BitField[pieceIndex] ||
-                                            this.pieceManager.IsEndGame)
+                                        if (BitField[pieceIndex] ||
+                                            pieceManager.IsEndGame)
                                         {
-                                            pieceData = pieceData.Length == this.pieceManager.GetPieceLength(pieceIndex) ? pieceData : new byte[this.pieceManager.GetPieceLength(pieceIndex)];
-                                            bitFieldData = bitFieldData.Length == this.pieceManager.GetBlockCount(pieceIndex) ? bitFieldData : new bool[this.pieceManager.GetBlockCount(pieceIndex)];
+                                            pieceData = pieceData.Length == pieceManager.GetPieceLength(pieceIndex) ? pieceData : new byte[pieceManager.GetPieceLength(pieceIndex)];
+                                            bitFieldData = bitFieldData.Length == pieceManager.GetBlockCount(pieceIndex)
+                                                ? bitFieldData
+                                                : new bool[pieceManager.GetBlockCount(pieceIndex)];
 
                                             // check it out
-                                            piece = this.pieceManager.CheckOut(pieceIndex, pieceData, bitFieldData);
+                                            piece = pieceManager.CheckOut(pieceIndex, pieceData, bitFieldData);
 
                                             if (piece != null)
                                             {
-                                                this.communicator.PieceData = pieceData;
+                                                communicator.PieceData = pieceData;
 
                                                 break;
                                             }
                                         }
                                     }
-                                }
 
                                 if (piece != null)
                                 {
                                     // request blocks from the missing piece
-                                    for (int i = 0; i < piece.BitField.Length; i++)
-                                    {
+                                    for (var i = 0; i < piece.BitField.Length; i++)
                                         if (!piece.BitField[i])
                                         {
-                                            this.EnqueueSendMessage(new RequestMessage(piece.PieceIndex, (int)piece.GetBlockOffset(i), (int)piece.GetBlockLength(piece.GetBlockOffset(i))));
+                                            EnqueueSendMessage(new RequestMessage(piece.PieceIndex, (int) piece.GetBlockOffset(i),
+                                                (int) piece.GetBlockLength(piece.GetBlockOffset(i))));
                                         }
-                                    }
                                 }
                             }
                         }
@@ -555,80 +517,79 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                     Thread.Sleep(timeout);
                 }
 
-                this.isDownloading = false;
+                isDownloading = false;
             }
         }
 
         /// <summary>
-        /// Enqueues the download message.
+        ///     Enqueues the download message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void EnqueueDownloadMessage(PeerMessage message)
         {
             message.CannotBeNull();
 
-            lock (this.downloadMessageQueueLocker)
+            lock (downloadMessageQueueLocker)
             {
-                this.downloadMessageQueue.Enqueue(message);
+                downloadMessageQueue.Enqueue(message);
             }
         }
 
         /// <summary>
-        /// Enqueues the send message.
+        ///     Enqueues the send message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void EnqueueSendMessage(PeerMessage message)
         {
             message.CannotBeNull();
 
-            lock (this.sendMessageQueueLocker)
+            lock (sendMessageQueueLocker)
             {
-                this.sendMessageQueue.Enqueue(message);
+                sendMessageQueue.Enqueue(message);
             }
         }
 
         /// <summary>
-        /// Enqueues the upload message.
+        ///     Enqueues the upload message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void EnqueueUploadMessage(PeerMessage message)
         {
             message.CannotBeNull();
 
-            lock (this.uploadMessageQueueLocker)
+            lock (uploadMessageQueueLocker)
             {
-                this.uploadMessageQueue.Enqueue(message);
+                uploadMessageQueue.Enqueue(message);
             }
         }
 
         /// <summary>
-        /// Keeps the connection alive.
+        ///     Keeps the connection alive.
         /// </summary>
         private void KeepAlive()
         {
-            TimeSpan keepAliveTimeout = TimeSpan.FromSeconds(60);
-            TimeSpan timeout = TimeSpan.FromSeconds(10);
+            var keepAliveTimeout = TimeSpan.FromSeconds(60);
+            var timeout = TimeSpan.FromSeconds(10);
 
-            if (!this.isKeepingAlive)
+            if (!isKeepingAlive)
             {
-                this.isKeepingAlive = true;
+                isKeepingAlive = true;
 
-                while (!this.IsDisposed)
-                {
-                    if (!this.isDownloading &&
-                        !this.isUploading)
+                while (!IsDisposed)
+                    if (!isDownloading &&
+                        !isUploading)
                     {
                         break;
                     }
-                    else if (this.lastMessageSentTime == null &&
-                             this.lastMessageReceivedTime == null)
+                    else if (lastMessageSentTime == null &&
+                             lastMessageReceivedTime == null)
                     {
                         Thread.Sleep(timeout);
                     }
-                    else if (DateTime.UtcNow - this.lastMessageSentTime > keepAliveTimeout ||
-                             DateTime.UtcNow - this.lastMessageReceivedTime > keepAliveTimeout)
+                    else if (DateTime.UtcNow - lastMessageSentTime > keepAliveTimeout ||
+                             DateTime.UtcNow - lastMessageReceivedTime > keepAliveTimeout)
                     {
-                        this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs($"No message exchanged in over {keepAliveTimeout}.", true));
+                        OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs($"No message exchanged in over {keepAliveTimeout}.", true));
 
                         break;
                     }
@@ -636,14 +597,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                     {
                         Thread.Sleep(timeout);
                     }
-                }
 
-                this.isKeepingAlive = false;
+                isKeepingAlive = false;
             }
         }
 
         /// <summary>
-        /// Called when peer communication error has occurred.
+        ///     Called when peer communication error has occurred.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -652,78 +612,78 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.CommunicationErrorOccurred != null)
+            if (CommunicationErrorOccurred != null)
             {
-                this.CommunicationErrorOccurred(sender, e);
+                CommunicationErrorOccurred(sender, e);
             }
         }
 
         /// <summary>
-        /// Handles the PieceCompleted event of the PieceManager control.
+        ///     Handles the PieceCompleted event of the PieceManager control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="PieceCompletedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="PieceCompletedEventArgs" /> instance containing the event data.</param>
         private void PieceManager_PieceCompleted(object sender, PieceCompletedEventArgs e)
         {
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
-                this.EnqueueSendMessage(new HaveMessage(e.PieceIndex));
+                EnqueueSendMessage(new HaveMessage(e.PieceIndex));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(PeerMessage message)
         {
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            lock (this.locker)
+            lock (locker)
             {
-                Debug.WriteLine($"{this.Endpoint} <- {message}");
+                Debug.WriteLine($"{Endpoint} <- {message}");
 
-                this.lastMessageReceivedTime = DateTime.UtcNow;
+                lastMessageReceivedTime = DateTime.UtcNow;
 
                 if (message is HandshakeMessage)
                 {
-                    this.ProcessRecievedMessage(message as HandshakeMessage);
+                    ProcessRecievedMessage(message as HandshakeMessage);
                 }
                 else if (message is ChokeMessage)
                 {
-                    this.ProcessRecievedMessage(message as ChokeMessage);
+                    ProcessRecievedMessage(message as ChokeMessage);
                 }
                 else if (message is UnchokeMessage)
                 {
-                    this.ProcessRecievedMessage(message as UnchokeMessage);
+                    ProcessRecievedMessage(message as UnchokeMessage);
                 }
                 else if (message is InterestedMessage)
                 {
-                    this.ProcessRecievedMessage(message as InterestedMessage);
+                    ProcessRecievedMessage(message as InterestedMessage);
                 }
                 else if (message is UninterestedMessage)
                 {
-                    this.ProcessRecievedMessage(message as UninterestedMessage);
+                    ProcessRecievedMessage(message as UninterestedMessage);
                 }
                 else if (message is HaveMessage)
                 {
-                    this.ProcessRecievedMessage(message as HaveMessage);
+                    ProcessRecievedMessage(message as HaveMessage);
                 }
                 else if (message is BitFieldMessage)
                 {
-                    this.ProcessRecievedMessage(message as BitFieldMessage);
+                    ProcessRecievedMessage(message as BitFieldMessage);
                 }
                 else if (message is RequestMessage)
                 {
-                    this.ProcessRecievedMessage(message as RequestMessage);
+                    ProcessRecievedMessage(message as RequestMessage);
                 }
                 else if (message is PieceMessage)
                 {
-                    this.ProcessRecievedMessage(message as PieceMessage);
+                    ProcessRecievedMessage(message as PieceMessage);
                 }
                 else if (message is CancelMessage)
                 {
-                    this.ProcessRecievedMessage(message as CancelMessage);
+                    ProcessRecievedMessage(message as CancelMessage);
                 }
                 else if (message is PortMessage)
                 {
@@ -737,376 +697,370 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(CancelMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
                 if (message.PieceIndex >= 0 &&
-                    message.PieceIndex < this.pieceManager.PieceCount &&
+                    message.PieceIndex < pieceManager.PieceCount &&
                     message.BlockOffset >= 0 &&
-                    message.BlockOffset < this.pieceManager.PieceLength &&
-                    message.BlockOffset % this.pieceManager.BlockLength == 0 &&
-                    message.BlockLength == this.pieceManager.GetBlockLength(message.PieceIndex, message.BlockOffset / this.pieceManager.BlockLength))
+                    message.BlockOffset < pieceManager.PieceLength &&
+                    message.BlockOffset % pieceManager.BlockLength == 0 &&
+                    message.BlockLength == pieceManager.GetBlockLength(message.PieceIndex, message.BlockOffset / pieceManager.BlockLength))
                 {
-                    this.EnqueueUploadMessage(message);
+                    EnqueueUploadMessage(message);
                 }
                 else
                 {
-                    this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid cancel message.", false));
+                    OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid cancel message.", false));
                 }
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(PieceMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
                 if (message.PieceIndex >= 0 &&
-                    message.PieceIndex < this.pieceManager.PieceCount &&
+                    message.PieceIndex < pieceManager.PieceCount &&
                     message.BlockOffset >= 0 &&
-                    message.BlockOffset < this.pieceManager.PieceLength &&
-                    message.BlockOffset % this.pieceManager.BlockLength == 0 &&
-                    message.Data.Length == this.pieceManager.GetPieceLength(message.PieceIndex))
+                    message.BlockOffset < pieceManager.PieceLength &&
+                    message.BlockOffset % pieceManager.BlockLength == 0 &&
+                    message.Data.Length == pieceManager.GetPieceLength(message.PieceIndex))
                 {
-                    this.EnqueueDownloadMessage(message);
+                    EnqueueDownloadMessage(message);
                 }
                 else
                 {
-                    this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid piece message.", false));
+                    OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid piece message.", false));
                 }
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(RequestMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
                 if (message.PieceIndex >= 0 &&
-                    message.PieceIndex < this.pieceManager.BlockCount &&
+                    message.PieceIndex < pieceManager.BlockCount &&
                     message.BlockOffset >= 0 &&
-                    message.BlockOffset < this.pieceManager.GetBlockCount(message.PieceIndex) &&
-                    message.BlockOffset / this.pieceManager.BlockLength == 0 &&
-                    message.BlockLength == this.pieceManager.GetBlockLength(message.PieceIndex, message.BlockOffset / this.pieceManager.BlockLength))
+                    message.BlockOffset < pieceManager.GetBlockCount(message.PieceIndex) &&
+                    message.BlockOffset / pieceManager.BlockLength == 0 &&
+                    message.BlockLength == pieceManager.GetBlockLength(message.PieceIndex, message.BlockOffset / pieceManager.BlockLength))
                 {
-                    this.EnqueueUploadMessage(message);
+                    EnqueueUploadMessage(message);
                 }
                 else
                 {
-                    this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid request message.", false));
+                    OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid request message.", false));
                 }
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(BitFieldMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
-                if (message.BitField.Length >= this.pieceManager.BlockCount)
+                if (message.BitField.Length >= pieceManager.BlockCount)
                 {
-                    for (int i = 0; i < this.BitField.Length; i++)
-                    {
-                        this.BitField[i] = message.BitField[i];
-                    }
+                    for (var i = 0; i < BitField.Length; i++) BitField[i] = message.BitField[i];
 
                     // notify downloading thread
-                    this.EnqueueDownloadMessage(message);
+                    EnqueueDownloadMessage(message);
                 }
                 else
                 {
-                    this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid bit field message.", true));
+                    OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid bit field message.", true));
                 }
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(ChokeMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
-                this.EnqueueDownloadMessage(message);
+                EnqueueDownloadMessage(message);
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(UnchokeMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
-                this.EnqueueDownloadMessage(message);
+                EnqueueDownloadMessage(message);
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(InterestedMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
-                this.EnqueueDownloadMessage(message);
+                EnqueueDownloadMessage(message);
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(UninterestedMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
-                this.EnqueueUploadMessage(message);
+                EnqueueUploadMessage(message);
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(HaveMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.SendAndReceived)
+            if (HandshakeState == HandshakeState.SendAndReceived)
             {
                 if (message.PieceIndex >= 0 &&
-                    message.PieceIndex < this.pieceManager.PieceCount)
+                    message.PieceIndex < pieceManager.PieceCount)
                 {
-                    this.BitField[message.PieceIndex] = true;
+                    BitField[message.PieceIndex] = true;
 
                     // notify downloading thread
-                    this.EnqueueDownloadMessage(message);
+                    EnqueueDownloadMessage(message);
                 }
                 else
                 {
-                    this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid have message.", false));
+                    OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid have message.", false));
                 }
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// Processes the received message.
+        ///     Processes the received message.
         /// </summary>
         /// <param name="message">The message.</param>
         private void ProcessRecievedMessage(HandshakeMessage message)
         {
             message.CannotBeNull();
 
-            if (this.HandshakeState == HandshakeState.None ||
-                this.HandshakeState == HandshakeState.SentButNotReceived)
+            if (HandshakeState == HandshakeState.None ||
+                HandshakeState == HandshakeState.SentButNotReceived)
             {
-                if (message.InfoHash == this.pieceManager.TorrentInfoHash &&
+                if (message.InfoHash == pieceManager.TorrentInfoHash &&
                     message.ProtocolString == HandshakeMessage.ProtocolName &&
                     message.PeerId.IsNotNullOrEmpty() &&
-                    message.PeerId != this.localPeerId)
+                    message.PeerId != localPeerId)
                 {
-                    if (this.HandshakeState == HandshakeState.None)
+                    if (HandshakeState == HandshakeState.None)
                     {
-                        this.HandshakeState = HandshakeState.ReceivedButNotSent;
-                        this.PeerId = message.PeerId;
+                        HandshakeState = HandshakeState.ReceivedButNotSent;
+                        PeerId = message.PeerId;
 
                         // send a handshake
-                        this.EnqueueSendMessage(new HandshakeMessage(this.pieceManager.TorrentInfoHash, this.localPeerId));
+                        EnqueueSendMessage(new HandshakeMessage(pieceManager.TorrentInfoHash, localPeerId));
 
                         // send a bit field
-                        this.EnqueueSendMessage(new BitFieldMessage(this.pieceManager.BitField.Select(x => x == PieceStatus.Present).ToArray()));
+                        EnqueueSendMessage(new BitFieldMessage(pieceManager.BitField.Select(x => x == PieceStatus.Present).ToArray()));
                     }
-                    else if (this.HandshakeState == HandshakeState.SentButNotReceived)
+                    else if (HandshakeState == HandshakeState.SentButNotReceived)
                     {
-                        this.HandshakeState = HandshakeState.SendAndReceived;
-                        this.PeerId = message.PeerId;
+                        HandshakeState = HandshakeState.SendAndReceived;
+                        PeerId = message.PeerId;
 
                         // send a bit field
-                        this.EnqueueSendMessage(new BitFieldMessage(this.pieceManager.BitField.Select(x => x == PieceStatus.Present).ToArray()));
+                        EnqueueSendMessage(new BitFieldMessage(pieceManager.BitField.Select(x => x == PieceStatus.Present).ToArray()));
                     }
                 }
                 else
                 {
-                    this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid handshake message.", true));
+                    OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid handshake message.", true));
                 }
             }
             else
             {
-                this.OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
+                OnCommunicationErrorOccurred(this, new PeerCommunicationErrorEventArgs("Invalid message sequence.", true));
             }
         }
 
         /// <summary>
-        /// The message sending thread.
+        ///     The message sending thread.
         /// </summary>
         private void Send()
         {
-            TimeSpan timeout = TimeSpan.FromMilliseconds(250);
+            var timeout = TimeSpan.FromMilliseconds(250);
             IEnumerable<PeerMessage> messages;
 
-            while (!this.IsDisposed)
+            while (!IsDisposed)
             {
-                messages = this.DequeueSendMessages();
+                messages = DequeueSendMessages();
 
                 if (messages.Count() > 0)
                 {
-                    if (this.communicator != null &&
-                        !this.communicator.IsDisposed)
+                    if (communicator != null &&
+                        !communicator.IsDisposed)
                     {
-                        foreach (var message in messages)
-                        {
-                            Debug.WriteLine($"{this.Endpoint} -> {message}");
-                        }
+                        foreach (var message in messages) Debug.WriteLine($"{Endpoint} -> {message}");
 
                         // send message
-                        this.communicator.Send(messages);
+                        communicator.Send(messages);
 
-                        this.UpdateTrafficParameters(0, messages.Sum(x => x.Length));
+                        UpdateTrafficParameters(0, messages.Sum(x => x.Length));
                     }
                 }
 
-                this.lastMessageSentTime = DateTime.UtcNow;
+                lastMessageSentTime = DateTime.UtcNow;
 
                 Thread.Sleep(timeout);
             }
         }
 
         /// <summary>
-        /// Starts the downloading.
+        ///     Starts the downloading.
         /// </summary>
         private void StartDownloading()
         {
             Thread thread;
 
-            if (!this.isDownloading)
+            if (!isDownloading)
             {
-                thread = new Thread(this.Download);
+                thread = new Thread(Download);
                 thread.IsBackground = true;
-                thread.Name = this.PeerId + " downloader";
+                thread.Name = PeerId + " downloader";
                 thread.Start();
             }
         }
 
         /// <summary>
-        /// Starts the keeping connection alive.
+        ///     Starts the keeping connection alive.
         /// </summary>
         private void StartKeepingConnectionAlive()
         {
             Thread thread;
 
-            if (this.isDownloading ||
-                this.isUploading)
+            if (isDownloading ||
+                isUploading)
             {
-                thread = new Thread(this.KeepAlive);
+                thread = new Thread(KeepAlive);
                 thread.IsBackground = true;
-                thread.Name = this.PeerId + " keeping alive";
+                thread.Name = PeerId + " keeping alive";
                 thread.Start();
             }
         }
 
         /// <summary>
-        /// Starts the sending.
+        ///     Starts the sending.
         /// </summary>
         private void StartSending()
         {
             Thread thread;
 
-            if (!this.isDownloading)
+            if (!isDownloading)
             {
-                thread = new Thread(this.Send);
+                thread = new Thread(Send);
                 thread.IsBackground = true;
-                thread.Name = this.PeerId + " sender";
+                thread.Name = PeerId + " sender";
                 thread.Start();
             }
         }
 
         /// <summary>
-        /// Starts the uploading.
+        ///     Starts the uploading.
         /// </summary>
         private void StartUploading()
         {
             Thread thread;
 
-            if (!this.isUploading)
+            if (!isUploading)
             {
-                thread = new Thread(this.Upload);
+                thread = new Thread(Upload);
                 thread.IsBackground = true;
-                thread.Name = this.PeerId + "uploader";
+                thread.Name = PeerId + "uploader";
                 thread.Start();
             }
         }
 
         /// <summary>
-        /// Updates the traffic parameters.
+        ///     Updates the traffic parameters.
         /// </summary>
         /// <param name="downloaded">The downloaded byte count.</param>
         /// <param name="uploaded">The uploaded byte count.</param>
@@ -1115,44 +1069,43 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             downloaded.MustBeGreaterThanOrEqualTo(0);
             uploaded.MustBeGreaterThanOrEqualTo(0);
 
-            lock (this.locker)
+            lock (locker)
             {
-                this.previouslyDownloaded += downloaded;
-                this.previouslyUploaded += uploaded;
+                previouslyDownloaded += downloaded;
+                previouslyUploaded += uploaded;
 
-                if (this.stopwatch.Elapsed > TimeSpan.FromSeconds(1))
+                if (stopwatch.Elapsed > TimeSpan.FromSeconds(1))
                 {
-                    this.downloadSpeed = (decimal)this.previouslyDownloaded / (decimal)this.stopwatch.Elapsed.TotalSeconds;
-                    this.uploadSpeed = (decimal)this.previouslyUploaded / (decimal)this.stopwatch.Elapsed.TotalSeconds;
+                    downloadSpeed = previouslyDownloaded / (decimal) stopwatch.Elapsed.TotalSeconds;
+                    uploadSpeed = previouslyUploaded / (decimal) stopwatch.Elapsed.TotalSeconds;
 
-                    this.Downloaded += this.previouslyDownloaded;
-                    this.Uploaded += this.previouslyUploaded;
+                    Downloaded += previouslyDownloaded;
+                    Uploaded += previouslyUploaded;
 
-                    this.previouslyDownloaded = 0;
-                    this.previouslyUploaded = 0;
+                    previouslyDownloaded = 0;
+                    previouslyUploaded = 0;
 
-                    this.stopwatch.Restart();
+                    stopwatch.Restart();
                 }
             }
         }
 
         /// <summary>
-        /// The uploading thread.
+        ///     The uploading thread.
         /// </summary>
         private void Upload()
         {
-            TimeSpan timeout = TimeSpan.FromMilliseconds(250);
+            var timeout = TimeSpan.FromMilliseconds(250);
             Piece piece = null;
             RequestMessage rm;
 
-            if (!this.isUploading)
+            if (!isUploading)
             {
-                this.isUploading = true;
+                isUploading = true;
 
-                while (!this.IsDisposed)
+                while (!IsDisposed)
                 {
-                    foreach (PeerMessage message in this.DequeueUploadMessages())
-                    {
+                    foreach (var message in DequeueUploadMessages())
                         if (message is RequestMessage)
                         {
                             rm = message as RequestMessage;
@@ -1161,18 +1114,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                                 piece.PieceIndex != rm.PieceIndex)
                             {
                                 // get the piece
-                                piece = this.pieceManager.GetPiece(rm.PieceIndex);
+                                piece = pieceManager.GetPiece(rm.PieceIndex);
                             }
 
                             if (piece != null &&
                                 piece.PieceLength > rm.BlockOffset)
                             {
                                 // return the piece
-                                this.EnqueueSendMessage(new PieceMessage(rm.PieceIndex, rm.BlockOffset, (int)piece.GetBlockLength(rm.PieceIndex), piece.GetBlock(rm.PieceIndex)));
-                            }
-                            else
-                            {
-                                // invalid requeste received -> ignore
+                                EnqueueSendMessage(new PieceMessage(rm.PieceIndex, rm.BlockOffset, (int) piece.GetBlockLength(rm.PieceIndex), piece.GetBlock(rm.PieceIndex)));
                             }
                         }
                         else if (message is CancelMessage)
@@ -1181,18 +1130,17 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
                         }
                         else if (message is InterestedMessage)
                         {
-                            this.LeechingState = LeechingState.Interested;
+                            LeechingState = LeechingState.Interested;
                         }
                         else if (message is UninterestedMessage)
                         {
-                            this.LeechingState = LeechingState.Uninterested;
+                            LeechingState = LeechingState.Uninterested;
                         }
-                    }
 
                     Thread.Sleep(timeout);
                 }
 
-                this.isUploading = false;
+                isUploading = false;
             }
         }
     }

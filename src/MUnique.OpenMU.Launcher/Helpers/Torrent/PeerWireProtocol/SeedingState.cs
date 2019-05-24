@@ -1,18 +1,18 @@
 ﻿namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 {
     /// <summary>
-    /// The seeding state.
+    ///     The seeding state.
     /// </summary>
     public enum SeedingState
     {
         /// <summary>
-        /// The choked seed state.
+        ///     The choked seed state.
         /// </summary>
         Choked = 1,
 
         /// <summary>
-        /// The un-choked seed state.
+        ///     The un-choked seed state.
         /// </summary>
-        Unchoked = 2,
+        Unchoked = 2
     }
 }

@@ -4,21 +4,21 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
 {
     /// <summary>
-    /// The peer message received event arguments.
+    ///     The peer message received event arguments.
     /// </summary>
     public sealed class PeerMessgeReceivedEventArgs : System.EventArgs
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PeerMessgeReceivedEventArgs"/> class.
+        ///     Initializes a new instance of the <see cref="PeerMessgeReceivedEventArgs" /> class.
         /// </summary>
         /// <param name="message">The message.</param>
         public PeerMessgeReceivedEventArgs(PeerMessage message)
         {
             message.CannotBeNull();
 
-            this.Message = message;
+            Message = message;
         }
 
         #endregion Public Constructors
@@ -26,16 +26,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.EventArgs
         #region Public Properties
 
         /// <summary>
-        /// Gets the message.
+        ///     Gets the message.
         /// </summary>
         /// <value>
-        /// The message.
+        ///     The message.
         /// </value>
-        public PeerMessage Message
-        {
-            get;
-            private set;
-        }
+        public PeerMessage Message { get; }
 
         #endregion Public Properties
     }

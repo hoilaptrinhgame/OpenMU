@@ -6,71 +6,34 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 {
     /// <summary>
-    /// The handshake message.
+    ///     The handshake message.
     /// </summary>
     public class HandshakeMessage : PeerMessage
     {
         #region Public Fields
 
         /// <summary>
-        /// The protocol name.
+        ///     The protocol name.
         /// </summary>
         public const string ProtocolName = "BitTorrent protocol";
 
         #endregion Public Fields
 
-        #region Private Fields
-
-        /// <summary>
-        /// The extended messaging flag.
-        /// </summary>
-        private const byte ExtendedMessagingFlag = 0x10;
-
-        /// <summary>
-        /// The fast peers flag.
-        /// </summary>
-        private const byte FastPeersFlag = 0x04;
-
-        /// <summary>
-        /// The information hash length in bytes.
-        /// </summary>
-        private const int InfoHashLength = 20;
-
-        /// <summary>
-        /// The name length length in bytes.
-        /// </summary>
-        private const int NameLengthLength = 1;
-
-        /// <summary>
-        /// The peer identifier length in bytes.
-        /// </summary>
-        private const int PeerIdLength = 20;
-
-        /// <summary>
-        /// The reserved length in bytes.
-        /// </summary>
-        private const int ReservedLength = 8;
-
-        /// <summary>
-        /// The zeroed bits.
-        /// </summary>
-        private static readonly byte[] ZeroedBits = new byte[8];
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HandshakeMessage" /> class.
+        ///     Initializes a new instance of the <see cref="HandshakeMessage" /> class.
         /// </summary>
         /// <param name="infoHash">The information hash.</param>
         /// <param name="peerId">The peer unique identifier.</param>
         /// <param name="protocolString">The protocol string.</param>
         /// <param name="supportsFastPeer">if set to <c>true</c> the peer supports fast peer.</param>
         /// <param name="supportsExtendedMessaging">if set to <c>true</c> the peer supports extended messaging.</param>
-        /// <exception cref="PeerWireProtocolException">The engine does not support fast peer, but fast peer was requested
-        /// or
-        /// The engine does not support extended, but extended was requested</exception>
+        /// <exception cref="PeerWireProtocolException">
+        ///     The engine does not support fast peer, but fast peer was requested
+        ///     or
+        ///     The engine does not support extended, but extended was requested
+        /// </exception>
         public HandshakeMessage(string infoHash, string peerId, string protocolString = ProtocolName, bool supportsFastPeer = false, bool supportsExtendedMessaging = false)
         {
             infoHash.CannotBeNullOrEmpty();
@@ -79,12 +42,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             peerId.Length.MustBeGreaterThanOrEqualTo(20);
             protocolString.CannotBeNullOrEmpty();
 
-            this.InfoHash = infoHash;
-            this.PeerId = peerId;
-            this.ProtocolString = protocolString;
-            this.ProtocolStringLength = protocolString.Length;
-            this.SupportsFastPeer = supportsFastPeer;
-            this.SupportsExtendedMessaging = supportsExtendedMessaging;
+            InfoHash = infoHash;
+            PeerId = peerId;
+            ProtocolString = protocolString;
+            ProtocolStringLength = protocolString.Length;
+            SupportsFastPeer = supportsFastPeer;
+            SupportsExtendedMessaging = supportsExtendedMessaging;
         }
 
         #endregion Public Constructors
@@ -92,7 +55,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="HandshakeMessage"/> class from being created.
+        ///     Prevents a default instance of the <see cref="HandshakeMessage" /> class from being created.
         /// </summary>
         private HandshakeMessage()
         {
@@ -100,100 +63,109 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 
         #endregion Private Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The extended messaging flag.
+        /// </summary>
+        private const byte ExtendedMessagingFlag = 0x10;
+
+        /// <summary>
+        ///     The fast peers flag.
+        /// </summary>
+        private const byte FastPeersFlag = 0x04;
+
+        /// <summary>
+        ///     The information hash length in bytes.
+        /// </summary>
+        private const int InfoHashLength = 20;
+
+        /// <summary>
+        ///     The name length length in bytes.
+        /// </summary>
+        private const int NameLengthLength = 1;
+
+        /// <summary>
+        ///     The peer identifier length in bytes.
+        /// </summary>
+        private const int PeerIdLength = 20;
+
+        /// <summary>
+        ///     The reserved length in bytes.
+        /// </summary>
+        private const int ReservedLength = 8;
+
+        /// <summary>
+        ///     The zeroed bits.
+        /// </summary>
+        private static readonly byte[] ZeroedBits = new byte[8];
+
+        #endregion Private Fields
+
         #region Public Properties
 
         /// <summary>
-        /// Gets the information hash.
+        ///     Gets the information hash.
         /// </summary>
         /// <value>
-        /// The information hash.
+        ///     The information hash.
         /// </value>
-        public string InfoHash
-        {
-            get;
-            private set;
-        }
+        public string InfoHash { get; }
 
         /// <summary>
-        /// Gets the length in bytes.
+        ///     Gets the length in bytes.
         /// </summary>
         /// <value>
-        /// The length in bytes.
+        ///     The length in bytes.
         /// </value>
-        public override int Length
-        {
-            get
-            {
-                return NameLengthLength + this.ProtocolString.Length + ReservedLength + InfoHashLength + PeerIdLength;
-            }
-        }
+        public override int Length => NameLengthLength + ProtocolString.Length + ReservedLength + InfoHashLength + PeerIdLength;
 
         /// <summary>
-        /// Gets the peer unique identifier.
+        ///     Gets the peer unique identifier.
         /// </summary>
         /// <value>
-        /// The peer unique identifier.
+        ///     The peer unique identifier.
         /// </value>
-        public string PeerId
-        {
-            get;
-            private set;
-        }
+        public string PeerId { get; }
 
         /// <summary>
-        /// Gets the protocol string.
+        ///     Gets the protocol string.
         /// </summary>
         /// <value>
-        /// The protocol string.
+        ///     The protocol string.
         /// </value>
-        public string ProtocolString
-        {
-            get;
-            private set;
-        }
+        public string ProtocolString { get; }
 
         /// <summary>
-        /// Gets the length of the protocol string.
+        ///     Gets the length of the protocol string.
         /// </summary>
         /// <value>
-        /// The length of the protocol string.
+        ///     The length of the protocol string.
         /// </value>
-        public int ProtocolStringLength
-        {
-            get;
-            private set;
-        }
+        public int ProtocolStringLength { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the peer supports extended messaging.
+        ///     Gets a value indicating whether the peer supports extended messaging.
         /// </summary>
         /// <value>
-        /// <c>true</c> if the peer supports extended messaging; otherwise, <c>false</c>.
+        ///     <c>true</c> if the peer supports extended messaging; otherwise, <c>false</c>.
         /// </value>
-        public bool SupportsExtendedMessaging
-        {
-            get;
-            private set;
-        }
+        public bool SupportsExtendedMessaging { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the peer supports fast peer.
+        ///     Gets a value indicating whether the peer supports fast peer.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the peer supports fast peer; otherwise, <c>false</c>.
+        ///     <c>true</c> if the peer supports fast peer; otherwise, <c>false</c>.
         /// </value>
-        public bool SupportsFastPeer
-        {
-            get;
-            private set;
-        }
+        public bool SupportsFastPeer { get; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offsetFrom">The offset.</param>
@@ -201,7 +173,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         /// <param name="message">The message.</param>
         /// <param name="isIncomplete">if set to <c>true</c> the message is incomplete.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, ref int offsetFrom, int offsetTo, out HandshakeMessage message, out bool isIncomplete)
         {
@@ -221,11 +193,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
                 offsetTo >= offsetFrom &&
                 offsetTo <= buffer.Length)
             {
-                protocolStringLength = Message.ReadByte(buffer, ref offsetFrom); // first byte is length
+                protocolStringLength = ReadByte(buffer, ref offsetFrom); // first byte is length
 
                 if (buffer.Length >= offsetFrom + protocolStringLength + ReservedLength + InfoHashLength + PeerIdLength)
                 {
-                    protocolString = Message.ReadString(buffer, ref offsetFrom, protocolStringLength);
+                    protocolString = ReadString(buffer, ref offsetFrom, protocolStringLength);
 
                     // increment offset first so that the indices are consistent between Encoding and Decoding
                     offsetFrom += ReservedLength;
@@ -233,8 +205,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
                     supportsExtendedMessaging = (ExtendedMessagingFlag & buffer[offsetFrom - 3]) == ExtendedMessagingFlag;
                     supportsFastPeer = (FastPeersFlag & buffer[offsetFrom - 1]) == FastPeersFlag;
 
-                    infoHash = Message.ReadBytes(buffer, ref offsetFrom, 20).ToHexaDecimalString();
-                    peerId = Message.ToPeerId(Message.ReadBytes(buffer, ref offsetFrom, 20));
+                    infoHash = ReadBytes(buffer, ref offsetFrom, 20).ToHexaDecimalString();
+                    peerId = ToPeerId(ReadBytes(buffer, ref offsetFrom, 20));
 
                     if (protocolStringLength == 19 &&
                         protocolString == ProtocolName &&
@@ -259,12 +231,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <returns>
-        /// The encoded peer message.
+        ///     The encoded peer message.
         /// </returns>
         public override int Encode(byte[] buffer, int offset)
         {
@@ -272,91 +244,87 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, (byte)this.ProtocolString.Length);
-            Message.Write(buffer, ref written, this.ProtocolString);
-            Message.Write(buffer, ref written, ZeroedBits);
+            Write(buffer, ref written, (byte) ProtocolString.Length);
+            Write(buffer, ref written, ProtocolString);
+            Write(buffer, ref written, ZeroedBits);
 
-            if (this.SupportsExtendedMessaging)
+            if (SupportsExtendedMessaging)
             {
                 buffer[written - 3] |= ExtendedMessagingFlag;
             }
 
-            if (this.SupportsFastPeer)
+            if (SupportsFastPeer)
             {
                 buffer[written - 1] |= FastPeersFlag;
             }
 
-            Message.Write(buffer, ref written, this.InfoHash.ToByteArray());
-            Message.Write(buffer, ref written, Message.FromPeerId(this.PeerId));
+            Write(buffer, ref written, InfoHash.ToByteArray());
+            Write(buffer, ref written, FromPeerId(PeerId));
 
-            return this.CheckWritten(written - offset);
+            return CheckWritten(written - offset);
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="object" />, is equal to this instance.
+        ///     Determines whether the specified <see cref="object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
-            HandshakeMessage msg = obj as HandshakeMessage;
+            var msg = obj as HandshakeMessage;
 
             if (msg == null)
             {
                 return false;
             }
-            else
+
+            if (InfoHash != msg.InfoHash)
             {
-                if (this.InfoHash != msg.InfoHash)
-                {
-                    return false;
-                }
-                else
-                {
-                    return this.InfoHash == msg.InfoHash &&
-                           this.PeerId == msg.PeerId &&
-                           this.ProtocolString == msg.ProtocolString &&
-                           this.SupportsFastPeer == msg.SupportsFastPeer &&
-                           this.SupportsExtendedMessaging == msg.SupportsExtendedMessaging;
-                }
+                return false;
             }
+
+            return InfoHash == msg.InfoHash &&
+                   PeerId == msg.PeerId &&
+                   ProtocolString == msg.ProtocolString &&
+                   SupportsFastPeer == msg.SupportsFastPeer &&
+                   SupportsExtendedMessaging == msg.SupportsExtendedMessaging;
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        ///     Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
-            return this.InfoHash.GetHashCode() ^
-                   this.PeerId.GetHashCode() ^
-                   this.ProtocolString.GetHashCode() ^
-                   this.SupportsFastPeer.GetHashCode() ^
-                   this.SupportsExtendedMessaging.GetHashCode();
+            return InfoHash.GetHashCode() ^
+                   PeerId.GetHashCode() ^
+                   ProtocolString.GetHashCode() ^
+                   SupportsFastPeer.GetHashCode() ^
+                   SupportsExtendedMessaging.GetHashCode();
         }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
             StringBuilder sb;
 
-            sb = new System.Text.StringBuilder();
+            sb = new StringBuilder();
             sb.Append("HandshakeMessage: ");
-            sb.Append($"PeerID = {this.PeerId}, ");
-            sb.Append($"InfoHash = {this.InfoHash}, ");
-            sb.Append($"FastPeer = {this.SupportsFastPeer}, ");
-            sb.Append($"ExtendedMessaging = {this.SupportsExtendedMessaging}");
+            sb.Append($"PeerID = {PeerId}, ");
+            sb.Append($"InfoHash = {InfoHash}, ");
+            sb.Append($"FastPeer = {SupportsFastPeer}, ");
+            sb.Append($"ExtendedMessaging = {SupportsExtendedMessaging}");
 
             return sb.ToString();
         }

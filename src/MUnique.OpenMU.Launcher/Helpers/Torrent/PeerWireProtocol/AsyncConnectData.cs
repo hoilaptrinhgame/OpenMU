@@ -5,14 +5,14 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
 {
     /// <summary>
-    /// The asynchronous connect data.
+    ///     The asynchronous connect data.
     /// </summary>
     public sealed class AsyncConnectData
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AsyncConnectData"/> class.
+        ///     Initializes a new instance of the <see cref="AsyncConnectData" /> class.
         /// </summary>
         /// <param name="endpoint">The endpoint.</param>
         /// <param name="tcp">The TCP.</param>
@@ -21,8 +21,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
             endpoint.CannotBeNull();
             tcp.CannotBeNull();
 
-            this.Endpoint = endpoint;
-            this.Tcp = tcp;
+            Endpoint = endpoint;
+            Tcp = tcp;
         }
 
         #endregion Public Constructors
@@ -30,7 +30,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="AsyncConnectData"/> class from being created.
+        ///     Prevents a default instance of the <see cref="AsyncConnectData" /> class from being created.
         /// </summary>
         private AsyncConnectData()
         {
@@ -41,28 +41,20 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol
         #region Public Properties
 
         /// <summary>
-        /// Gets the endpoint.
+        ///     Gets the endpoint.
         /// </summary>
         /// <value>
-        /// The endpoint.
+        ///     The endpoint.
         /// </value>
-        public IPEndPoint Endpoint
-        {
-            get;
-            private set;
-        }
+        public IPEndPoint Endpoint { get; }
 
         /// <summary>
-        /// Gets the TCP client.
+        ///     Gets the TCP client.
         /// </summary>
         /// <value>
-        /// The TCP client.
+        ///     The TCP client.
         /// </value>
-        public TcpClient Tcp
-        {
-            get;
-            private set;
-        }
+        public TcpClient Tcp { get; }
 
         #endregion Public Properties
     }

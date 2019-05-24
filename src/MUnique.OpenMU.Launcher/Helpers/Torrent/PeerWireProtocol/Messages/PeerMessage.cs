@@ -4,14 +4,14 @@ using DefensiveProgrammingFramework;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 {
     /// <summary>
-    /// The peer wire protocol message base class.
+    ///     The peer wire protocol message base class.
     /// </summary>
     public abstract class PeerMessage : Message
     {
         #region Public Fields
 
         /// <summary>
-        /// The default block length in bytes (16kB)
+        ///     The default block length in bytes (16kB)
         /// </summary>
         public const int DefaultBlockLength = 16384;
 
@@ -20,13 +20,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         #region Public Methods
 
         /// <summary>
-        /// Decodes the messages in the buffer.
+        ///     Decodes the messages in the buffer.
         /// </summary>
         /// <param name="buffer">The data.</param>
         /// <param name="offsetStart">The offset.</param>
         /// <param name="offsetEnd">The offset end.</param>
         /// <returns>
-        /// The list of messages.
+        ///     The list of messages.
         /// </returns>
         public static IEnumerable<PeerMessage> Decode(byte[] buffer, ref int offsetStart, int offsetEnd)
         {
@@ -36,14 +36,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offsetEnd.MustBeGreaterThan(0);
             offsetEnd.MustBeLessThanOrEqualTo(buffer.Length);
 
-            List<PeerMessage> messages = new List<PeerMessage>();
+            var messages = new List<PeerMessage>();
             PeerMessage message;
             bool isIncomplete;
-            int offset = offsetStart;
+            var offset = offsetStart;
 
             // walk through the array and try to decode messages
             while (offset <= offsetEnd)
-            {
                 if (TryDecode(buffer, ref offset, offsetEnd, out message, out isIncomplete))
                 {
                     // successfully decoded message
@@ -62,13 +61,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
                     // move to next byte
                     offset++;
                 }
-            }
 
             return messages;
         }
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offsetFrom">The offset from.</param>
@@ -76,22 +74,22 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         /// <param name="message">The message.</param>
         /// <param name="isIncomplete">if set to <c>true</c> the message is incomplete.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, ref int offsetFrom, int offsetTo, out PeerMessage message, out bool isIncomplete)
         {
             byte messageId;
             int messageLength;
-            int offset2 = offsetFrom;
+            var offset2 = offsetFrom;
 
             message = null;
             isIncomplete = false;
 
             if (buffer.IsNotNullOrEmpty() &&
-                buffer.Length >= offsetFrom + Message.IntLength + Message.ByteLength)
+                buffer.Length >= offsetFrom + IntLength + ByteLength)
             {
-                messageLength = Message.ReadInt(buffer, ref offset2);
-                messageId = Message.ReadByte(buffer, ref offset2);
+                messageLength = ReadInt(buffer, ref offset2);
+                messageId = ReadByte(buffer, ref offset2);
 
                 offset2 = offsetFrom; // reset offset
 

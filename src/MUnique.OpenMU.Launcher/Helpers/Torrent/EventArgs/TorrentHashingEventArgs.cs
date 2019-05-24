@@ -3,21 +3,21 @@
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.EventArgs
 {
     /// <summary>
-    /// The torrent hashing event arguments.
+    ///     The torrent hashing event arguments.
     /// </summary>
     public sealed class TorrentHashingEventArgs : System.EventArgs
     {
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TorrentHashingEventArgs" /> class.
+        ///     Initializes a new instance of the <see cref="TorrentHashingEventArgs" /> class.
         /// </summary>
         /// <param name="torrentInfo">The torrent information.</param>
         public TorrentHashingEventArgs(TorrentInfo torrentInfo)
         {
             torrentInfo.CannotBeNull();
 
-            this.TorrentInfo = torrentInfo;
+            TorrentInfo = torrentInfo;
         }
 
         #endregion Public Constructors
@@ -25,7 +25,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.EventArgs
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="TorrentHashingEventArgs"/> class from being created.
+        ///     Prevents a default instance of the <see cref="TorrentHashingEventArgs" /> class from being created.
         /// </summary>
         private TorrentHashingEventArgs()
         {
@@ -36,16 +36,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.EventArgs
         #region Public Properties
 
         /// <summary>
-        /// Gets the torrent information.
+        ///     Gets the torrent information.
         /// </summary>
         /// <value>
-        /// The torrent information.
+        ///     The torrent information.
         /// </value>
-        public TorrentInfo TorrentInfo
-        {
-            get;
-            private set;
-        }
+        public TorrentInfo TorrentInfo { get; }
 
         #endregion Public Properties
     }

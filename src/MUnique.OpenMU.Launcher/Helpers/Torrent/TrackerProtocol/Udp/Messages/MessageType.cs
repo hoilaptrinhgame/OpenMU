@@ -1,18 +1,18 @@
 ﻿namespace MUnique.OpenMU.Launcher.Helpers.Torrent.TrackerProtocol.Udp.Messages
 {
 	/// <summary>
-	/// The message type.
+	///     The message type.
 	/// </summary>
 	public enum MessageType
-	{
-		/// <summary>
-		/// The request message type.
-		/// </summary>
-		Request = 1,
+    {
+	    /// <summary>
+	    ///     The request message type.
+	    /// </summary>
+	    Request = 1,
 
-		/// <summary>
-		/// The response message type.
-		/// </summary>
-		Response = 2
-	}
+	    /// <summary>
+	    ///     The response message type.
+	    /// </summary>
+	    Response = 2
+    }
 }

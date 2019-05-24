@@ -10,7 +10,7 @@ namespace MUnique.OpenMU.Launcher.Models
     public class DownloadTask : IDisposable
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        
+
         #region Fields
 
         private readonly WebClient WClient = new WebClient
@@ -59,7 +59,7 @@ namespace MUnique.OpenMU.Launcher.Models
                     DownloadHTTP();
                     break;
                 case UpdaterTypes.Torrent:
-                    
+
                     break;
                 case UpdaterTypes.SFTP:
                     DownloadFTP();
@@ -89,9 +89,9 @@ namespace MUnique.OpenMU.Launcher.Models
 
         public DownloadTask(Uri uri, string savePath, UpdaterTypes type)
         {
-            URI      = uri;
+            URI = uri;
             SavePath = savePath;
-            SaveDir  = Path.GetDirectoryName(savePath);
+            SaveDir = Path.GetDirectoryName(savePath);
             FileName = Path.GetFileName(savePath);
 
             if (RequireRestart)
@@ -101,7 +101,7 @@ namespace MUnique.OpenMU.Launcher.Models
             }
 
             WClient.DownloadProgressChanged += WClient_DownloadProgressChanged;
-            WClient.DownloadFileCompleted   += WClient_DownloadFileCompleted;
+            WClient.DownloadFileCompleted += WClient_DownloadFileCompleted;
         }
 
         #endregion
@@ -109,6 +109,7 @@ namespace MUnique.OpenMU.Launcher.Models
         #region Public Events
 
         public delegate void OnDownloadCompleteDelegate(DownloadTask task);
+
         public delegate void OnProgressChangedDelegate(int progress);
 
         public event OnDownloadCompleteDelegate OnDownloadComplete;

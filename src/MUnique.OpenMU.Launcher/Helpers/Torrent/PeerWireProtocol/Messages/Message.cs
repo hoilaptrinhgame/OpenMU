@@ -8,53 +8,69 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.Extensions;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 {
     /// <summary>
-    /// The message base class.
+    ///     The message base class.
     /// </summary>
     public abstract class Message
     {
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets the length in bytes.
+        /// </summary>
+        /// <value>
+        ///     The length in bytes.
+        /// </value>
+        public abstract int Length { get; }
+
+        #endregion Public Properties
+
+        #region Protected Methods
+
+        /// <summary>
+        ///     Checks the written.
+        /// </summary>
+        /// <param name="written">The written.</param>
+        /// <returns>The written byte count.</returns>
+        protected int CheckWritten(int written)
+        {
+            if (written != Length)
+            {
+                throw new MessageException("Message encoded incorrectly. Incorrect number of bytes written");
+            }
+
+            return written;
+        }
+
+        #endregion Protected Methods
+
         #region Public Fields
 
         /// <summary>
-        /// The byte length in bytes.
+        ///     The byte length in bytes.
         /// </summary>
         public const int ByteLength = 1;
 
         /// <summary>
-        /// The integer length in bytes.
+        ///     The integer length in bytes.
         /// </summary>
         public const int IntLength = 4;
 
         /// <summary>
-        /// The long length in bytes.
+        ///     The long length in bytes.
         /// </summary>
         public const int LongLength = 8;
 
         /// <summary>
-        /// The short length in bytes.
+        ///     The short length in bytes.
         /// </summary>
         public const int ShortLength = 2;
 
         #endregion Public Fields
 
-        #region Public Properties
-
-        /// <summary>
-        /// Gets the length in bytes.
-        /// </summary>
-        /// <value>
-        /// The length in bytes.
-        /// </value>
-        public abstract int Length
-        {
-            get;
-        }
-
-        #endregion Public Properties
-
         #region Public Methods
 
         /// <summary>
-        /// Copies the bytes from the specified source array to the specified destination array.
+        ///     Copies the bytes from the specified source array to the specified destination array.
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="sourceOffset">The source offset.</param>
@@ -78,7 +94,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Converts peer id to binary array.
+        ///     Converts peer id to binary array.
         /// </summary>
         /// <param name="peerId">The peer identifier.</param>
         /// <returns>The peer id binary array.</returns>
@@ -99,7 +115,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Reads the byte form the buffer at the specified offset by advancing the offset afterwards.
+        ///     Reads the byte form the buffer at the specified offset by advancing the offset afterwards.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -120,13 +136,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Reads the byte form the buffer starting at the specified offset for the specified count by advancing the offset.
+        ///     Reads the byte form the buffer starting at the specified offset for the specified count by advancing the offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="count">The count.</param>
         /// <returns>
-        /// The array of read bytes
+        ///     The array of read bytes
         /// </returns>
         public static byte[] ReadBytes(byte[] buffer, ref int offset, int count)
         {
@@ -136,7 +152,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             count.MustBeGreaterThanOrEqualTo(0);
             count.MustBeLessThanOrEqualTo(buffer.Length - offset);
 
-            byte[] result = new byte[count];
+            var result = new byte[count];
 
             Buffer.BlockCopy(buffer, offset, result, 0, count);
 
@@ -146,7 +162,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Reads the endpoint from the buffer starting at the specified offset by advancing the offset.
+        ///     Reads the endpoint from the buffer starting at the specified offset by advancing the offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -157,17 +173,17 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThanOrEqualTo(buffer.Length - IntLength - ShortLength);
 
-            byte[] ipaddress = new byte[4];
+            var ipaddress = new byte[4];
             int port;
 
             ipaddress = ReadBytes(buffer, ref offset, 4);
-            port = (ushort)ReadShort(buffer, ref offset);
+            port = (ushort) ReadShort(buffer, ref offset);
 
             return new IPEndPoint(new IPAddress(ipaddress), port);
         }
 
         /// <summary>
-        /// Reads the integer form the buffer starting at the specified offset by advancing the offset.
+        ///     Reads the integer form the buffer starting at the specified offset by advancing the offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -188,7 +204,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Reads the long number form the buffer starting at the specified offset by advancing the offset.
+        ///     Reads the long number form the buffer starting at the specified offset by advancing the offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -209,7 +225,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Reads the short number form the buffer starting at the specified offset by advancing the offset.
+        ///     Reads the short number form the buffer starting at the specified offset by advancing the offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -230,13 +246,13 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Reads the string form the buffer starting at the specified offset for the specified count by advancing the offset.
+        ///     Reads the string form the buffer starting at the specified offset for the specified count by advancing the offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="count">The count.</param>
         /// <returns>
-        /// The string.
+        ///     The string.
         /// </returns>
         public static string ReadString(byte[] buffer, ref int offset, int count)
         {
@@ -256,28 +272,26 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Reads the peer identifier.
+        ///     Reads the peer identifier.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
-        /// The peer identifier.
+        ///     The peer identifier.
         /// </returns>
         public static string ToPeerId(byte[] value)
         {
             value.CannotBeNullOrEmpty();
             value.Length.MustBeEqualTo(20);
 
-            int delimiterIndex = -1;
-            int offset = 0;
+            var delimiterIndex = -1;
+            var offset = 0;
             string peerId = null;
 
-            for (int i = 0; i < value.Length; i++)
-            {
-                if ((char)value[i] == '-')
+            for (var i = 0; i < value.Length; i++)
+                if ((char) value[i] == '-')
                 {
                     delimiterIndex = i;
                 }
-            }
 
             if (delimiterIndex > 0)
             {
@@ -293,7 +307,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Writes the specified byte value to the buffer at the specified offset.
+        ///     Writes the specified byte value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -310,7 +324,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -321,11 +335,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThanOrEqualTo(buffer.Length - ShortLength);
 
-            Write(buffer, ref offset, (short)value);
+            Write(buffer, ref offset, (short) value);
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -340,7 +354,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -356,7 +370,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -369,11 +383,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             value.CannotBeNull();
 
             Write(buffer, ref offset, value.Address);
-            Write(buffer, ref offset, (ushort)value.Port);
+            Write(buffer, ref offset, (ushort) value.Port);
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -388,7 +402,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -399,11 +413,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThanOrEqualTo(buffer.Length - IntLength);
 
-            Write(buffer, ref offset, (int)value);
+            Write(buffer, ref offset, (int) value);
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -418,7 +432,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -429,11 +443,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThanOrEqualTo(buffer.Length - LongLength);
 
-            Write(buffer, ref offset, (long)value);
+            Write(buffer, ref offset, (long) value);
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -449,7 +463,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Writes the value to the buffer at the specified offset.
+        ///     Writes the value to the buffer at the specified offset.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -468,20 +482,20 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <returns>The byte array.</returns>
         public byte[] Encode()
         {
-            byte[] buffer = new byte[this.Length];
+            var buffer = new byte[Length];
 
-            this.Encode(buffer, 0);
+            Encode(buffer, 0);
 
             return buffer;
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
@@ -489,26 +503,5 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         public abstract int Encode(byte[] buffer, int offset);
 
         #endregion Public Methods
-
-        #region Protected Methods
-
-        /// <summary>
-        /// Checks the written.
-        /// </summary>
-        /// <param name="written">The written.</param>
-        /// <returns>The written byte count.</returns>
-        protected int CheckWritten(int written)
-        {
-            if (written != this.Length)
-            {
-                throw new MessageException("Message encoded incorrectly. Incorrect number of bytes written");
-            }
-            else
-            {
-                return written;
-            }
-        }
-
-        #endregion Protected Methods
     }
 }

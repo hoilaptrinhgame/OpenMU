@@ -11,43 +11,14 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 {
     /// <summary>
-    /// The persistence manager.
+    ///     The persistence manager.
     /// </summary>
     public sealed class PersistenceManager : IDisposable
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The file info / file stream dictionary.
-        /// </summary>
-        private Dictionary<TorrentFileInfo, FileStream> files;
-
-        /// <summary>
-        /// The thread locker.
-        /// </summary>
-        private object locker = new object();
-
-        /// <summary>
-        /// The piece hashes.
-        /// </summary>
-        private IEnumerable<string> pieceHashes;
-
-        /// <summary>
-        /// The piece length.
-        /// </summary>
-        private long pieceLength;
-
-        /// <summary>
-        /// The torrent length in bytes.
-        /// </summary>
-        private long torrentLength;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersistenceManager" /> class.
+        ///     Initializes a new instance of the <see cref="PersistenceManager" /> class.
         /// </summary>
         /// <param name="directoryPath">The directory path.</param>
         /// <param name="torrentLength">Length of the torrent.</param>
@@ -64,7 +35,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
             Debug.WriteLine($"creating persistence manager for {Path.GetFullPath(directoryPath)}");
 
-            this.DirectoryPath = directoryPath;
+            DirectoryPath = directoryPath;
             this.torrentLength = torrentLength;
             this.pieceLength = pieceLength;
             this.pieceHashes = pieceHashes;
@@ -73,14 +44,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             this.files = new Dictionary<TorrentFileInfo, FileStream>();
 
             foreach (var file in files)
-            {
                 if (file.Download)
                 {
-                    this.CreateFile(Path.Combine(this.DirectoryPath, file.FilePath), file.Length);
+                    CreateFile(Path.Combine(DirectoryPath, file.FilePath), file.Length);
 
-                    this.files.Add(file, new FileStream(Path.Combine(this.DirectoryPath, file.FilePath), FileMode.Open, FileAccess.ReadWrite, FileShare.None));
+                    this.files.Add(file, new FileStream(Path.Combine(DirectoryPath, file.FilePath), FileMode.Open, FileAccess.ReadWrite, FileShare.None));
                 }
-            }
         }
 
         #endregion Public Constructors
@@ -88,7 +57,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="PersistenceManager"/> class from being created.
+        ///     Prevents a default instance of the <see cref="PersistenceManager" /> class from being created.
         /// </summary>
         private PersistenceManager()
         {
@@ -96,63 +65,84 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
         #endregion Private Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The file info / file stream dictionary.
+        /// </summary>
+        private readonly Dictionary<TorrentFileInfo, FileStream> files;
+
+        /// <summary>
+        ///     The thread locker.
+        /// </summary>
+        private readonly object locker = new object();
+
+        /// <summary>
+        ///     The piece hashes.
+        /// </summary>
+        private readonly IEnumerable<string> pieceHashes;
+
+        /// <summary>
+        ///     The piece length.
+        /// </summary>
+        private readonly long pieceLength;
+
+        /// <summary>
+        ///     The torrent length in bytes.
+        /// </summary>
+        private long torrentLength;
+
+        #endregion Private Fields
+
         #region Public Properties
 
         /// <summary>
-        /// Gets the directory path.
+        ///     Gets the directory path.
         /// </summary>
         /// <value>
-        /// The directory path.
+        ///     The directory path.
         /// </value>
-        public string DirectoryPath
-        {
-            get;
-            private set;
-        }
+        public string DirectoryPath { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the object is disposed.
+        ///     Gets a value indicating whether the object is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if object is disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if object is disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool IsDisposed
-        {
-            get;
-            private set;
-        }
+        public bool IsDisposed { get; private set; }
 
         #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            if (!this.IsDisposed)
+            if (!IsDisposed)
             {
-                this.IsDisposed = true;
+                IsDisposed = true;
 
-                Debug.WriteLine($"disposing persistence manager for {this.DirectoryPath}");
+                Debug.WriteLine($"disposing persistence manager for {DirectoryPath}");
 
-                foreach (var file in this.files)
+                foreach (var file in files)
                 {
                     file.Value.Close();
                     file.Value.Dispose();
                 }
 
-                this.files.Clear();
+                files.Clear();
             }
         }
 
         /// <summary>
-        /// Gets the data.
+        ///     Gets the data.
         /// </summary>
         /// <param name="pieceIndex">Index of the piece.</param>
         /// <returns>
-        /// The piece data.
+        ///     The piece data.
         /// </returns>
         public byte[] Get(int pieceIndex)
         {
@@ -164,30 +154,30 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             long torrentEndOffset;
             long fileOffset;
             byte[] pieceData;
-            int pieceOffset = 0;
-            int length = 0;
+            var pieceOffset = 0;
+            var length = 0;
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            lock (this.locker)
+            lock (locker)
             {
                 // calculate length of the data read (it could be less than the specified piece length)
-                foreach (var file in this.files)
+                foreach (var file in files)
                 {
                     torrentEndOffset = torrentStartOffset + file.Key.Length;
 
-                    pieceStart = (torrentStartOffset - (torrentStartOffset % this.pieceLength)) / this.pieceLength;
+                    pieceStart = (torrentStartOffset - torrentStartOffset % pieceLength) / pieceLength;
 
-                    pieceEnd = (torrentEndOffset - (torrentEndOffset % this.pieceLength)) / this.pieceLength;
-                    pieceEnd -= torrentEndOffset % this.pieceLength == 0 ? 1 : 0;
+                    pieceEnd = (torrentEndOffset - torrentEndOffset % pieceLength) / pieceLength;
+                    pieceEnd -= torrentEndOffset % pieceLength == 0 ? 1 : 0;
 
                     if (pieceIndex >= pieceStart &&
                         pieceIndex <= pieceEnd)
                     {
-                        fileOffset = (pieceIndex - pieceStart) * this.pieceLength;
-                        fileOffset -= pieceIndex > pieceStart ? torrentStartOffset % this.pieceLength : 0;
+                        fileOffset = (pieceIndex - pieceStart) * pieceLength;
+                        fileOffset -= pieceIndex > pieceStart ? torrentStartOffset % pieceLength : 0;
 
-                        length += (int)Math.Min(this.pieceLength - length, file.Key.Length - fileOffset);
+                        length += (int) Math.Min(pieceLength - length, file.Key.Length - fileOffset);
                     }
                     else if (pieceIndex < pieceStart)
                     {
@@ -204,26 +194,26 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                     length = 0;
 
                     // read the piece
-                    foreach (var file in this.files)
+                    foreach (var file in files)
                     {
                         torrentEndOffset = torrentStartOffset + file.Key.Length;
 
-                        pieceStart = (torrentStartOffset - (torrentStartOffset % this.pieceLength)) / this.pieceLength;
+                        pieceStart = (torrentStartOffset - torrentStartOffset % pieceLength) / pieceLength;
 
-                        pieceEnd = (torrentEndOffset - (torrentEndOffset % this.pieceLength)) / this.pieceLength;
-                        pieceEnd -= torrentEndOffset % this.pieceLength == 0 ? 1 : 0;
+                        pieceEnd = (torrentEndOffset - torrentEndOffset % pieceLength) / pieceLength;
+                        pieceEnd -= torrentEndOffset % pieceLength == 0 ? 1 : 0;
 
                         if (pieceIndex >= pieceStart &&
                             pieceIndex <= pieceEnd)
                         {
-                            fileOffset = (pieceIndex - pieceStart) * this.pieceLength;
-                            fileOffset -= pieceIndex > pieceStart ? torrentStartOffset % this.pieceLength : 0;
+                            fileOffset = (pieceIndex - pieceStart) * pieceLength;
+                            fileOffset -= pieceIndex > pieceStart ? torrentStartOffset % pieceLength : 0;
 
-                            length = (int)Math.Min(this.pieceLength - pieceOffset, file.Key.Length - fileOffset);
+                            length = (int) Math.Min(pieceLength - pieceOffset, file.Key.Length - fileOffset);
 
                             if (file.Key.Download)
                             {
-                                this.Read(file.Value, fileOffset, length, pieceData, pieceOffset);
+                                Read(file.Value, fileOffset, length, pieceData, pieceOffset);
                             }
 
                             pieceOffset += length;
@@ -246,7 +236,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         }
 
         /// <summary>
-        /// Puts the data.
+        ///     Puts the data.
         /// </summary>
         /// <param name="files">The files.</param>
         /// <param name="pieceLength">Length of the piece.</param>
@@ -264,21 +254,21 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             long torrentStartOffset = 0;
             long torrentEndOffset = 0;
             long fileOffset;
-            int pieceOffset = 0;
-            int length = 0;
+            var pieceOffset = 0;
+            var length = 0;
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            lock (this.locker)
+            lock (locker)
             {
                 // verify length of the data written
                 foreach (var file in files)
                 {
                     torrentEndOffset = torrentStartOffset + file.Length;
 
-                    pieceStart = (torrentStartOffset - (torrentStartOffset % pieceLength)) / pieceLength;
+                    pieceStart = (torrentStartOffset - torrentStartOffset % pieceLength) / pieceLength;
 
-                    pieceEnd = (torrentEndOffset - (torrentEndOffset % pieceLength)) / pieceLength;
+                    pieceEnd = (torrentEndOffset - torrentEndOffset % pieceLength) / pieceLength;
                     pieceEnd -= torrentEndOffset % pieceLength == 0 ? 1 : 0;
 
                     if (pieceIndex >= pieceStart &&
@@ -287,7 +277,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                         fileOffset = (pieceIndex - pieceStart) * pieceLength;
                         fileOffset -= pieceIndex > pieceStart ? torrentStartOffset % pieceLength : 0;
 
-                        length += (int)Math.Min(pieceLength - length, file.Length - fileOffset);
+                        length += (int) Math.Min(pieceLength - length, file.Length - fileOffset);
                     }
                     else if (pieceIndex < pieceStart)
                     {
@@ -307,9 +297,9 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                     {
                         torrentEndOffset = torrentStartOffset + file.Key.Length;
 
-                        pieceStart = (torrentStartOffset - (torrentStartOffset % pieceLength)) / pieceLength;
+                        pieceStart = (torrentStartOffset - torrentStartOffset % pieceLength) / pieceLength;
 
-                        pieceEnd = (torrentEndOffset - (torrentEndOffset % pieceLength)) / pieceLength;
+                        pieceEnd = (torrentEndOffset - torrentEndOffset % pieceLength) / pieceLength;
                         pieceEnd -= torrentEndOffset % pieceLength == 0 ? 1 : 0;
 
                         if (pieceIndex >= pieceStart &&
@@ -318,11 +308,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                             fileOffset = (pieceIndex - pieceStart) * pieceLength;
                             fileOffset -= pieceIndex > pieceStart ? torrentStartOffset % pieceLength : 0;
 
-                            length = (int)Math.Min(pieceLength - pieceOffset, file.Key.Length - fileOffset);
+                            length = (int) Math.Min(pieceLength - pieceOffset, file.Key.Length - fileOffset);
 
                             if (file.Key.Download)
                             {
-                                this.Write(file.Value, fileOffset, length, pieceData, pieceOffset);
+                                Write(file.Value, fileOffset, length, pieceData, pieceOffset);
                             }
 
                             pieceOffset += length;
@@ -343,46 +333,47 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         }
 
         /// <summary>
-        /// Verifies the specified file if it corresponds with the piece hashes.
+        ///     Verifies the specified file if it corresponds with the piece hashes.
         /// </summary>
         /// <returns>
-        /// The bit field.
+        ///     The bit field.
         /// </returns>
         public PieceStatus[] Verify()
         {
-            PieceStatus[] bitField = new PieceStatus[this.pieceHashes.Count()];
+            var bitField = new PieceStatus[pieceHashes.Count()];
             long pieceStart;
             long pieceEnd;
             long previousPieceIndex = 0;
             long torrentStartOffset = 0;
             long torrentEndOffset;
             long fileOffset;
-            byte[] pieceData = new byte[this.pieceLength];
-            int pieceOffset = 0;
-            int length = 0;
-            bool ignore = false;
-            bool download = false;
+            var pieceData = new byte[pieceLength];
+            var pieceOffset = 0;
+            var length = 0;
+            var ignore = false;
+            var download = false;
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            lock (this.locker)
+            lock (locker)
             {
-                foreach (var file in this.files)
+                foreach (var file in files)
                 {
                     torrentEndOffset = torrentStartOffset + file.Key.Length;
 
-                    pieceStart = (torrentStartOffset - (torrentStartOffset % this.pieceLength)) / this.pieceLength;
+                    pieceStart = (torrentStartOffset - torrentStartOffset % pieceLength) / pieceLength;
 
-                    pieceEnd = (torrentEndOffset - (torrentEndOffset % this.pieceLength)) / this.pieceLength;
-                    pieceEnd -= torrentEndOffset % this.pieceLength == 0 ? 1 : 0;
+                    pieceEnd = (torrentEndOffset - torrentEndOffset % pieceLength) / pieceLength;
+                    pieceEnd -= torrentEndOffset % pieceLength == 0 ? 1 : 0;
 
                     Debug.WriteLine($"verifying file {file.Value.Name}");
 
-                    for (long pieceIndex = pieceStart; pieceIndex <= pieceEnd; pieceIndex++)
+                    for (var pieceIndex = pieceStart; pieceIndex <= pieceEnd; pieceIndex++)
                     {
                         if (pieceIndex > previousPieceIndex)
                         {
-                            bitField[previousPieceIndex] = this.GetStatus(ignore, download, this.pieceHashes.ElementAt((int)previousPieceIndex), pieceData.CalculateSha1Hash(0, pieceOffset).ToHexaDecimalString());
+                            bitField[previousPieceIndex] = GetStatus(ignore, download, pieceHashes.ElementAt((int) previousPieceIndex),
+                                pieceData.CalculateSha1Hash(0, pieceOffset).ToHexaDecimalString());
 
                             previousPieceIndex = pieceIndex;
                             pieceOffset = 0;
@@ -390,14 +381,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                             download = false;
                         }
 
-                        fileOffset = (pieceIndex - pieceStart) * this.pieceLength;
-                        fileOffset -= pieceIndex > pieceStart ? torrentStartOffset % this.pieceLength : 0;
+                        fileOffset = (pieceIndex - pieceStart) * pieceLength;
+                        fileOffset -= pieceIndex > pieceStart ? torrentStartOffset % pieceLength : 0;
 
-                        length = (int)Math.Min(this.pieceLength - pieceOffset, file.Key.Length - fileOffset);
+                        length = (int) Math.Min(pieceLength - pieceOffset, file.Key.Length - fileOffset);
 
                         if (file.Key.Download)
                         {
-                            this.Read(file.Value, fileOffset, length, pieceData, pieceOffset);
+                            Read(file.Value, fileOffset, length, pieceData, pieceOffset);
 
                             download = true;
                         }
@@ -416,7 +407,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                 }
 
                 // last piece
-                bitField[previousPieceIndex] = this.GetStatus(ignore, download, this.pieceHashes.ElementAt((int)previousPieceIndex), pieceData.CalculateSha1Hash(0, pieceOffset).ToHexaDecimalString());
+                bitField[previousPieceIndex] = GetStatus(ignore, download, pieceHashes.ElementAt((int) previousPieceIndex),
+                    pieceData.CalculateSha1Hash(0, pieceOffset).ToHexaDecimalString());
             }
 
             return bitField;
@@ -427,18 +419,18 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Private Methods
 
         /// <summary>
-        /// Checks if object is disposed.
+        ///     Checks if object is disposed.
         /// </summary>
         private void CheckIfObjectIsDisposed()
         {
-            if (this.IsDisposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException("TorrentClient");
             }
         }
 
         /// <summary>
-        /// Creates the file.
+        ///     Creates the file.
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="fileLength">Length of the file in bytes.</param>
@@ -449,7 +441,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             filePath.MustBeValidFilePath();
             fileLength.MustBeGreaterThan(0);
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
             {
@@ -462,7 +454,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             {
                 Debug.WriteLine($"creating file {filePath}");
 
-                using (FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     stream.SetLength(fileLength);
                     stream.Close();
@@ -470,14 +462,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         /// <summary>
-        /// Gets the status.
+        ///     Gets the status.
         /// </summary>
         /// <param name="ignore">if set to <c>true</c> one of the piece parts is to be ignored.</param>
         /// <param name="download">if set to <c>true</c> one of the piece parts is to be downloaded.</param>
@@ -493,34 +483,32 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             if (download &&
                 !ignore)
             {
-                for (int i = 0; i < pieceHash.Length; i++)
-                {
+                for (var i = 0; i < pieceHash.Length; i++)
                     if (pieceHash[i] != calculatedPieceHash[i])
                     {
                         return PieceStatus.Missing;
                     }
-                }
 
                 return PieceStatus.Present;
             }
-            else if (download &&
-                     ignore)
+
+            if (download &&
+                ignore)
             {
                 return PieceStatus.Partial;
             }
-            else if (!download &&
-                     ignore)
+
+            if (!download &&
+                ignore)
             {
                 return PieceStatus.Ignore;
             }
-            else
-            {
-                throw new TorrentPersistanceException("Invalid piece status.");
-            }
+
+            throw new TorrentPersistanceException("Invalid piece status.");
         }
 
         /// <summary>
-        /// Reads the specified data at the offset to the file path.
+        ///     Reads the specified data at the offset to the file path.
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="offset">The offset.</param>
@@ -549,7 +537,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         }
 
         /// <summary>
-        /// Writes the specified data at the offset to the file path.
+        ///     Writes the specified data at the offset to the file path.
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="offset">The offset.</param>
@@ -565,7 +553,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             length.MustBeGreaterThan(0);
             length.MustBeLessThanOrEqualTo(buffer.Length);
             bufferOffset.MustBeGreaterThanOrEqualTo(0);
-            bufferOffset.MustBeLessThanOrEqualTo((int)(buffer.Length - length));
+            bufferOffset.MustBeLessThanOrEqualTo(buffer.Length - length);
 
             if (stream.Length >= offset + length)
             {

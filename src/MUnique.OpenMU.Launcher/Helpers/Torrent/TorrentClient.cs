@@ -16,43 +16,14 @@ using MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages;
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 {
     /// <summary>
-    /// The torrent client.
+    ///     The torrent client.
     /// </summary>
     public sealed class TorrentClient : IDisposable
     {
-        #region Private Fields
-
-        /// <summary>
-        /// The downloaded bytes count.
-        /// </summary>
-        private long downloaded = 0;
-
-        /// <summary>
-        /// The TCP server.
-        /// </summary>
-        private TcpListener server;
-
-        /// <summary>
-        /// The throttling manager.
-        /// </summary>
-        private ThrottlingManager throttlingManager = new ThrottlingManager();
-
-        /// <summary>
-        /// The torrent info hash / torrent transfer manager dictionary.
-        /// </summary>
-        private Dictionary<string, TransferManager> transfers = new Dictionary<string, TransferManager>();
-
-        /// <summary>
-        /// The uploaded bytes count.
-        /// </summary>
-        private long uploaded = 0;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TorrentClient" /> class.
+        ///     Initializes a new instance of the <see cref="TorrentClient" /> class.
         /// </summary>
         /// <param name="listeningPort">The listening port.</param>
         /// <param name="baseDirectory">The base directory, where all torrents are persisted.</param>
@@ -67,8 +38,8 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             Debug.WriteLine($"listening port: {listeningPort}");
             Debug.WriteLine($"base directory: {Path.GetFullPath(baseDirectory)}");
 
-            this.BaseDirectory = baseDirectory;
-            this.ListeningPort = listeningPort;
+            BaseDirectory = baseDirectory;
+            ListeningPort = listeningPort;
         }
 
         #endregion Public Constructors
@@ -76,7 +47,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Private Constructors
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="TorrentClient"/> class from being created.
+        ///     Prevents a default instance of the <see cref="TorrentClient" /> class from being created.
         /// </summary>
         private TorrentClient()
         {
@@ -84,30 +55,59 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
         #endregion Private Constructors
 
+        #region Private Fields
+
+        /// <summary>
+        ///     The downloaded bytes count.
+        /// </summary>
+        private long downloaded;
+
+        /// <summary>
+        ///     The TCP server.
+        /// </summary>
+        private TcpListener server;
+
+        /// <summary>
+        ///     The throttling manager.
+        /// </summary>
+        private readonly ThrottlingManager throttlingManager = new ThrottlingManager();
+
+        /// <summary>
+        ///     The torrent info hash / torrent transfer manager dictionary.
+        /// </summary>
+        private readonly Dictionary<string, TransferManager> transfers = new Dictionary<string, TransferManager>();
+
+        /// <summary>
+        ///     The uploaded bytes count.
+        /// </summary>
+        private long uploaded;
+
+        #endregion Private Fields
+
         #region Public Events
 
         /// <summary>
-        /// Occurs when torrent is hashing.
+        ///     Occurs when torrent is hashing.
         /// </summary>
         public event EventHandler<TorrentHashingEventArgs> TorrentHashing;
 
         /// <summary>
-        /// Occurs when torrent leeching.
+        ///     Occurs when torrent leeching.
         /// </summary>
         public event EventHandler<TorrentLeechingEventArgs> TorrentLeeching;
 
         /// <summary>
-        /// Occurs when torrent seeding.
+        ///     Occurs when torrent seeding.
         /// </summary>
         public event EventHandler<TorrentSeedingEventArgs> TorrentSeeding;
 
         /// <summary>
-        /// Occurs when torrent started.
+        ///     Occurs when torrent started.
         /// </summary>
         public event EventHandler<TorrentStartedEventArgs> TorrentStarted;
 
         /// <summary>
-        /// Occurs when torrent stopped.
+        ///     Occurs when torrent stopped.
         /// </summary>
         public event EventHandler<TorrentStoppedEventArgs> TorrentStopped;
 
@@ -116,168 +116,152 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Public Properties
 
         /// <summary>
-        /// Gets the base directory.
+        ///     Gets the base directory.
         /// </summary>
         /// <value>
-        /// The base directory.
+        ///     The base directory.
         /// </value>
-        public string BaseDirectory
-        {
-            get;
-            private set;
-        }
+        public string BaseDirectory { get; }
 
         /// <summary>
-        /// Gets the downloaded bytes count.
+        ///     Gets the downloaded bytes count.
         /// </summary>
         /// <value>
-        /// The downloaded bytes count.
+        ///     The downloaded bytes count.
         /// </value>
         public long Downloaded
         {
             get
             {
-                lock (((IDictionary)this.transfers).SyncRoot)
+                lock (((IDictionary) transfers).SyncRoot)
                 {
-                    return this.downloaded + this.transfers.Values.Sum(x => x.Downloaded);
+                    return downloaded + transfers.Values.Sum(x => x.Downloaded);
                 }
             }
         }
 
         /// <summary>
-        /// Gets the download speed in bytes per second.
+        ///     Gets the download speed in bytes per second.
         /// </summary>
         /// <value>
-        /// The download speed in bytes per second.
+        ///     The download speed in bytes per second.
         /// </value>
         public decimal DownloadSpeed
         {
             get
             {
-                lock (((IDictionary)this.transfers).SyncRoot)
+                lock (((IDictionary) transfers).SyncRoot)
                 {
-                    return this.transfers.Values.Sum(x => x.DownloadSpeed);
+                    return transfers.Values.Sum(x => x.DownloadSpeed);
                 }
             }
         }
 
         /// <summary>
-        /// Gets or sets the download speed limit in bytes per second.
+        ///     Gets or sets the download speed limit in bytes per second.
         /// </summary>
         /// <value>
-        /// The download speed limit in bytes per second.
+        ///     The download speed limit in bytes per second.
         /// </value>
         public long DownloadSpeedLimit
         {
             get
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
-                return this.throttlingManager.ReadSpeedLimit;
+                return throttlingManager.ReadSpeedLimit;
             }
 
             set
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
                 Debug.WriteLine($"setting download speed limit to {value}B/s");
 
-                this.throttlingManager.ReadSpeedLimit = value;
+                throttlingManager.ReadSpeedLimit = value;
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the object is disposed.
+        ///     Gets a value indicating whether the object is disposed.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if object is disposed; otherwise, <c>false</c>.
+        ///     <c>true</c> if object is disposed; otherwise, <c>false</c>.
         /// </value>
-        public bool IsDisposed
-        {
-            get;
-            private set;
-        }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether the torrent client is running.
+        ///     Gets a value indicating whether the torrent client is running.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the torrent client is running; otherwise, <c>false</c>.
+        ///     <c>true</c> if the torrent client is running; otherwise, <c>false</c>.
         /// </value>
-        public bool IsRunning
-        {
-            get;
-            private set;
-        }
+        public bool IsRunning { get; private set; }
 
         /// <summary>
-        /// Gets the listening port.
+        ///     Gets the listening port.
         /// </summary>
         /// <value>
-        /// The listening port.
+        ///     The listening port.
         /// </value>
-        public int ListeningPort
-        {
-            get;
-            private set;
-        }
+        public int ListeningPort { get; }
 
         /// <summary>
-        /// Gets the uploaded bytes count.
+        ///     Gets the uploaded bytes count.
         /// </summary>
         /// <value>
-        /// The uploaded bytes count.
+        ///     The uploaded bytes count.
         /// </value>
         public long Uploaded
         {
             get
             {
-                lock (((IDictionary)this.transfers).SyncRoot)
+                lock (((IDictionary) transfers).SyncRoot)
                 {
-                    return this.uploaded + this.transfers.Values.Sum(x => x.Uploaded);
+                    return uploaded + transfers.Values.Sum(x => x.Uploaded);
                 }
             }
         }
 
         /// <summary>
-        /// Gets the upload speed in bytes per second.
+        ///     Gets the upload speed in bytes per second.
         /// </summary>
         /// <value>
-        /// The upload speed in bytes per second.
+        ///     The upload speed in bytes per second.
         /// </value>
         public decimal UploadSpeed
         {
             get
             {
-                lock (((IDictionary)this.transfers).SyncRoot)
+                lock (((IDictionary) transfers).SyncRoot)
                 {
-                    return this.transfers.Values.Sum(x => x.UploadSpeed);
+                    return transfers.Values.Sum(x => x.UploadSpeed);
                 }
             }
         }
 
         /// <summary>
-        /// Gets or sets the upload speed limit in bytes per second.
+        ///     Gets or sets the upload speed limit in bytes per second.
         /// </summary>
         /// <value>
-        /// The upload speed limit in bytes per second.
+        ///     The upload speed limit in bytes per second.
         /// </value>
         public long UploadSpeedLimit
         {
             get
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
-                return this.throttlingManager.WriteSpeedLimit;
+                return throttlingManager.WriteSpeedLimit;
             }
 
             set
             {
-                this.CheckIfObjectIsDisposed();
+                CheckIfObjectIsDisposed();
 
                 Debug.WriteLine($"setting upload speed limit to {value}B/s");
 
-                this.throttlingManager.WriteSpeedLimit = value;
+                throttlingManager.WriteSpeedLimit = value;
             }
         }
 
@@ -286,29 +270,29 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Public Methods
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            if (!this.IsDisposed)
+            if (!IsDisposed)
             {
-                this.IsDisposed = true;
+                IsDisposed = true;
 
                 Debug.WriteLine("disposing torrent client");
 
-                if (this.IsRunning)
+                if (IsRunning)
                 {
-                    this.Stop();
+                    Stop();
                 }
             }
         }
 
         /// <summary>
-        /// Gets the progress information.
+        ///     Gets the progress information.
         /// </summary>
         /// <param name="torrentInfoHash">The torrent information hash.</param>
         /// <returns>
-        /// The torrent progress information.
+        ///     The torrent progress information.
         /// </returns>
         public TorrentProgressInfo GetProgressInfo(string torrentInfoHash)
         {
@@ -316,7 +300,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
             TransferManager transferManager;
 
-            if (this.transfers.TryGetValue(torrentInfoHash, out transferManager))
+            if (transfers.TryGetValue(torrentInfoHash, out transferManager))
             {
                 return new TorrentProgressInfo(
                     torrentInfoHash,
@@ -329,28 +313,25 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                     transferManager.LeechingPeerCount,
                     transferManager.SeedingPeerCount);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
-        /// Gets the progress information.
+        ///     Gets the progress information.
         /// </summary>
         /// <returns>
-        /// The torrent progress information.
+        ///     The torrent progress information.
         /// </returns>
         public IEnumerable<TorrentProgressInfo> GetProgressInfo()
         {
-            List<TorrentProgressInfo> info = new List<TorrentProgressInfo>();
+            var info = new List<TorrentProgressInfo>();
 
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
-            lock (((IDictionary)this.transfers).SyncRoot)
+            lock (((IDictionary) transfers).SyncRoot)
             {
-                foreach (var transferManager in this.transfers.Values)
-                {
+                foreach (var transferManager in transfers.Values)
                     info.Add(new TorrentProgressInfo(
                         transferManager.TorrentInfo.InfoHash,
                         DateTime.UtcNow - transferManager.StartTime,
@@ -361,37 +342,36 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                         transferManager.UploadSpeed,
                         transferManager.LeechingPeerCount,
                         transferManager.SeedingPeerCount));
-                }
             }
 
             return info;
         }
 
         /// <summary>
-        /// Starts the specified listening port.
+        ///     Starts the specified listening port.
         /// </summary>
         public void Start()
         {
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
             Thread thread;
 
             Debug.WriteLine("starting torrent client");
 
             // start listening
-            this.server = new TcpListener(IPAddress.Any, (int)this.ListeningPort);
-            this.server.Start();
+            server = new TcpListener(IPAddress.Any, ListeningPort);
+            server.Start();
 
-            this.IsRunning = true;
+            IsRunning = true;
 
-            thread = new Thread(this.Listen);
+            thread = new Thread(Listen);
             thread.IsBackground = true;
             thread.Name = "port listener";
             thread.Start();
         }
 
         /// <summary>
-        /// Starts the specified torrent.
+        ///     Starts the specified torrent.
         /// </summary>
         /// <param name="torrentInfo">The torrent information.</param>
         public void Start(TorrentInfo torrentInfo)
@@ -402,21 +382,22 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
             Debug.WriteLine($"starting torrent {torrentInfo.InfoHash}");
 
-            if (this.IsRunning)
+            if (IsRunning)
             {
-                lock (((IDictionary)this.transfers).SyncRoot)
+                lock (((IDictionary) transfers).SyncRoot)
                 {
-                    if (!this.transfers.ContainsKey(torrentInfo.InfoHash))
+                    if (!transfers.ContainsKey(torrentInfo.InfoHash))
                     {
-                        transfer = new TransferManager(this.ListeningPort, torrentInfo, this.throttlingManager, new PersistenceManager(this.BaseDirectory, torrentInfo.Length, torrentInfo.PieceLength, torrentInfo.PieceHashes, torrentInfo.Files));
-                        transfer.TorrentHashing += this.Transfer_TorrentHashing;
-                        transfer.TorrentLeeching += this.Transfer_TorrentLeeching;
-                        transfer.TorrentSeeding += this.Transfer_TorrentSeeding;
-                        transfer.TorrentStarted += this.Transfer_TorrentStarted;
-                        transfer.TorrentStopped += this.Transfer_TorrentStopped;
+                        transfer = new TransferManager(ListeningPort, torrentInfo, throttlingManager,
+                            new PersistenceManager(BaseDirectory, torrentInfo.Length, torrentInfo.PieceLength, torrentInfo.PieceHashes, torrentInfo.Files));
+                        transfer.TorrentHashing += Transfer_TorrentHashing;
+                        transfer.TorrentLeeching += Transfer_TorrentLeeching;
+                        transfer.TorrentSeeding += Transfer_TorrentSeeding;
+                        transfer.TorrentStarted += Transfer_TorrentStarted;
+                        transfer.TorrentStopped += Transfer_TorrentStopped;
                         transfer.Start();
 
-                        this.transfers.Add(torrentInfo.InfoHash, transfer);
+                        transfers.Add(torrentInfo.InfoHash, transfer);
                     }
                     else
                     {
@@ -431,36 +412,36 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         }
 
         /// <summary>
-        /// Stops this instance.
+        ///     Stops this instance.
         /// </summary>
         public void Stop()
         {
-            this.CheckIfObjectIsDisposed();
+            CheckIfObjectIsDisposed();
 
             Debug.WriteLine("stopping torrent client");
 
-            if (!this.IsRunning)
+            if (!IsRunning)
             {
                 // stop tracking
-                lock (((IDictionary)this.transfers).SyncRoot)
+                lock (((IDictionary) transfers).SyncRoot)
                 {
-                    foreach (var transfer in this.transfers.Values)
+                    foreach (var transfer in transfers.Values)
                     {
-                        this.downloaded += transfer.Downloaded;
-                        this.uploaded += transfer.Uploaded;
+                        downloaded += transfer.Downloaded;
+                        uploaded += transfer.Uploaded;
 
                         transfer.Stop();
                         transfer.Dispose();
                     }
 
-                    this.transfers.Clear();
+                    transfers.Clear();
                 }
 
                 // stop server
-                this.server.Stop();
-                this.server = null;
+                server.Stop();
+                server = null;
 
-                this.IsRunning = false;
+                IsRunning = false;
             }
             else
             {
@@ -469,7 +450,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         }
 
         /// <summary>
-        /// Stops the specified torrent.
+        ///     Stops the specified torrent.
         /// </summary>
         /// <param name="torrentInfoHash">The torrent information hash.</param>
         public void Stop(string torrentInfoHash)
@@ -480,11 +461,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
 
             Debug.WriteLine($"stopping torrent {torrentInfoHash}");
 
-            lock (((IDictionary)this.transfers).SyncRoot)
+            lock (((IDictionary) transfers).SyncRoot)
             {
-                if (this.transfers.TryGetValue(torrentInfoHash, out transfer))
+                if (transfers.TryGetValue(torrentInfoHash, out transfer))
                 {
-                    this.transfers.Remove(torrentInfoHash);
+                    transfers.Remove(torrentInfoHash);
 
                     transfer.Stop();
 
@@ -503,33 +484,33 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         #region Private Methods
 
         /// <summary>
-        /// Checks if object is disposed.
+        ///     Checks if object is disposed.
         /// </summary>
         private void CheckIfObjectIsDisposed()
         {
-            if (this.IsDisposed)
+            if (IsDisposed)
             {
-                throw new ObjectDisposedException(this.GetType().Name);
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 
         /// <summary>
-        /// Listens to incoming socket messages.
+        ///     Listens to incoming socket messages.
         /// </summary>
         private void Listen()
         {
-            int timeout = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
-            int bufferSize = 1024 * 1024;
+            var timeout = (int) TimeSpan.FromSeconds(5).TotalMilliseconds;
+            var bufferSize = 1024 * 1024;
             int bytesRead;
-            int offset = 0;
-            byte[] buffer = new byte[bufferSize];
+            var offset = 0;
+            var buffer = new byte[bufferSize];
             TcpClient tcp;
             TransferManager transfer;
 
-            while (!this.IsDisposed &&
-                   this.IsRunning)
+            while (!IsDisposed &&
+                   IsRunning)
             {
-                tcp = this.server.AcceptTcpClient();
+                tcp = server.AcceptTcpClient();
                 tcp.Client.SendTimeout = timeout;
                 tcp.SendBufferSize = bufferSize;
                 tcp.Client.ReceiveTimeout = timeout;
@@ -544,12 +525,11 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                     if (bytesRead > 0)
                     {
                         foreach (var message in PeerMessage.Decode(buffer, ref offset, bytesRead))
-                        {
                             if (message is HandshakeMessage)
                             {
-                                lock (((IDictionary)this.transfers).SyncRoot)
+                                lock (((IDictionary) transfers).SyncRoot)
                                 {
-                                    if (this.transfers.TryGetValue(message.As<HandshakeMessage>().InfoHash, out transfer))
+                                    if (transfers.TryGetValue(message.As<HandshakeMessage>().InfoHash, out transfer))
                                     {
                                         transfer.AddLeecher(tcp, message.As<HandshakeMessage>().PeerId);
                                     }
@@ -559,7 +539,6 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
                                     }
                                 }
                             }
-                        }
                     }
                 }
                 catch (IOException ex)
@@ -575,7 +554,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
         }
 
         /// <summary>
-        /// Called when torrent is hashing.
+        ///     Called when torrent is hashing.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -584,14 +563,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentHashing != null)
+            if (TorrentHashing != null)
             {
-                this.TorrentHashing(sender, e);
+                TorrentHashing(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when torrent leeching.
+        ///     Called when torrent leeching.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -600,14 +579,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentLeeching != null)
+            if (TorrentLeeching != null)
             {
-                this.TorrentLeeching(sender, e);
+                TorrentLeeching(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when torrent seeding.
+        ///     Called when torrent seeding.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -616,14 +595,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentSeeding != null)
+            if (TorrentSeeding != null)
             {
-                this.TorrentSeeding(sender, e);
+                TorrentSeeding(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when torrent started.
+        ///     Called when torrent started.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -632,14 +611,14 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentStarted != null)
+            if (TorrentStarted != null)
             {
-                this.TorrentStarted(sender, e);
+                TorrentStarted(sender, e);
             }
         }
 
         /// <summary>
-        /// Called when torrent stopped.
+        ///     Called when torrent stopped.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
@@ -648,70 +627,70 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent
             sender.CannotBeNull();
             e.CannotBeNull();
 
-            if (this.TorrentStopped != null)
+            if (TorrentStopped != null)
             {
-                this.TorrentStopped(sender, e);
+                TorrentStopped(sender, e);
             }
         }
 
         /// <summary>
-        /// Handles the TorrentHashing event of the Transfer control.
+        ///     Handles the TorrentHashing event of the Transfer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.EventArgs" /> instance containing the event data.</param>
         private void Transfer_TorrentHashing(object sender, System.EventArgs e)
         {
             Debug.WriteLine($"torrent {sender.As<TransferManager>().TorrentInfo.InfoHash} hashing");
 
-            this.OnTorrentHashing(this, new TorrentHashingEventArgs(sender.As<TransferManager>().TorrentInfo));
+            OnTorrentHashing(this, new TorrentHashingEventArgs(sender.As<TransferManager>().TorrentInfo));
         }
 
         /// <summary>
-        /// Handles the TorrentLeeching event of the Transfer control.
+        ///     Handles the TorrentLeeching event of the Transfer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.EventArgs" /> instance containing the event data.</param>
         private void Transfer_TorrentLeeching(object sender, System.EventArgs e)
         {
             Debug.WriteLine($"torrent {sender.As<TransferManager>().TorrentInfo.InfoHash} leeching");
 
-            this.OnTorrentLeeching(this, new TorrentLeechingEventArgs(sender.As<TransferManager>().TorrentInfo));
+            OnTorrentLeeching(this, new TorrentLeechingEventArgs(sender.As<TransferManager>().TorrentInfo));
         }
 
         /// <summary>
-        /// Handles the TorrentSeeding event of the Transfer control.
+        ///     Handles the TorrentSeeding event of the Transfer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void Transfer_TorrentSeeding(object sender, System.EventArgs e)
         {
             Debug.WriteLine($"torrent {sender.As<TransferManager>().TorrentInfo.InfoHash} seeding");
 
-            this.OnTorrentSeeding(this, new TorrentSeedingEventArgs(sender.As<TransferManager>().TorrentInfo));
+            OnTorrentSeeding(this, new TorrentSeedingEventArgs(sender.As<TransferManager>().TorrentInfo));
         }
 
         /// <summary>
-        /// Handles the TorrentStarted event of the Transfer control.
+        ///     Handles the TorrentStarted event of the Transfer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void Transfer_TorrentStarted(object sender, System.EventArgs e)
         {
             Debug.WriteLine($"torrent {sender.As<TransferManager>().TorrentInfo.InfoHash} started");
 
-            this.OnTorrentStarted(this, new TorrentStartedEventArgs(sender.As<TransferManager>().TorrentInfo));
+            OnTorrentStarted(this, new TorrentStartedEventArgs(sender.As<TransferManager>().TorrentInfo));
         }
 
         /// <summary>
-        /// Handles the TorrentStopped event of the Transfer control.
+        ///     Handles the TorrentStopped event of the Transfer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void Transfer_TorrentStopped(object sender, System.EventArgs e)
         {
             Debug.WriteLine($"torrent {sender.As<TransferManager>().TorrentInfo.InfoHash} stopped");
 
-            this.OnTorrentStopped(this, new TorrentStoppedEventArgs(sender.As<TransferManager>().TorrentInfo));
+            OnTorrentStopped(this, new TorrentStoppedEventArgs(sender.As<TransferManager>().TorrentInfo));
         }
 
         #endregion Private Methods

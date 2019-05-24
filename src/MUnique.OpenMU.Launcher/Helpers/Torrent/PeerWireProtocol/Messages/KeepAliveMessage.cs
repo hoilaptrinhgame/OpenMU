@@ -3,52 +3,46 @@
 namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
 {
     /// <summary>
-    /// The keep alive message.
+    ///     The keep alive message.
     /// </summary>
     public class KeepAliveMessage : PeerMessage
     {
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets the length in bytes.
+        /// </summary>
+        /// <value>
+        ///     The length in bytes.
+        /// </value>
+        public override int Length => MessageLengthLength;
+
+        #endregion Public Properties
+
         #region Private Fields
 
         /// <summary>
-        /// The message length in bytes.
+        ///     The message length in bytes.
         /// </summary>
         private const int MessageLength = 0;
 
         /// <summary>
-        /// The message length in bytes.
+        ///     The message length in bytes.
         /// </summary>
         private const int MessageLengthLength = 4;
 
         #endregion Private Fields
 
-        #region Public Properties
-
-        /// <summary>
-        /// Gets the length in bytes.
-        /// </summary>
-        /// <value>
-        /// The length in bytes.
-        /// </value>
-        public override int Length
-        {
-            get
-            {
-                return MessageLengthLength;
-            }
-        }
-
-        #endregion Public Properties
-
         #region Public Methods
 
         /// <summary>
-        /// Decodes the message.
+        ///     Decodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="message">The message.</param>
         /// <returns>
-        /// True if decoding was successful; false otherwise.
+        ///     True if decoding was successful; false otherwise.
         /// </returns>
         public static bool TryDecode(byte[] buffer, ref int offset, out KeepAliveMessage message)
         {
@@ -60,7 +54,7 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
                 buffer.Length >= offset + MessageLengthLength &&
                 offset >= 0)
             {
-                messageLength = Message.ReadInt(buffer, ref offset);
+                messageLength = ReadInt(buffer, ref offset);
 
                 if (messageLength == MessageLength)
                 {
@@ -72,12 +66,12 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Encodes the message.
+        ///     Encodes the message.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="offset">The offset.</param>
         /// <returns>
-        /// The encoded peer message.
+        ///     The encoded peer message.
         /// </returns>
         public override int Encode(byte[] buffer, int offset)
         {
@@ -85,19 +79,19 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
             offset.MustBeGreaterThanOrEqualTo(0);
             offset.MustBeLessThan(buffer.Length);
 
-            int written = offset;
+            var written = offset;
 
-            Message.Write(buffer, ref written, MessageLength);
+            Write(buffer, ref written, MessageLength);
 
-            return this.CheckWritten(written - offset);
+            return CheckWritten(written - offset);
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="object" /> is equal to this instance.
+        ///     Determines whether the specified <see cref="object" /> is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
@@ -105,21 +99,21 @@ namespace MUnique.OpenMU.Launcher.Helpers.Torrent.PeerWireProtocol.Messages
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        ///     Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
-            return this.ToString().GetHashCode();
+            return ToString().GetHashCode();
         }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
