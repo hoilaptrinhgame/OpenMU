@@ -4,7 +4,45 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:MUnique.OpenMU.Launcher.Views"
+             xmlns:viewModels="clr-namespace:MUnique.OpenMU.Launcher.ViewModels"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:selectors="clr-namespace:MUnique.OpenMU.Launcher.Helpers.Selectors"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid />
+             d:DesignHeight="1000" d:DesignWidth="1000">
+    <UserControl.DataContext>
+        <viewModels:SettingsViewModel />
+    </UserControl.DataContext>
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Orientation="Vertical">
+        <GroupBox Header="Settings" Margin="15">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Username: " VerticalAlignment="Center"></TextBlock>
+                    <TextBox MinHeight="15" MinWidth="120" Text="{Binding Settings.UserName, Mode=TwoWay}" VerticalAlignment="Center"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="LocalVersion: " VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Text="{Binding Settings.LocalVersion}" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Launcher Settings" Visibility="{Binding DevMode, Converter={StaticResource BoolToVis}}" Margin="15">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Username: " VerticalAlignment="Center"></TextBlock>
+                    <TextBox MinHeight="15" MinWidth="120" Text="{Binding Settings.UserName, Mode=TwoWay}" VerticalAlignment="Center"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="LocalVersion: " VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Text="{Binding Settings.LocalVersion}" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</ScrollViewer>
 </UserControl>

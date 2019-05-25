@@ -12,5 +12,8 @@ namespace MUnique.OpenMU.Launcher.Models
 
         [Option('p', "port", Required = false, HelpText = "Port address of the main game server.")]
         public int Port { get; set; }
+
+        [Option('d', "dev", Required = false, HelpText = "Dev Mode, gives access to launcher settings.")]
+        public bool Dev { get; set; } = false;
     }
 }

@@ -1,9 +1,11 @@
 using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Input;
 using MUnique.OpenMU.Launcher.Managers;
 using MUnique.OpenMU.Launcher.Models;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 
 namespace MUnique.OpenMU.Launcher.ViewModels
 {

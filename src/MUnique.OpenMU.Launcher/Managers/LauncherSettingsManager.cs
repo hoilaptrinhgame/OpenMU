@@ -49,7 +49,7 @@ namespace MUnique.OpenMU.Launcher.Managers
         {
             try
             {
-                File.WriteAllText("config.json", JsonConvert.SerializeObject(Settings));
+                File.WriteAllText("launcher.json", JsonConvert.SerializeObject(Settings));
             }
             catch (Exception e)
             {

@@ -5,8 +5,8 @@ namespace MUnique.OpenMU.Launcher.Models
 {
     public class Settings : BindableBase
     {
-        private Version localVersion;
-        private string userName;
+        private Version localVersion = Version.Parse("0.0.1.0");
+        private string userName = "test";
 
         public string UserName
         {
