@@ -21,17 +21,27 @@ namespace MUnique.OpenMU.Launcher.Models.Updaters
             {
                 return;
             }
+            
+            UpdateManager.NotifyStatusChange("Fetching updates ...", true);
+
+            await Task.Delay(5000);
 
             CheckingForUpdates = true;
             TotalProgress = 0;
             //Simulating the update process
+            UpdateManager.NotifyStatusChange("Downloading files ...");
             for (var i = 0; i < 100; i++)
             {
-                await Task.Delay(50);
+                await Task.Delay(10);
                 TotalProgress++;
                 UpdateManager.NotifyProgressChanged(TotalProgress);
             }
+            UpdateManager.NotifyStatusChange("Patching files ...", true);
 
+            await Task.Delay(4000);
+
+            UpdateManager.NotifyStatusChange("Update finished!", false, true);
+            
             CheckingForUpdates = false;
         }
     }

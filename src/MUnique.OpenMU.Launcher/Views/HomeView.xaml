@@ -6,7 +6,37 @@
              xmlns:local="clr-namespace:MUnique.OpenMU.Launcher.Views"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <TextBlock> Home View</TextBlock>
-    </Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical">
+            <GroupBox Header="News" Margin="10">
+                <TextBlock Text="Very Gut News">
+                </TextBlock>
+            </GroupBox>
+            <GroupBox Header="News" Margin="10">
+                <TextBlock Text="Very Gut News">
+                </TextBlock>
+            </GroupBox>
+            <GroupBox Header="News" Margin="10">
+                <TextBlock Text="Very Gut News">
+                </TextBlock>
+            </GroupBox>
+            <GroupBox Header="News" Margin="10">
+                <TextBlock Text="Very Gut News">
+                </TextBlock>
+            </GroupBox>
+            <GroupBox Header="News" Margin="10">
+                <TextBlock Text="Very Gut News">
+                </TextBlock>
+            </GroupBox>
+            <GroupBox Header="News" Margin="10">
+                <TextBlock Text="Very Gut News">
+                </TextBlock>
+            </GroupBox>
+            <GroupBox Header="News" Margin="10">
+                <TextBlock Text="Very Gut News">
+                </TextBlock>
+            </GroupBox>
+            
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

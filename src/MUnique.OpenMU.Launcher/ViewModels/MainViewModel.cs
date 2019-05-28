@@ -48,6 +48,56 @@ namespace MUnique.OpenMU.Launcher.ViewModels
             GoToHome.Execute("");
 
             UpdateManager.OnProgressChanged += UpdateManagerOnOnProgressChanged;
+            UpdateManager.OnStatusChange += UpdateManagerOnOnStatusChange;
+        }
+
+        private void UpdateManagerOnOnStatusChange(string status, bool indeterminated, bool finished)
+        {
+            UpdateStatus = status;
+            SetIndeterminate(indeterminated);
+            LaunchButtonEnabled = finished;
+            if (finished)
+            {
+                Progress = 100;
+            }
+        }
+
+        public void SetIndeterminate(bool yes)
+        {
+            if (yes)
+            {
+                Indeterminate = true;
+                Progress = 15;
+            }
+            else
+            {
+                Indeterminate = false;
+                Progress = 0;
+            }
+        }
+
+        private bool launchButtonEnabled;
+
+        public bool LaunchButtonEnabled
+        {
+            get => launchButtonEnabled;
+            set => SetProperty(ref launchButtonEnabled, value);
+        }
+
+        private bool indeterminate = true;
+
+        public bool Indeterminate
+        {
+            get => indeterminate;
+            set => SetProperty(ref indeterminate, value);
+        }
+
+        private string updateStatus;
+
+        public string UpdateStatus
+        {
+            get => updateStatus;
+            set => SetProperty(ref updateStatus, value);
         }
 
         private ICommand goToHome;

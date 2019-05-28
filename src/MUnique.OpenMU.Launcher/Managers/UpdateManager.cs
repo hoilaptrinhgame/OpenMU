@@ -12,6 +12,8 @@ namespace MUnique.OpenMU.Launcher.Managers
         public delegate void OnDownloadCompleteDelegate(DownloadTask task);
 
         public delegate void OnProgressChangedDelegate(int progress);
+        
+        public delegate void OnStatusChangeDelegate(string status, bool indeterminated, bool finished);
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -63,6 +65,19 @@ namespace MUnique.OpenMU.Launcher.Managers
 
         public static event OnDownloadCompleteDelegate OnDownloadComplete;
         public static event OnProgressChangedDelegate OnProgressChanged;
+        public static event OnStatusChangeDelegate OnStatusChange;
+        
+        public static void NotifyStatusChange(string status, bool indeterminated = false, bool finished = false)
+        {
+            try
+            {
+                OnStatusChange?.Invoke(status, indeterminated, finished);
+            }
+            catch (Exception e)
+            {
+                logger.Log(LogLevel.Error, e, "Failed to notify status change.");
+            }
+        }
 
         public static void NotifyDownloadComplete(DownloadTask task)
         {
