@@ -1,11 +1,13 @@
 using System.Diagnostics;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using MUnique.OpenMU.Launcher.Managers;
 using MUnique.OpenMU.Launcher.Models;
+using MUnique.OpenMU.Launcher.Views;
 using Prism.Commands;
 using Prism.Mvvm;
-using Prism.Regions;
 
 namespace MUnique.OpenMU.Launcher.ViewModels
 {
@@ -19,6 +21,17 @@ namespace MUnique.OpenMU.Launcher.ViewModels
 
         private TestModel testModel;
 
+        private UserControl content;
+
+        public UserControl Content
+        {
+            get => content;
+            set => SetProperty(ref content, value);
+        }
+        
+        private HomeView HomeView = new HomeView();
+        private SettingsView SettingsView = new SettingsView();
+        
         public MainViewModel()
         {
             testModel = new TestModel
@@ -29,7 +42,28 @@ namespace MUnique.OpenMU.Launcher.ViewModels
             githubButtonCommand = new DelegateCommand(OpenGithubURL);
             checkForUpdatesCommand = new DelegateCommand(UpdateManager.CheckForUpdates);
 
+            goToSettings = new DelegateCommand(() => { Content = SettingsView; });
+            goToHome = new DelegateCommand(() => { Content = HomeView; });
+            
+            GoToHome.Execute("");
+
             UpdateManager.OnProgressChanged += UpdateManagerOnOnProgressChanged;
+        }
+
+        private ICommand goToHome;
+
+        public ICommand GoToHome
+        {
+            get => goToHome;
+            set => SetProperty(ref goToHome, value);
+        }
+
+        private ICommand goToSettings;
+
+        public ICommand GoToSettings
+        {
+            get => goToSettings;
+            set => SetProperty(ref goToSettings, value);
         }
 
         public int Progress

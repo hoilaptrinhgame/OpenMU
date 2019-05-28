@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Windows;
+using CommonServiceLocator;
 using MahApps.Metro.Controls;
 using MUnique.OpenMU.Launcher.Managers;
 using MUnique.OpenMU.Launcher.ViewModels;
@@ -8,7 +10,6 @@ using NLog;
 using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Regions;
-using Unity;
 
 namespace MUnique.OpenMU.Launcher.Views
 {
@@ -16,26 +17,12 @@ namespace MUnique.OpenMU.Launcher.Views
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         
-        IContainerExtension _container;
-        IRegionManager _regionManager;
-        private IRegion pageRegion;
-
-
-        public MainView(IContainerExtension container, IRegionManager regionManager)
+        public MainView()
         {
-            //TODO Remove
-            logger.Log(LogLevel.Info, "Test");
-
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-            
+
             InitializeComponent();
             
-            _container = container;
-            _regionManager = regionManager;
-
-            _regionManager.RegisterViewWithRegion("ContentRegion", typeof(SettingsView));
-
-            //Check for updates on the start up
             UpdateManager.CheckForUpdates();
         }
 
