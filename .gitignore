@@ -309,3 +309,7 @@ src/AdminPanel/wwwroot/content/css/app.css
 src/AdminPanel/wwwroot/content/css/app.min.css
 src/AdminPanel/wwwroot/content/js/app.js
 src/AdminPanel/wwwroot/content/js/app.js.map
+
+# These files are created because of Visual Studio's WPF Designer
+src/launcher.json
+src/config.json

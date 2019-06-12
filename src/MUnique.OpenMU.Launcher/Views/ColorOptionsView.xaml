@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="MUnique.OpenMU.Launcher.Views.ColorOptionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MUnique.OpenMU.Launcher.Views"
+             xmlns:viewModels="clr-namespace:MUnique.OpenMU.Launcher.ViewModels"
+             xmlns:converters="clr-namespace:MUnique.OpenMU.Launcher.Helpers.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <viewModels:ColorOptionsViewModel />
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <converters:StringToBrushConverter x:Key="StringToBrushConverter"></converters:StringToBrushConverter>
+    </UserControl.Resources>
+<StackPanel>
+    <StackPanel Orientation="Horizontal" Margin="10">
+        <TextBlock Text="DarkMode:" FontSize="18"></TextBlock>
+        <ToggleButton Margin="15,0,0,0" Command="{Binding SetDarkMode}" IsChecked="{Binding DarkMode}"></ToggleButton>
+        </StackPanel>
+    <ItemsControl ItemsSource="{Binding Swatches}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <Ellipse Fill="{Binding Name, Converter={StaticResource StringToBrushConverter}}" StrokeThickness="0" Width="25" Height="25"></Ellipse>
+                    <Button Content="Set to Primary" Margin="10,0,0,0" Command="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl},
+                             Path=DataContext.SetPrimaryCommand}" CommandParameter="{Binding Name}"></Button>
+                    <Button Content="Set to Accent" Margin="10,0,0,0"></Button>
+                    <TextBlock Text="{Binding Name}" Margin="10,0,0,0"></TextBlock>
+                </StackPanel>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    </StackPanel>
+</UserControl>

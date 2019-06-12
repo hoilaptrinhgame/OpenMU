@@ -55,7 +55,7 @@ namespace MUnique.OpenMU.Launcher.Models
             //Console.WriteLine(URI.ToString());
             switch (UpdaterType)
             {
-                case UpdaterTypes.HTTP:
+                case UpdaterTypes.HTTPS:
                     DownloadHTTP();
                     break;
                 case UpdaterTypes.Torrent:

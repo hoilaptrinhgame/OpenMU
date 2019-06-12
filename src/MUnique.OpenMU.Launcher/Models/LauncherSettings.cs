@@ -5,12 +5,12 @@ namespace MUnique.OpenMU.Launcher.Models
 {
     public class LauncherSettings : BindableBase
     {
-        private string defaultAccentColor = "blue";
+        private string defaultAccentColor = "lightblue";
         private string iconPath = "icon.ico";
 
         private string name = "TestName";
 
-        private UpdaterTypes updaterType = UpdaterTypes.HTTP;
+        private UpdaterTypes updaterType = UpdaterTypes.HTTPS;
 
         public string IconPath
         {
@@ -34,6 +34,22 @@ namespace MUnique.OpenMU.Launcher.Models
         {
             get => updaterType;
             set => SetProperty(ref updaterType, value);
+        }
+
+        private string defaultPrimaryColor = "blue";
+
+        public string DefaultPrimaryColor
+        {
+            get => defaultPrimaryColor;
+            set => SetProperty(ref defaultPrimaryColor, value);
+        }
+
+        private bool darkMode = true;
+
+        public bool DarkMode
+        {
+            get => darkMode;
+            set => SetProperty(ref darkMode, value);
         }
     }
 }

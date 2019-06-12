@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using MaterialDesignColors;
+using MaterialDesignThemes.Wpf;
 using MUnique.OpenMU.Launcher.Views;
 using Prism.Ioc;
 using Prism.Regions;

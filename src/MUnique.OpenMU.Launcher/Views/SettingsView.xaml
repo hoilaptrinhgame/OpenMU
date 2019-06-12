@@ -8,7 +8,7 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:selectors="clr-namespace:MUnique.OpenMU.Launcher.Helpers.Selectors"
              mc:Ignorable="d"
-             d:DesignHeight="1000" d:DesignWidth="1000">
+             d:DesignHeight="2000" d:DesignWidth="1000">
     <UserControl.DataContext>
         <viewModels:SettingsViewModel />
     </UserControl.DataContext>
@@ -19,7 +19,7 @@
     
     <ScrollViewer VerticalScrollBarVisibility="Auto">
     <StackPanel Orientation="Vertical">
-        <GroupBox Header="Settings" Margin="15">
+            <GroupBox Header="Settings" Margin="10,10,10,0">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Username: " VerticalAlignment="Center"></TextBlock>
@@ -31,16 +31,25 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="Launcher Settings" Visibility="{Binding DevMode, Converter={StaticResource BoolToVis}}" Margin="15">
+
+        <GroupBox Header="Theme" Margin="10,10,10,0">
+            <local:ColorOptionsView></local:ColorOptionsView>
+        </GroupBox>
+
+            <GroupBox Header="Launcher Settings (Only shown with when Dev arg = true)" Visibility="{Binding DevMode, Converter={StaticResource BoolToVis}}" Margin="10,10,10,0">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Username: " VerticalAlignment="Center"></TextBlock>
-                    <TextBox MinHeight="15" MinWidth="120" Text="{Binding Settings.UserName, Mode=TwoWay}" VerticalAlignment="Center"></TextBox>
+                    <TextBlock Text="Default DarkMode:"></TextBlock>
+                    <ToggleButton></ToggleButton>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="LocalVersion: " VerticalAlignment="Center"></TextBlock>
-                    <TextBlock Text="{Binding Settings.LocalVersion}" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Text="Default Primary Color: " VerticalAlignment="Center"></TextBlock>
+                    <ComboBox ItemsSource="{Binding Colors}"></ComboBox>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Default Accent Color: " VerticalAlignment="Center"></TextBlock>
+                    <ComboBox ItemsSource="{Binding Colors}"></ComboBox>
+                    </StackPanel>
             </StackPanel>
         </GroupBox>
     </StackPanel>

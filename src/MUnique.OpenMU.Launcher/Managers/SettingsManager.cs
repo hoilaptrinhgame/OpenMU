@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using MUnique.OpenMU.Launcher.Models;
+using MUnique.OpenMU.Launcher.ViewModels;
 using Newtonsoft.Json;
 using NLog;
 
@@ -17,6 +18,11 @@ namespace MUnique.OpenMU.Launcher.Managers
         static SettingsManager()
         {
             LoadSettings();
+
+            //Restoring colors
+            ColorOptionsViewModel.PaletteHelper.SetLightDark(Settings.DarkMode);
+            ColorOptionsViewModel.PaletteHelper.ReplaceAccentColor(Settings.AccentColor);
+            ColorOptionsViewModel.PaletteHelper.ReplacePrimaryColor(Settings.PrimaryColor);
         }
 
         private static void LoadSettings()

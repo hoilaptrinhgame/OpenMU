@@ -23,7 +23,7 @@ namespace MUnique.OpenMU.Launcher.Managers
         {
             switch (LauncherSettingsManager.Settings.UpdaterType)
             {
-                case UpdaterTypes.HTTP:
+                case UpdaterTypes.HTTPS:
                     updater = new HTTPSUpdater();
                     break;
                 case UpdaterTypes.Torrent:

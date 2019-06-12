@@ -132,6 +132,7 @@
     </ApplicationDefinition>
     <Compile Include="Enumerations\UpdaterTypes.cs" />
     <Compile Include="Helpers\Converters\PropertyNameToPropertyConverter.cs" />
+    <Compile Include="Helpers\Converters\StringToBrushConverter.cs" />
     <Compile Include="Helpers\Selectors\TypeSelector.cs" />
     <Compile Include="Helpers\Torrent\BEncoding\BEncodedDictionary.cs" />
     <Compile Include="Helpers\Torrent\BEncoding\BEncodedList.cs" />
@@ -229,8 +230,12 @@
     <Compile Include="Models\Updaters\HTTPSUpdater.cs" />
     <Compile Include="Models\Updaters\SFTPUpdater.cs" />
     <Compile Include="Models\Updaters\TorrentUpdater.cs" />
+    <Compile Include="ViewModels\ColorOptionsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="Views\ColorOptionsView.xaml.cs">
+      <DependentUpon>ColorOptionsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\HomeView.xaml.cs">
       <DependentUpon>HomeView.xaml</DependentUpon>
     </Compile>
@@ -244,6 +249,10 @@
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\ColorOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\HomeView.xaml" />
     <Page Include="Views\MainView.xaml" />
     <Page Include="Views\SettingsView.xaml" />
